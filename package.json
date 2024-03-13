@@ -1,0 +1,35 @@
+{
+  "name": "swan-ai-measurements",
+  "version": "1.0.1",
+  "description": "provides ai measurement suggestion",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://paras-swan@github.com/paras-swan/swan-ai-measurements.git"
+  },
+  "keywords": [
+    "swan",
+    "ai",
+    "measurements",
+    "fit",
+    "view"
+  ],
+  "author": "paras-swan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/paras-swan/swan-ai-measurements/issues"
+  },
+  "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "@uppy/aws-s3": "^3.6.2",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.5"
+  }
+}
