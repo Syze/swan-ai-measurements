@@ -1,7 +1,8 @@
-const { UPPY_FILE_UPLOAD_ENDPOINT } = require("./constants");
-const { fetchData } = require("./utils");
-const Uppy = require("@uppy/aws-s3");
-class Swan {
+import Uppy from "@uppy/core";
+import { UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { fetchData } from "./utils.js";
+import AwsS3Multipart from "@uppy/aws-s3-multipart";
+export default class Swan {
   constructor(key) {
     if (key !== 12345) {
       throw new Error({ message: "wrong access key" });
@@ -77,5 +78,3 @@ class Swan {
     });
   }
 }
-
-module.exports = Swan;

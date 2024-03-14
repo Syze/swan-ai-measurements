@@ -1,7 +1,7 @@
-const axios = require("axios");
-const { FILE_UPLOAD_URL } = require("./constants");
+import { FILE_UPLOAD_URL } from "./constants.js";
+import axios from "axios";
 
-async function fetchData({
+export async function fetchData({
   path,
   body,
   queryParams,
@@ -22,5 +22,3 @@ async function fetchData({
     return {};
   }
 }
-
-module.exports = { fetchData };
