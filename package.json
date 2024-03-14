@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://paras-swan@github.com/paras-swan/swan-ai-measurements.git"
+    "url": "https://paras-swan@github.com/paras-swan/swan-ai-measurements.git"
   },
   "keywords": [
     "swan",
