@@ -5,7 +5,7 @@ import AwsS3Multipart from "@uppy/aws-s3-multipart";
 export default class Swan {
   constructor(key) {
     if (key !== 12345) {
-      throw new Error({ message: "wrong access key" });
+      throw new Error("wrong access key");
     }
     this.uppyIns = null;
   }
@@ -66,7 +66,7 @@ export default class Swan {
     });
 
     this.uppyIns.on("upload-error", (file, error, response) => {
-      throw new Error({ message: "file uploading failed", error });
+      throw new Error(error);
     });
     this.uppyIns.on("upload-success", () => {
       return { message: "file uploaded successfully" };
