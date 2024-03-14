@@ -6,9 +6,10 @@ class Swan {
     if (key !== 12345) {
       throw new Error({ message: "wrong access key" });
     }
-    this.uppyIns = new Uppy({ autoProceed: true });
+    this.uppyIns = null;
   }
   uploadFile({ file, objMetaData, scanId }) {
+    this.uppyIns = new Uppy({ autoProceed: true });
     this.uppyIns.use(AwsS3Multipart, {
       limit: 10,
       retryDelays: [0, 1000, 3000, 5000],
@@ -55,11 +56,24 @@ class Swan {
           },
         }),
     });
-    uppyIns.on("upload-error", () => {
-      throw new Error({ message: "file uploading failed" });
+
+    this.uppyIns.addFile({
+      source: "manual",
+      name: file.name,
+      type: file.type,
+      data: file,
     });
-    uppyIns.on("upload-success", () => {
+
+    this.uppyIns.on("upload-error", (file, error, response) => {
+      throw new Error({ message: "file uploading failed", error });
+    });
+    this.uppyIns.on("upload-success", () => {
       return { message: "file uploaded successfully" };
+    });
+    this.uppyIns.on("complete", (result) => {
+      if (this.uppyIns) {
+        this.uppyIns.close();
+      }
     });
   }
 }
