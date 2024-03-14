@@ -9,7 +9,7 @@ export default class Swan {
     }
     this.uppyIns = null;
   }
-  uploadFile({ file, objMetaData, scanId }) {
+  async uploadFile({ file, objMetaData, scanId, apiKey }) {
     this.uppyIns = new Uppy({ autoProceed: true });
     this.uppyIns.use(AwsS3Multipart, {
       limit: 10,
@@ -19,6 +19,7 @@ export default class Swan {
         const objectKey = `${scanId}.${file.extension}`;
         return fetchData({
           path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+          apiKey,
           body: {
             objectKey,
             contentType: file.type,
@@ -29,6 +30,7 @@ export default class Swan {
       completeMultipartUpload: (file, { uploadId, key, parts }) =>
         fetchData({
           path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+          apiKey,
           body: {
             uploadId,
             objectKey: key,
@@ -40,6 +42,7 @@ export default class Swan {
       signPart: (file, partData) =>
         fetchData({
           path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+          apiKey,
           body: {
             objectKey: partData.key,
             uploadId: partData.uploadId,
@@ -50,6 +53,7 @@ export default class Swan {
       abortMultipartUpload: (file, { uploadId, key }) =>
         fetchData({
           path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+          apiKey,
           body: {
             uploadId,
             objectKey: key,

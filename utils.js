@@ -1,6 +1,5 @@
 import { FILE_UPLOAD_URL } from "./constants.js";
 import axios from "axios";
-
 export async function fetchData({
   path,
   body,
