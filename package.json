@@ -17,9 +17,6 @@
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "publishConfig": {
-    "@swan-admin:registry": "https://npm.pkg.github.com"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://paras-swan@github.com/paras-swan/swan-ai-measurements.git"
