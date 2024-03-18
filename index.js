@@ -1,5 +1,5 @@
-import { FILE_UPLOAD_KEY } from "./constants.js";
-import { addUser, getUserDetail, registerUser, verifyUser } from "./auth.js";
+import { addUser, getUserDetail, registerUser, verifyToken } from "./auth.js";
+import { getCustomCustomerConfig } from "./custom.js";
 import uploadFile from "./fileUpload.js";
 export default class Swan {
   constructor(key) {
@@ -8,16 +8,17 @@ export default class Swan {
     }
     this.accessKey = key;
   }
-  registerUser({ email, appVerifyUrl, gender, height, username = "" }) {
+
+  registerUser({ email, appVerifyUrl, gender, height, username }) {
     return registerUser({ email, appVerifyUrl, gender, height, username, accessKey: this.accessKey });
   }
 
-  verifyUser(token) {
-    return verifyUser(token, this.accessKey);
+  verifyToken(token) {
+    return verifyToken(token, this.accessKey);
   }
 
-  addUser({ scanId, email, name = "", height, gender }) {
-    return addUser({ scanId, email, name, height, gender, accessKey: this.accessKey });
+  addUser({ scanId, email, name, height, gender, offsetMarketingConsent }) {
+    return addUser({ scanId, email, name, height, gender, offsetMarketingConsent, accessKey: this.accessKey });
   }
 
   getUserDetail(email) {
@@ -27,4 +28,22 @@ export default class Swan {
   uploadFile({ file, objMetaData, scanId }) {
     return uploadFile({ file, objMetaData, scanId, accessKey: this.accessKey });
   }
+
+  getModelUrl(id) {
+    return getModelUrl(id, this.accessKey);
+  }
+
+  getCustomCustomerConfig(storeUrl) {
+    return getCustomCustomerConfig(storeUrl, this.accessKey);
+  }
+
+  getMeasurementStatus(scanId) {
+    return getMeasurementStatus(scanId, this.accessKey);
+  }
+
+  getTryOnMeasurements({ scanId, shopDomain, productName }) {
+    return getTryOnMeasurements({ scanId, shopDomain, productName, accessKey: this.accessKey });
+  }
 }
+
+const a = new Swan(9876543210);
