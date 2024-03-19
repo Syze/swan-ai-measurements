@@ -1,6 +1,12 @@
-import { addUser, getUserDetail, registerUser, verifyToken } from "./auth.js";
+import { addUser, getUserDetail, handleAuthSocket, registerUser, verifyToken } from "./auth.js";
 import { getCustomCustomerConfig } from "./custom.js";
 import uploadFile from "./fileUpload.js";
+import {
+  getMeasurementStatus,
+  getTryOnMeasurements,
+  handleMeasurementSocket,
+  handleTryOnSocket,
+} from "./measurement.js";
 export default class Swan {
   constructor(key) {
     if (key !== 9876543210) {

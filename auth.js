@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL } from "./constants.js";
 let socketRef;
 
-export const registerUser = ({ email, appVerifyUrl, gender, height, username = "", accessKey }) => {
+export const registerUser = ({ email, appVerifyUrl, gender, height, username, accessKey }) => {
   let body = {
     username,
     email,
