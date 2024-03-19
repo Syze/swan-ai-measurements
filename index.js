@@ -66,5 +66,3 @@ export default class Swan {
     return handleAuthSocket({ email, scanId, accessKey: this.accessKey, onError, onSuccess, onClose, onOpen });
   }
 }
-
-const a = new Swan(9876543210);
