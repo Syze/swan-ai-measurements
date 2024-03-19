@@ -44,6 +44,27 @@ export default class Swan {
   getTryOnMeasurements({ scanId, shopDomain, productName }) {
     return getTryOnMeasurements({ scanId, shopDomain, productName, accessKey: this.accessKey });
   }
+
+  handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen }) {
+    return handleTryOnSocket({
+      shopDomain,
+      scanId,
+      productName,
+      accessKey: this.accessKey,
+      onError,
+      onSuccess,
+      onClose,
+      onOpen,
+    });
+  }
+
+  handleMeasurementSocket({ scanId, onError, onSuccess, onClose, onOpen }) {
+    return handleMeasurementSocket({ scanId, accessKey: this.accessKey, onError, onSuccess, onClose, onOpen });
+  }
+
+  handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }) {
+    return handleAuthSocket({ email, scanId, accessKey: this.accessKey, onError, onSuccess, onClose, onOpen });
+  }
 }
 
 const a = new Swan(9876543210);
