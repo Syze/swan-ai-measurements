@@ -4,7 +4,7 @@ import { FILE_UPLOAD_KEY, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
 
 function uploadFile({ file, objMetaData, scanId, accessKey }) {
   return new Promise((resolve, reject) => {
-    uppyIns = new Uppy({ autoProceed: true });
+    const uppyIns = new Uppy({ autoProceed: true });
     uppyIns.use(AwsS3Multipart, {
       limit: 10,
       retryDelays: [0, 1000, 3000, 5000],
