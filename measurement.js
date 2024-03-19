@@ -143,7 +143,7 @@ export const handleMeasurementSocket = ({ scanId, accessKey, onError, onSuccess,
     }
   };
 
-  measurementSocketRef.current.onerror = (event) => {
+  measurementSocketRef.onerror = (event) => {
     if (onError) {
       onError(event);
     }

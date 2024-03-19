@@ -62,7 +62,7 @@ export const handleAuthSocket = ({ email, scanId, accessKey, onError, onSuccess,
     }
   };
 
-  socketRef.current.onerror = (event) => {
+  socketRef.onerror = (event) => {
     if (onError) {
       onError(event);
     }
