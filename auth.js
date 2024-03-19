@@ -43,20 +43,28 @@ export const handleAuthSocket = ({ email, scanId, accessKey, onError, onSuccess,
   };
 
   socketRef.onopen = () => {
-    onOpen();
+    if (onOpen) {
+      onOpen();
+    }
     socketRef.send(JSON.stringify(detailObj));
   };
 
   socketRef.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    onSuccess(data);
+    if (onSuccess) {
+      onSuccess(data);
+    }
   };
 
   socketRef.onclose = () => {
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   socketRef.current.onerror = (event) => {
-    onError(event);
+    if (onError) {
+      onError(event);
+    }
   };
 };

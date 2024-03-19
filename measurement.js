@@ -42,24 +42,34 @@ export const handleTryOnSocket = ({
   tryOnSocketRef = new WebSocket(url);
 
   tryOnSocketRef.onopen = () => {
-    onOpen();
+    if (onOpen) {
+      onOpen();
+    }
   };
 
   tryOnSocketRef.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data?.tryOnProcessStatus === "available") {
-      onSuccess(data);
+      if (onSuccess) {
+        onSuccess(data);
+      }
     } else {
-      onError({ message: "failed to get image urls" });
+      if (onError) {
+        onError({ message: "failed to get image urls" });
+      }
     }
   };
 
   tryOnSocketRef.onclose = () => {
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   tryOnSocketRef.onerror = (event) => {
-    onError(event);
+    if (onError) {
+      onError(event);
+    }
   };
 };
 
@@ -67,12 +77,16 @@ const getMeasurementsCheck = async (onSuccess, onError, scanId, accessKey) => {
   try {
     const res = await getMeasurementStatus(scanId, accessKey);
     if (res?.data && res?.data?.[0]?.isMeasured === true) {
-      onSuccess(res?.data);
+      if (onSuccess) {
+        onSuccess(res?.data);
+      }
       clearInterval(timerPollingRef);
     }
   } catch (e) {
     clearInterval(timerPollingRef);
-    onError(e);
+    if (onError) {
+      onError(e);
+    }
   }
 };
 
@@ -103,25 +117,35 @@ export const handleMeasurementSocket = ({ scanId, accessKey, onError, onSuccess,
   measurementSocketRef = new WebSocket(url);
 
   measurementSocketRef.onopen = () => {
-    onOpen();
+    if (onOpen) {
+      onOpen();
+    }
     handleTimeOut(onSuccess, onError);
   };
 
   measurementSocketRef.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data?.code === 200 && data?.scanStatus === "success") {
-      onSuccess(data);
+      if (onSuccess) {
+        onSuccess(data);
+      }
     } else {
-      onError(data);
+      if (onError) {
+        onError(data);
+      }
     }
     clearTimeout(timerWaitingRef);
   };
 
   measurementSocketRef.onclose = () => {
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   measurementSocketRef.current.onerror = (event) => {
-    onError(event);
+    if (onError) {
+      onError(event);
+    }
   };
 };
