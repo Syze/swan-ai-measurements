@@ -1,6 +1,7 @@
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import Uppy from "@uppy/core";
 import { FILE_UPLOAD_KEY, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { fetchData } from "./utils.js";
 
 function uploadFile({ file, objMetaData, scanId, accessKey }) {
   return new Promise((resolve, reject) => {
