@@ -7,6 +7,7 @@ import {
   handleMeasurementSocket,
   handleTryOnSocket,
 } from "./measurement.js";
+import { handlePoseDetectionSocket } from "./poseDetection.js";
 export default class Swan {
   constructor(key) {
     if (key !== 9876543210) {
@@ -71,4 +72,6 @@ export default class Swan {
   handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }) {
     return handleAuthSocket({ email, scanId, accessKey: this.accessKey, onError, onSuccess, onClose, onOpen });
   }
+
+  handlePoseDetectionSocket = handlePoseDetectionSocket;
 }
