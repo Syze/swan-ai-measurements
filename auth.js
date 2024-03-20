@@ -32,9 +32,7 @@ export const getUserDetail = (email, accessKey) =>
   axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`);
 
 export const handleAuthSocket = ({ email, scanId, accessKey, onError, onSuccess, onClose, onOpen }) => {
-  if (socketRef) {
-    socketRef.close();
-  }
+  socketRef?.close?.();
 
   socketRef = new WebSocket(APP_AUTH_WEBSOCKET_URL);
   const detailObj = {
@@ -43,28 +41,20 @@ export const handleAuthSocket = ({ email, scanId, accessKey, onError, onSuccess,
   };
 
   socketRef.onopen = () => {
-    if (onOpen) {
-      onOpen();
-    }
+    onOpen?.();
     socketRef.send(JSON.stringify(detailObj));
   };
 
   socketRef.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (onSuccess) {
-      onSuccess(data);
-    }
+    onSuccess?.(data);
   };
 
   socketRef.onclose = () => {
-    if (onClose) {
-      onClose();
-    }
+    onClose?.();
   };
 
   socketRef.onerror = (event) => {
-    if (onError) {
-      onError(event);
-    }
+    onError?.(event);
   };
 };

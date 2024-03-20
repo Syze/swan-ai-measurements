@@ -7,10 +7,10 @@ export function handlePoseDetectionSocket() {
     connect: function () {
       return new Promise((resolve, reject) => {
         socket = io.connect(APP_POSE_DETECTION_WEbSOCKET_URL);
-        socket.on("connect", () => {
+        socket?.on("connect", () => {
           resolve(socket.id); // "G5p5..."
         });
-        socket.on("connect_error", (err) => reject(err));
+        socket?.on("connect_error", (err) => reject(err));
       });
     },
 
@@ -25,9 +25,7 @@ export function handlePoseDetectionSocket() {
     },
 
     disconnect: function () {
-      if (socket) {
-        socket.disconnect();
-      }
+      socket?.disconnect?.();
     },
 
     poseStatus: function (callBack) {
@@ -40,10 +38,7 @@ export function handlePoseDetectionSocket() {
     },
 
     connected: function () {
-      if (!socket) {
-        return false;
-      }
-      return socket.connected;
+      return !!socket?.connected;
     },
   };
 }

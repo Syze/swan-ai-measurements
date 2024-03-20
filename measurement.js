@@ -5,7 +5,6 @@ import {
   APP_RECOMMENDATION_WEBSOCKET_URL,
   APP_TRY_ON_WEBSOCKET_URL,
   FILE_UPLOAD_KEY,
-  FILE_UPLOAD_URL,
 } from "./constants.js";
 
 let tryOnSocketRef;
@@ -14,7 +13,7 @@ let timerPollingRef;
 let timerWaitingRef;
 
 export const getMeasurementStatus = (scanId, accessKey) => {
-  const url = `${FILE_UPLOAD_URL}/measurements?scanId=${scanId}`;
+  const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
   return axios.get(url, {
     headers: { "X-Api-Key": FILE_UPLOAD_KEY },
   });
@@ -77,16 +76,12 @@ const getMeasurementsCheck = async (onSuccess, onError, scanId, accessKey) => {
   try {
     const res = await getMeasurementStatus(scanId, accessKey);
     if (res?.data && res?.data?.[0]?.isMeasured === true) {
-      if (onSuccess) {
-        onSuccess(res?.data);
-      }
+      onSuccess?.(res?.data);
       clearInterval(timerPollingRef);
     }
   } catch (e) {
     clearInterval(timerPollingRef);
-    if (onError) {
-      onError(e);
-    }
+    onError?.(e);
   }
 };
 
@@ -117,35 +112,25 @@ export const handleMeasurementSocket = ({ scanId, accessKey, onError, onSuccess,
   measurementSocketRef = new WebSocket(url);
 
   measurementSocketRef.onopen = () => {
-    if (onOpen) {
-      onOpen();
-    }
+    onOpen?.();
     handleTimeOut(onSuccess, onError);
   };
 
   measurementSocketRef.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data?.code === 200 && data?.scanStatus === "success") {
-      if (onSuccess) {
-        onSuccess(data);
-      }
+      onSuccess?.(data);
     } else {
-      if (onError) {
-        onError(data);
-      }
+      onError?.(data);
     }
     clearTimeout(timerWaitingRef);
   };
 
   measurementSocketRef.onclose = () => {
-    if (onClose) {
-      onClose();
-    }
+    onClose?.();
   };
 
   measurementSocketRef.onerror = (event) => {
-    if (onError) {
-      onError(event);
-    }
+    onError?.(event);
   };
 };
