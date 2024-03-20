@@ -15,6 +15,9 @@ export function handlePoseDetectionSocket() {
     },
 
     videoEmit: function ({ image, scanId }) {
+      if (!socket) {
+        throw new Error("socket is not connected");
+      }
       socket.emit("video", {
         image,
         user_unique_key: scanId,
@@ -22,11 +25,24 @@ export function handlePoseDetectionSocket() {
     },
 
     disconnect: function () {
+      if (!socket) {
+        throw new Error("socket is not connected");
+      }
       socket.disconnect();
     },
 
     poseStatus: function (callBack) {
+      if (!socket) {
+        throw new Error("socket is not connected");
+      }
       socket.on("pose_status", callBack(data));
+    },
+
+    connected: function name() {
+      if (!socket) {
+        throw new Error("socket is not connected");
+      }
+      return socket.connected;
     },
   };
 }
