@@ -35,7 +35,6 @@ export function handlePoseDetectionSocket() {
         throw new Error("socket is not connected");
       }
       socket.on("pose_status", (data) => {
-        console.log(data);
         callBack(data);
       });
     },
