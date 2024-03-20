@@ -3,9 +3,6 @@ import { io } from "socket.io-client";
 let socket;
 
 export function handlePoseDetectionSocket() {
-  if (socket) {
-    socket.close();
-  }
   return {
     connect: function () {
       return new Promise((resolve, reject) => {
