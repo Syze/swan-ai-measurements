@@ -25,10 +25,9 @@ export function handlePoseDetectionSocket() {
     },
 
     disconnect: function () {
-      if (!socket) {
-        throw new Error("socket is not connected");
+      if (socket) {
+        socket.disconnect();
       }
-      socket.disconnect();
     },
 
     poseStatus: function (callBack) {
@@ -38,9 +37,9 @@ export function handlePoseDetectionSocket() {
       socket.on("pose_status", callBack(data));
     },
 
-    connected: function name() {
+    connected: function () {
       if (!socket) {
-        throw new Error("socket is not connected");
+        return false;
       }
       return socket.connected;
     },
