@@ -4,7 +4,7 @@ export const APP_BASE_URL = "https://fitview-server-staging.ft2a64raup4pg.us-eas
 export const APP_AUTH_BASE_URL = "https://staging.api.getswan.co";
 export const APP_AUTH_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co/auth";
 export const APP_TRY_ON_WEBSOCKET_URL = "wss://bucbzczxjk.execute-api.ap-south-1.amazonaws.com";
-export const APP_RECOMMENDATION_WEBSOCKET_URL = "wss://9cfbimvp2e.execute-api.us-east-1.amazonaws.com/staging";
+export const APP_RECOMMENDATION_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co/scanning";
 
 export const UPPY_FILE_UPLOAD_ENDPOINT = {
   UPLOAD_START: "/upload/start",
