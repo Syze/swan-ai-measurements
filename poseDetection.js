@@ -1,44 +1,43 @@
 import { APP_POSE_DETECTION_WEbSOCKET_URL } from "./constants.js";
 import { io } from "socket.io-client";
-let socket;
 
-export function handlePoseDetectionSocket() {
-  return {
-    connect: function () {
-      return new Promise((resolve, reject) => {
-        socket = io.connect(APP_POSE_DETECTION_WEbSOCKET_URL);
-        socket?.on("connect", () => {
-          resolve(socket.id); // "G5p5..."
-        });
-        socket?.on("connect_error", (err) => reject(err));
+export default class PoseDetection {
+  static socket = null;
+
+  connect() {
+    return new Promise((resolve, reject) => {
+      this.socket = io.connect(APP_POSE_DETECTION_WEbSOCKET_URL);
+      this.socket?.on("connect", () => {
+        resolve(this.socket.id); // "G5p5..."
       });
-    },
+      this.socket?.on("connect_error", (err) => reject(err));
+    });
+  }
 
-    videoEmit: function ({ image, scanId }) {
-      if (!socket) {
-        throw new Error("socket is not connected");
-      }
-      socket.emit("video", {
-        image,
-        user_unique_key: scanId,
-      });
-    },
+  videoEmit({ image, scanId }) {
+    if (!this.socket) {
+      throw new Error("socket is not connected");
+    }
+    this.socket.emit("video", {
+      image,
+      user_unique_key: scanId,
+    });
+  }
 
-    disconnect: function () {
-      socket?.disconnect?.();
-    },
+  disconnect() {
+    this.socket?.disconnect?.();
+  }
 
-    poseStatus: function (callBack) {
-      if (!socket) {
-        throw new Error("socket is not connected");
-      }
-      socket.on("pose_status", (data) => {
-        callBack(data);
-      });
-    },
+  poseStatus(callBack) {
+    if (!this.socket) {
+      throw new Error("socket is not connected");
+    }
+    this.socket.on("pose_status", (data) => {
+      callBack(data);
+    });
+  }
 
-    connected: function () {
-      return !!socket?.connected;
-    },
-  };
+  connected() {
+    return !!this.socket?.connected;
+  }
 }

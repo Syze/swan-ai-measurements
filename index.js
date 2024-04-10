@@ -1,13 +1,8 @@
-import { addUser, getUserDetail, handleAuthSocket, registerUser, verifyToken } from "./auth.js";
-import { getCustomCustomerConfig } from "./custom.js";
-import uploadFile from "./fileUpload.js";
-import {
-  getMeasurementStatus,
-  getTryOnMeasurements,
-  handleMeasurementSocket,
-  handleTryOnSocket,
-} from "./measurement.js";
-import { handlePoseDetectionSocket } from "./poseDetection.js";
+import Auth from "./auth.js";
+import Custom from "./custom.js";
+import FileUpload from "./fileUpload.js";
+import Measurement from "./measurement.js";
+import PoseDetection from "./poseDetection.js";
 export default class Swan {
   constructor(key) {
     if (key !== 9876543210) {
@@ -16,62 +11,13 @@ export default class Swan {
     this.accessKey = key;
   }
 
-  registerUser({ email, appVerifyUrl, gender, height, username }) {
-    return registerUser({ email, appVerifyUrl, gender, height, username, accessKey: this.accessKey });
-  }
+  auth = new Auth();
 
-  verifyToken(token) {
-    return verifyToken(token, this.accessKey);
-  }
+  custom = new Custom();
 
-  addUser({ scanId, email, name, height, gender, offsetMarketingConsent }) {
-    return addUser({ scanId, email, name, height, gender, offsetMarketingConsent, accessKey: this.accessKey });
-  }
+  fileUpload = new FileUpload();
 
-  getUserDetail(email) {
-    return getUserDetail(email, this.accessKey);
-  }
+  measurement = new Measurement();
 
-  uploadFile({ file, objMetaData, scanId }) {
-    return uploadFile({ file, objMetaData, scanId, accessKey: this.accessKey });
-  }
-
-  getModelUrl(id) {
-    return getModelUrl(id, this.accessKey);
-  }
-
-  getCustomCustomerConfig(storeUrl) {
-    return getCustomCustomerConfig(storeUrl, this.accessKey);
-  }
-
-  getMeasurementStatus(scanId) {
-    return getMeasurementStatus(scanId, this.accessKey);
-  }
-
-  getTryOnMeasurements({ scanId, shopDomain, productName }) {
-    return getTryOnMeasurements({ scanId, shopDomain, productName, accessKey: this.accessKey });
-  }
-
-  handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen }) {
-    return handleTryOnSocket({
-      shopDomain,
-      scanId,
-      productName,
-      accessKey: this.accessKey,
-      onError,
-      onSuccess,
-      onClose,
-      onOpen,
-    });
-  }
-
-  handleMeasurementSocket({ scanId, onError, onSuccess, onClose, onOpen }) {
-    return handleMeasurementSocket({ scanId, accessKey: this.accessKey, onError, onSuccess, onClose, onOpen });
-  }
-
-  handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }) {
-    return handleAuthSocket({ email, scanId, accessKey: this.accessKey, onError, onSuccess, onClose, onOpen });
-  }
-
-  handlePoseDetectionSocket = handlePoseDetectionSocket;
+  poseDetection = new PoseDetection();
 }

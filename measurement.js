@@ -7,130 +7,110 @@ import {
   FILE_UPLOAD_KEY,
 } from "./constants.js";
 
-let tryOnSocketRef;
-let measurementSocketRef;
-let timerPollingRef;
-let timerWaitingRef;
+export default class Measurement {
+  static tryOnSocketRef = null;
+  static measurementSocketRef = null;
+  static timerPollingRef = null;
+  static timerWaitingRef = null;
 
-export const getMeasurementStatus = (scanId, accessKey) => {
-  const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
-  return axios.get(url, {
-    headers: { "X-Api-Key": FILE_UPLOAD_KEY },
-  });
-};
-
-export const getTryOnMeasurements = ({ scanId, shopDomain, productName, accessKey }) => {
-  const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/${scanId}/shop/${shopDomain}/product/${productName}`;
-  return axios.get(tryOnUrl);
-};
-
-export const handleTryOnSocket = ({
-  shopDomain,
-  scanId,
-  productName,
-  accessKey,
-  onError,
-  onSuccess,
-  onClose,
-  onOpen,
-}) => {
-  if (tryOnSocketRef) {
-    tryOnSocketRef.close();
+  getMeasurementStatus(scanId, accessKey) {
+    const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
+    return axios.get(url, {
+      headers: { "X-Api-Key": FILE_UPLOAD_KEY },
+    });
   }
-  const url = `${APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-  tryOnSocketRef = new WebSocket(url);
 
-  tryOnSocketRef.onopen = () => {
-    if (onOpen) {
-      onOpen();
-    }
-  };
+  getTryOnMeasurements({ scanId, shopDomain, productName, accessKey }) {
+    const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/${scanId}/shop/${shopDomain}/product/${productName}`;
+    return axios.get(tryOnUrl);
+  }
 
-  tryOnSocketRef.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data?.tryOnProcessStatus === "available") {
-      if (onSuccess) {
-        onSuccess(data);
+  handleTryOnSocket({ shopDomain, scanId, productName, accessKey, onError, onSuccess, onClose, onOpen }) {
+    this.tryOnSocketRef?.close();
+
+    const url = `${APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
+    this.tryOnSocketRef = new WebSocket(url);
+
+    this.tryOnSocketRef.onopen = () => {
+      onOpen?.();
+    };
+
+    this.tryOnSocketRef.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data?.tryOnProcessStatus === "available") {
+        onSuccess?.(data);
+      } else {
+        onError?.({ message: "failed to get image urls" });
       }
-    } else {
-      if (onError) {
-        onError({ message: "failed to get image urls" });
+    };
+
+    this.tryOnSocketRef.onclose = () => {
+      onClose?.();
+    };
+
+    this.tryOnSocketRef.onerror = (event) => {
+      onError?.(event);
+    };
+  }
+
+  static getMeasurementsCheck = async (onSuccess, onError, scanId, accessKey) => {
+    try {
+      const res = await getMeasurementStatus(scanId, accessKey);
+      if (res?.data && res?.data?.[0]?.isMeasured === true) {
+        onSuccess?.(res?.data);
+        clearInterval(this.timerPollingRef);
       }
+    } catch (e) {
+      clearInterval(this.timerPollingRef);
+      onError?.(e);
     }
   };
 
-  tryOnSocketRef.onclose = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
-
-  tryOnSocketRef.onerror = (event) => {
-    if (onError) {
-      onError(event);
-    }
-  };
-};
-
-const getMeasurementsCheck = async (onSuccess, onError, scanId, accessKey) => {
-  try {
-    const res = await getMeasurementStatus(scanId, accessKey);
-    if (res?.data && res?.data?.[0]?.isMeasured === true) {
-      onSuccess?.(res?.data);
-      clearInterval(timerPollingRef);
-    }
-  } catch (e) {
-    clearInterval(timerPollingRef);
-    onError?.(e);
+  static handlePolling(onSuccess, onError) {
+    clearInterval(this.timerPollingRef);
+    this.timerPollingRef = setInterval(() => {
+      this.getMeasurementsCheck(onSuccess, onError);
+    }, 5000);
   }
-};
 
-const handlePolling = (onSuccess, onError) => {
-  clearInterval(timerPollingRef);
-  timerPollingRef = setInterval(() => {
-    getMeasurementsCheck(onSuccess, onError);
-  }, 5000);
-};
-
-const disconnectSocket = () => {
-  if (measurementSocketRef) {
-    measurementSocketRef.close();
-    clearTimeout(timerWaitingRef);
-  }
-};
-
-const handleTimeOut = (onSuccess, onError) => {
-  timerWaitingRef = setTimeout(() => {
-    handlePolling(onSuccess, onError);
-    disconnectSocket();
-  }, 2 * 60000);
-};
-
-export const handleMeasurementSocket = ({ scanId, accessKey, onError, onSuccess, onClose, onOpen }) => {
-  disconnectSocket();
-  const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
-  measurementSocketRef = new WebSocket(url);
-
-  measurementSocketRef.onopen = () => {
-    onOpen?.();
-    handleTimeOut(onSuccess, onError);
+  static disconnectSocket = () => {
+    this.measurementSocketRef?.close();
+    clearTimeout(this.timerWaitingRef);
   };
 
-  measurementSocketRef.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data?.code === 200 && data?.scanStatus === "success") {
-      onSuccess?.(data);
-    } else {
-      onError?.(data);
-    }
-    clearTimeout(timerWaitingRef);
+  static handleTimeOut = (onSuccess, onError) => {
+    this.timerWaitingRef = setTimeout(() => {
+      this.handlePolling(onSuccess, onError);
+      disconnectSocket();
+    }, 2 * 60000);
   };
 
-  measurementSocketRef.onclose = () => {
-    onClose?.();
-  };
+  handleMeasurementSocket = ({ scanId, accessKey, onError, onSuccess, onClose, onOpen }) => {
+    this.disconnectSocket();
+    const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
+    this.measurementSocketRef = new WebSocket(url);
 
-  measurementSocketRef.onerror = (event) => {
-    onError?.(event);
+    this.measurementSocketRef.onopen = () => {
+      onOpen?.();
+      this.handleTimeOut(onSuccess, onError);
+    };
+
+    this.measurementSocketRef.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data?.code === 200 && data?.scanStatus === "success") {
+        onSuccess?.(data);
+      } else {
+        onError?.(data);
+      }
+      clearTimeout(this.timerWaitingRef);
+    };
+
+    this.measurementSocketRef.onclose = () => {
+      onClose?.();
+    };
+
+    this.measurementSocketRef.onerror = (event) => {
+      onError?.(event);
+    };
   };
-};
+}
