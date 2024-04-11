@@ -22,6 +22,3 @@ export default class Swan {
 
   poseDetection = new PoseDetection(Swan.accessKey);
 }
-
-const s = new Swan(9876543210);
-s.poseDetection.disconnect();
