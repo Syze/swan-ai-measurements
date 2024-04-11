@@ -3,7 +3,11 @@ import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL 
 let socketRef;
 
 class Auth {
-  registerUser({ email, appVerifyUrl, gender, height, username, accessKey }) {
+  static accessKey;
+  constructor(key) {
+    Auth.accessKey = key;
+  }
+  registerUser({ email, appVerifyUrl, gender, height, username }) {
     let body = {
       username,
       email,
@@ -15,12 +19,12 @@ class Auth {
     return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.REGISTER_USER}`, body);
   }
 
-  verifyToken = (token, accessKey) =>
+  verifyToken = (token) =>
     axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.VERIFY_USER}`, null, {
       params: { token },
     });
 
-  addUser = ({ scanId, email, name, height, gender, accessKey, offsetMarketingConsent }) =>
+  addUser = ({ scanId, email, name, height, gender, offsetMarketingConsent }) =>
     axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.ADD_USER}`, {
       scan_id: scanId,
       email,
@@ -29,9 +33,9 @@ class Auth {
       attributes: JSON.stringify({ height, gender }),
     });
 
-  getUserDetail = (email, accessKey) => axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`);
+  getUserDetail = (email) => axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`);
 
-  handleAuthSocket = ({ email, scanId, accessKey, onError, onSuccess, onClose, onOpen }) => {
+  handleAuthSocket = ({ email, scanId, onError, onSuccess, onClose, onOpen }) => {
     socketRef?.close?.();
 
     socketRef = new WebSocket(APP_AUTH_WEBSOCKET_URL);

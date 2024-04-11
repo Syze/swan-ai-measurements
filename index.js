@@ -4,20 +4,24 @@ import FileUpload from "./fileUpload.js";
 import Measurement from "./measurement.js";
 import PoseDetection from "./poseDetection.js";
 export default class Swan {
+  static accessKey;
   constructor(key) {
     if (key !== 9876543210) {
       throw new Error("wrong access key");
     }
-    this.accessKey = key;
+    Swan.accessKey = key;
   }
 
-  auth = new Auth();
+  auth = new Auth(Swan.accessKey);
 
-  custom = new Custom();
+  custom = new Custom(Swan.accessKey);
 
-  fileUpload = new FileUpload();
+  fileUpload = new FileUpload(Swan.accessKey);
 
-  measurement = new Measurement();
+  measurement = new Measurement(Swan.accessKey);
 
-  poseDetection = new PoseDetection();
+  poseDetection = new PoseDetection(Swan.accessKey);
 }
+
+const s = new Swan(9876543210);
+s.poseDetection.disconnect();

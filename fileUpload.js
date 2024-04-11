@@ -4,7 +4,11 @@ import { FILE_UPLOAD_KEY, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
 import { fetchData } from "./utils.js";
 
 export default class FileUpload {
-  uploadFile({ file, objMetaData, scanId, accessKey }) {
+  static accessKey;
+  constructor(key) {
+    FileUpload.accessKey = key;
+  }
+  uploadFile({ file, objMetaData, scanId }) {
     return new Promise((resolve, reject) => {
       const uppyIns = new Uppy({ autoProceed: true });
       uppyIns.use(AwsS3Multipart, {
