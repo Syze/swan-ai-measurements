@@ -21,3 +21,12 @@ export async function fetchData({
     return {};
   }
 }
+
+export const checkParameters = (...args) => {
+  for (const element of args) {
+    if (!element) {
+      return false;
+    }
+  }
+  return true;
+};

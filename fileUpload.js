@@ -1,7 +1,7 @@
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import Uppy from "@uppy/core";
-import { FILE_UPLOAD_KEY, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { fetchData } from "./utils.js";
+import { FILE_UPLOAD_KEY, REQUIRED_MESSAGE, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkParameters, fetchData } from "./utils.js";
 
 export default class FileUpload {
   static accessKey;
@@ -9,6 +9,9 @@ export default class FileUpload {
     FileUpload.accessKey = key;
   }
   uploadFile({ file, objMetaData, scanId }) {
+    if (checkParameters(file, objMetaData, scanId) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     return new Promise((resolve, reject) => {
       const uppyIns = new Uppy({ autoProceed: true });
       uppyIns.use(AwsS3Multipart, {

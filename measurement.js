@@ -5,7 +5,9 @@ import {
   APP_RECOMMENDATION_WEBSOCKET_URL,
   APP_TRY_ON_WEBSOCKET_URL,
   FILE_UPLOAD_KEY,
+  REQUIRED_MESSAGE,
 } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 export default class Measurement {
   static accessKey;
@@ -18,6 +20,9 @@ export default class Measurement {
   static timerWaitingRef = null;
 
   getMeasurementStatus(scanId) {
+    if (!scanId) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
     return axios.get(url, {
       headers: { "X-Api-Key": FILE_UPLOAD_KEY },
@@ -25,11 +30,17 @@ export default class Measurement {
   }
 
   getTryOnMeasurements({ scanId, shopDomain, productName }) {
+    if (checkParameters(scanId, shopDomain, productName) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/${scanId}/shop/${shopDomain}/product/${productName}`;
     return axios.get(tryOnUrl);
   }
 
   handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen }) {
+    if (checkParameters(shopDomain, scanId, productName) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     Measurement.tryOnSocketRef?.close();
 
     const url = `${APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
@@ -90,6 +101,9 @@ export default class Measurement {
   };
 
   handleMeasurementSocket = ({ scanId, onError, onSuccess, onClose, onOpen }) => {
+    if (!scanId) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     Measurement.disconnectSocket();
     const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
     Measurement.measurementSocketRef = new WebSocket(url);

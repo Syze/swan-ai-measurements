@@ -36,7 +36,7 @@ export default class PoseDetection {
       throw new Error("socket is not connected");
     }
     PoseDetection.socket.on("pose_status", (data) => {
-      callBack(data);
+      callBack?.(data);
     });
   }
 

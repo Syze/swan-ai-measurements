@@ -23,3 +23,5 @@ export const API_ENDPOINTS = {
   MODEL: "/model",
   TRY_ON: "/tryon/scan",
 };
+
+export const REQUIRED_MESSAGE = "Please verify required parameters";
