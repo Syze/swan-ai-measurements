@@ -11,13 +11,13 @@ import { checkParameters } from "./utils.js";
 
 export default class Measurement {
   static accessKey;
-  constructor(key) {
-    Measurement.accessKey = key;
-  }
   static tryOnSocketRef = null;
   static measurementSocketRef = null;
   static timerPollingRef = null;
   static timerWaitingRef = null;
+  constructor(key) {
+    Measurement.accessKey = key;
+  }
 
   getMeasurementStatus(scanId) {
     if (!scanId) {
@@ -70,7 +70,7 @@ export default class Measurement {
 
   static getMeasurementsCheck = async (onSuccess, onError, scanId) => {
     try {
-      const res = await getMeasurementStatus(scanId);
+      const res = await this.getMeasurementStatus(scanId);
       if (res?.data && res?.data?.[0]?.isMeasured === true) {
         onSuccess?.(res?.data);
         clearInterval(Measurement.timerPollingRef);
@@ -96,7 +96,7 @@ export default class Measurement {
   static handleTimeOut = (onSuccess, onError) => {
     Measurement.timerWaitingRef = setTimeout(() => {
       Measurement.handlePolling(onSuccess, onError);
-      disconnectSocket();
+      Measurement.disconnectSocket();
     }, 2 * 60000);
   };
 
