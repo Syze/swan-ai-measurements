@@ -3,6 +3,7 @@ import Custom from "./custom.js";
 import FileUpload from "./fileUpload.js";
 import Measurement from "./measurement.js";
 import PoseDetection from "./poseDetection.js";
+import TryOn from "./tryOn.js";
 export default class Swan {
   static accessKey;
   constructor(key) {
@@ -21,4 +22,7 @@ export default class Swan {
   measurement = new Measurement(Swan.accessKey);
 
   poseDetection = new PoseDetection(Swan.accessKey);
+
+  tryOn = new TryOn(Swan.accessKey);
 }
+const a = new Swan(9876543210);

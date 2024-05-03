@@ -22,6 +22,10 @@ export const API_ENDPOINTS = {
   CUSTOM_CUSTOMER: "/customers/custom",
   MODEL: "/model",
   TRY_ON: "/tryon/scan",
+  TRY_ON_IMAGE_UPLOAD: "/tryon/user-image-urls/upload",
+  TRY_ON_IMAGE_DOWNLOAD: "/tryon/user-image-urls/download",
+  TRY_ON_IMAGE_URLS: "/tryon/user-image-urls",
+  TRY_ON_RESULT_IMAGE_DOWNLOAD: "/tryon/result-image-urls/download",
 };
 
 export const REQUIRED_MESSAGE = "Please verify required parameters";
