@@ -2,9 +2,9 @@ import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
 
 export default class Custom {
-  static accessKey;
+  #accessKey;
   constructor(key) {
-    Custom.accessKey = key;
+    this.#accessKey = key;
   }
   getCustomCustomerConfig = (store_url) => {
     if (!store_url) {

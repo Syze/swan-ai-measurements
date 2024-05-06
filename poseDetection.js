@@ -2,45 +2,45 @@ import { APP_POSE_DETECTION_WEbSOCKET_URL } from "./constants.js";
 import { io } from "socket.io-client";
 
 export default class PoseDetection {
-  static socket = null;
-  static accessKey;
+  #socketRef = null;
+  #accessKey;
   constructor(key) {
-    PoseDetection.accessKey = key;
+    this.#accessKey = key;
   }
   connect() {
     return new Promise((resolve, reject) => {
-      PoseDetection.socket = io.connect(APP_POSE_DETECTION_WEbSOCKET_URL);
-      PoseDetection.socket?.on("connect", () => {
-        resolve(PoseDetection.socket.id); // "G5p5..."
+      this.#socketRef = io.connect(APP_POSE_DETECTION_WEbSOCKET_URL);
+      this.#socketRef?.on("connect", () => {
+        resolve(this.#socketRef.id); // "G5p5..."
       });
-      PoseDetection.socket?.on("connect_error", (err) => reject(err));
+      this.#socketRef?.on("connect_error", (err) => reject(err));
     });
   }
 
   videoEmit({ image, scanId }) {
-    if (!PoseDetection.socket) {
+    if (!this.#socketRef) {
       throw new Error("socket is not connected");
     }
-    PoseDetection.socket.emit("video", {
+    this.#socketRef.emit("video", {
       image,
       user_unique_key: scanId,
     });
   }
 
   disconnect() {
-    PoseDetection.socket?.disconnect?.();
+    this.#socketRef?.disconnect?.();
   }
 
   poseStatus(callBack) {
-    if (!PoseDetection.socket) {
+    if (!this.#socketRef) {
       throw new Error("socket is not connected");
     }
-    PoseDetection.socket.on("pose_status", (data) => {
+    this.#socketRef.on("pose_status", (data) => {
       callBack?.(data);
     });
   }
 
   connected() {
-    return !!PoseDetection.socket?.connected;
+    return !!this.#socketRef?.connected;
   }
 }

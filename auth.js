@@ -7,12 +7,12 @@ import {
   REQUIRED_MESSAGE,
 } from "./constants.js";
 import { checkParameters } from "./utils.js";
-let socketRef;
 
 class Auth {
-  static accessKey;
+  #accessKey;
+  #socketRef;
   constructor(key) {
-    Auth.accessKey = key;
+    this.#accessKey = key;
   }
   registerUser({ email, appVerifyUrl, gender, height, username }) {
     if (checkParameters(email, appVerifyUrl) === false) {
@@ -62,29 +62,29 @@ class Auth {
     if (checkParameters(email, scanId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    socketRef?.close?.();
+    this.#socketRef?.close?.();
 
-    socketRef = new WebSocket(`${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.AUTH}`);
+    this.#socketRef = new WebSocket(`${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.AUTH}`);
     const detailObj = {
       email,
       scanId,
     };
 
-    socketRef.onopen = () => {
-      socketRef.send(JSON.stringify(detailObj));
+    this.#socketRef.onopen = () => {
+      this.#socketRef.send(JSON.stringify(detailObj));
       onOpen?.();
     };
 
-    socketRef.onmessage = (event) => {
+    this.#socketRef.onmessage = (event) => {
       const data = JSON.parse(event.data);
       onSuccess?.(data);
     };
 
-    socketRef.onclose = () => {
+    this.#socketRef.onclose = () => {
       onClose?.();
     };
 
-    socketRef.onerror = (event) => {
+    this.#socketRef.onerror = (event) => {
       onError?.(event);
     };
   };

@@ -4,17 +4,21 @@ import { FILE_UPLOAD_KEY, REQUIRED_MESSAGE, UPPY_FILE_UPLOAD_ENDPOINT } from "./
 import { checkParameters, fetchData } from "./utils.js";
 
 export default class FileUpload {
-  static accessKey;
+  #accessKey;
+  #uppyIns;
   constructor(key) {
-    FileUpload.accessKey = key;
+    this.#accessKey = key;
   }
   uploadFile({ file, objMetaData, scanId }) {
     if (checkParameters(file, objMetaData, scanId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     return new Promise((resolve, reject) => {
+      if (this.#uppyIns) {
+        this.#uppyIns.close();
+      }
       const uppyIns = new Uppy({ autoProceed: true });
-      uppyIns.use(AwsS3Multipart, {
+      this.#uppyIns.use(AwsS3Multipart, {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,
@@ -65,22 +69,22 @@ export default class FileUpload {
           }),
       });
 
-      uppyIns.addFile({
+      this.#uppyIns.addFile({
         source: "manual",
         name: file.name,
         type: file.type,
         data: file,
       });
 
-      uppyIns.on("upload-error", (file, error, response) => {
+      this.#uppyIns.on("upload-error", (file, error, response) => {
         reject(error);
       });
-      uppyIns.on("upload-success", () => {
+      this.#uppyIns.on("upload-success", () => {
         resolve({ message: "file uploaded successfully" });
       });
-      uppyIns.on("complete", (result) => {
-        if (uppyIns) {
-          uppyIns.close();
+      this.#uppyIns.on("complete", (result) => {
+        if (this.#uppyIns) {
+          this.#uppyIns.close();
         }
       });
     });
