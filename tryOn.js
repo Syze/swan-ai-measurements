@@ -90,14 +90,14 @@ class TryOn {
       } else {
         onError?.(data);
       }
-      clearTimeout(this.#tryOnSocketRef);
+      clearTimeout(this.#timerWaitingRef);
     };
     this.#tryOnSocketRef.onclose = () => {
       onClose?.();
     };
     this.#tryOnSocketRef.onerror = (event) => {
       onError?.(event);
-      clearTimeout(this.#tryOnSocketRef);
+      clearTimeout(this.#timerWaitingRef);
     };
   };
 
