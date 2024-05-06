@@ -25,4 +25,3 @@ export default class Swan {
 
   tryOn = new TryOn(Swan.accessKey);
 }
-const a = new Swan(9876543210);
