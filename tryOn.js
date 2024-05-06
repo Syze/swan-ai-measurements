@@ -107,7 +107,7 @@ class TryOn {
     }
     return new Promise(async (resolve, reject) => {
       try {
-        const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/?scan_id=${id}&store_url=${shopDomain}&product_name=${productName}`;
+        const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
         const res = await axios.post(url);
         if (res?.data?.tryOnProcessStatus === "failed") {
           TryOn.disconnectSocket();
