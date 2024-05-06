@@ -33,7 +33,7 @@ export default class Measurement {
     if (checkParameters(scanId, shopDomain, productName) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/${scanId}/shop/${shopDomain}/product/${productName}`;
+    const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
     return axios.get(tryOnUrl);
   }
 

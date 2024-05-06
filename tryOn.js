@@ -1,6 +1,6 @@
 import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants";
-import { checkParameters } from "./utils";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 class TryOn {
   static accessKey;
@@ -62,7 +62,7 @@ class TryOn {
 
   static handleTimeOut = ({ onSuccess, onError, shopDomain, userId, productName }) => {
     TryOn.timerWaitingRef = setTimeout(() => {
-      this.getTryOnResult({ shopDomain, userId, productName });
+      TryOn.handleGetTryOnResult({ shopDomain, userId, productName, onSuccess, onError });
       TryOn.disconnectSocket();
     }, 78000);
   };
@@ -85,14 +85,14 @@ class TryOn {
     TryOn.tryOnSocketRef.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data?.status === "success") {
-        this.getTryOnResult({ shopDomain, userId, productName });
+        TryOn.handleGetTryOnResult({ shopDomain, userId, productName, onError, onSuccess });
       } else {
         onError?.(data);
       }
       clearTimeout(TryOn.tryOnSocketRef);
     };
     TryOn.tryOnSocketRef.onclose = () => {
-      onclose?.();
+      onClose?.();
     };
     TryOn.tryOnSocketRef.onerror = (event) => {
       onError?.(event);
@@ -106,7 +106,7 @@ class TryOn {
     }
     return new Promise(async (resolve, reject) => {
       try {
-        const url = `${APP_AUTH_BASE_URL}/tryon/?scan_id=${id}&store_url=${shopDomain}&product_name=${productName}`;
+        const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/?scan_id=${id}&store_url=${shopDomain}&product_name=${productName}`;
         const res = await axios.post(url);
         if (res?.data?.tryOnProcessStatus === "failed") {
           TryOn.disconnectSocket();
@@ -122,7 +122,7 @@ class TryOn {
     });
   };
 
-  handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userId, productName }) => {
+  static handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userId, productName }) => {
     try {
       const data = await this.getTryOnResult({ shopDomain, userId, productName });
       onSuccess?.(data?.data);
