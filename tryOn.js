@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters } from "./utils.js";
 
 class TryOn {
@@ -72,6 +72,7 @@ class TryOn {
       throw new Error(REQUIRED_MESSAGE);
     }
     TryOn.disconnectSocket();
+    const url = `${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.TRY_ON}/?store_url=${shopDomain}&product_name=${productName}&scan_id=${userId}`;
     TryOn.tryOnSocketRef = new WebSocket(url);
     TryOn.tryOnSocketRef.onopen = async () => {
       onOpen?.();

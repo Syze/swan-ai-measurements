@@ -64,7 +64,7 @@ class Auth {
     }
     socketRef?.close?.();
 
-    socketRef = new WebSocket(APP_AUTH_WEBSOCKET_URL);
+    socketRef = new WebSocket(`${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.AUTH}`);
     const detailObj = {
       email,
       scanId,
