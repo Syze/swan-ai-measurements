@@ -17,7 +17,7 @@ export default class FileUpload {
       if (this.#uppyIns) {
         this.#uppyIns.close();
       }
-      const uppyIns = new Uppy({ autoProceed: true });
+      this.#uppyIns = new Uppy({ autoProceed: true });
       this.#uppyIns.use(AwsS3Multipart, {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
