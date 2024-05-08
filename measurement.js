@@ -104,31 +104,33 @@ export default class Measurement {
     if (!scanId) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    this.#disconnectSocket();
-    const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
-    this.#measurementSocketRef = new WebSocket(url);
+    setTimeout(() => {
+      this.#disconnectSocket();
+      const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
+      this.#measurementSocketRef = new WebSocket(url);
 
-    this.#measurementSocketRef.onopen = () => {
-      onOpen?.();
-      this.#handleTimeOut(onSuccess, onError);
-    };
+      this.#measurementSocketRef.onopen = () => {
+        onOpen?.();
+        this.#handleTimeOut(onSuccess, onError);
+      };
 
-    this.#measurementSocketRef.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data?.code === 200 && data?.scanStatus === "success") {
-        onSuccess?.(data);
-      } else {
-        onError?.(data);
-      }
-      clearTimeout(this.#timerWaitingRef);
-    };
+      this.#measurementSocketRef.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data?.code === 200 && data?.scanStatus === "success") {
+          onSuccess?.(data);
+        } else {
+          onError?.(data);
+        }
+        clearTimeout(this.#timerWaitingRef);
+      };
 
-    this.#measurementSocketRef.onclose = () => {
-      onClose?.();
-    };
+      this.#measurementSocketRef.onclose = () => {
+        onClose?.();
+      };
 
-    this.#measurementSocketRef.onerror = (event) => {
-      onError?.(event);
-    };
+      this.#measurementSocketRef.onerror = (event) => {
+        onError?.(event);
+      };
+    }, 5000);
   };
 }
