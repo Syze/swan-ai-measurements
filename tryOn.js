@@ -74,7 +74,7 @@ class TryOn {
     this.#timerWaitingRef = setTimeout(() => {
       this.#handleGetTryOnResult({ shopDomain, userId, productName, onSuccess, onError, accessKey });
       this.#disconnectSocket();
-    }, 78000);
+    }, 120000);
   };
 
   handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen, accessKey }) => {
