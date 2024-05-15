@@ -6,7 +6,7 @@ class TryOn {
   #tryOnSocketRef = null;
   #timerWaitingRef = null;
 
-  uploadFile(files, userId, accessKey) {
+  uploadFile({ files, userId, accessKey }) {
     if (!accessKey) {
       throw new Error(REQUIRED_MESSAGE);
     }
