@@ -1,16 +1,13 @@
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import Uppy from "@uppy/core";
-import { FILE_UPLOAD_KEY, REQUIRED_MESSAGE, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { REQUIRED_MESSAGE, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
 import { checkParameters, fetchData } from "./utils.js";
 
 export default class FileUpload {
-  #accessKey;
   #uppyIns;
-  constructor(key) {
-    this.#accessKey = key;
-  }
-  uploadFile({ file, objMetaData, scanId }) {
-    if (checkParameters(file, objMetaData, scanId) === false) {
+
+  uploadFile({ file, objMetaData, scanId, accessKey }) {
+    if (checkParameters(file, objMetaData, scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     return new Promise((resolve, reject) => {
@@ -26,7 +23,7 @@ export default class FileUpload {
           const objectKey = `${scanId}.${file.extension}`;
           return fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-            apiKey: FILE_UPLOAD_KEY,
+            apiKey: accessKey,
             body: {
               objectKey,
               contentType: file.type,
@@ -37,7 +34,7 @@ export default class FileUpload {
         completeMultipartUpload: (file, { uploadId, key, parts }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-            apiKey: FILE_UPLOAD_KEY,
+            apiKey: accessKey,
             body: {
               uploadId,
               objectKey: key,
@@ -49,7 +46,7 @@ export default class FileUpload {
         signPart: (file, partData) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-            apiKey: FILE_UPLOAD_KEY,
+            apiKey: accessKey,
             body: {
               objectKey: partData.key,
               uploadId: partData.uploadId,
@@ -60,7 +57,7 @@ export default class FileUpload {
         abortMultipartUpload: (file, { uploadId, key }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-            apiKey: FILE_UPLOAD_KEY,
+            apiKey: accessKey,
             body: {
               uploadId,
               objectKey: key,

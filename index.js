@@ -5,23 +5,15 @@ import Measurement from "./measurement.js";
 import PoseDetection from "./poseDetection.js";
 import TryOn from "./tryOn.js";
 export default class Swan {
-  #accessKey;
-  constructor(key) {
-    if (key !== 9876543210) {
-      throw new Error("wrong access key");
-    }
-    this.#accessKey = key;
-  }
+  auth = new Auth();
 
-  auth = new Auth(this.#accessKey);
+  custom = new Custom();
 
-  custom = new Custom(this.#accessKey);
+  fileUpload = new FileUpload();
 
-  fileUpload = new FileUpload(this.#accessKey);
+  measurement = new Measurement();
 
-  measurement = new Measurement(this.#accessKey);
+  poseDetection = new PoseDetection();
 
-  poseDetection = new PoseDetection(this.#accessKey);
-
-  tryOn = new TryOn(this.#accessKey);
+  tryOn = new TryOn();
 }

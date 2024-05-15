@@ -9,13 +9,10 @@ import {
 import { checkParameters } from "./utils.js";
 
 class Auth {
-  #accessKey;
   #socketRef;
-  constructor(key) {
-    this.#accessKey = key;
-  }
-  registerUser({ email, appVerifyUrl, gender, height, username }) {
-    if (checkParameters(email, appVerifyUrl) === false) {
+
+  registerUser({ email, appVerifyUrl, gender, height, username, accessKey }) {
+    if (checkParameters(email, appVerifyUrl, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     let body = {
@@ -26,40 +23,49 @@ class Auth {
     if (gender && height) {
       body = { ...body, attributes: { gender, height } };
     }
-    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.REGISTER_USER}`, body);
+    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.REGISTER_USER}`, body, {
+      headers: { "X-Api-Key": accessKey },
+    });
   }
 
-  verifyToken = (token) => {
-    if (!token) {
+  verifyToken = (token, accessKey) => {
+    if (checkParameters(token, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.VERIFY_USER}`, null, {
       params: { token },
+      headers: { "X-Api-Key": accessKey },
     });
   };
 
-  addUser = ({ scanId, email, name, height, gender, offsetMarketingConsent }) => {
-    if (checkParameters(scanId, email, height, gender) === false) {
+  addUser = ({ scanId, email, name, height, gender, offsetMarketingConsent, accessKey }) => {
+    if (checkParameters(scanId, email, height, gender, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.ADD_USER}`, {
-      scan_id: scanId,
-      email,
-      name,
-      offsetMarketingConsent,
-      attributes: JSON.stringify({ height, gender }),
+    return axios.post(
+      `${APP_AUTH_BASE_URL}${API_ENDPOINTS.ADD_USER}`,
+      {
+        scan_id: scanId,
+        email,
+        name,
+        offsetMarketingConsent,
+        attributes: JSON.stringify({ height, gender }),
+      },
+      { headers: { "X-Api-Key": accessKey } }
+    );
+  };
+
+  getUserDetail = (email, accessKey) => {
+    if (checkParameters(email, accessKey) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    return axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+      headers: { "X-Api-Key": accessKey },
     });
   };
 
-  getUserDetail = (email) => {
-    if (!email) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    return axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`);
-  };
-
-  handleAuthSocket = ({ email, scanId, onError, onSuccess, onClose, onOpen }) => {
-    if (checkParameters(email, scanId) === false) {
+  handleAuthSocket = ({ email, scanId, onError, onSuccess, onClose, onOpen, accessKey }) => {
+    if (checkParameters(email, scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     this.#socketRef?.close?.();

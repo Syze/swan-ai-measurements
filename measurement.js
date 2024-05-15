@@ -4,45 +4,39 @@ import {
   APP_AUTH_BASE_URL,
   APP_RECOMMENDATION_WEBSOCKET_URL,
   APP_TRY_ON_WEBSOCKET_URL,
-  FILE_UPLOAD_KEY,
   REQUIRED_MESSAGE,
 } from "./constants.js";
 import { checkParameters } from "./utils.js";
 
 export default class Measurement {
-  #accessKey;
   #tryOnSocketRef = null;
   #measurementSocketRef = null;
   #timerPollingRef = null;
   #timerWaitingRef = null;
-  constructor(key) {
-    this.#accessKey = key;
-  }
 
-  getMeasurementStatus(scanId) {
-    if (!scanId) {
+  getMeasurementStatus(scanId, accessKey) {
+    if (checkParameters(scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
     return axios.get(url, {
-      headers: { "X-Api-Key": FILE_UPLOAD_KEY },
+      headers: { "X-Api-Key": accessKey },
     });
   }
 
-  getTryOnMeasurements({ scanId, shopDomain, productName }) {
-    if (checkParameters(scanId, shopDomain, productName) === false) {
+  getTryOnMeasurements({ scanId, shopDomain, productName, accessKey }) {
+    if (checkParameters(scanId, shopDomain, productName, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
-    return axios.get(tryOnUrl);
+    return axios.get(tryOnUrl, { headers: { "X-Api-Key": accessKey } });
   }
 
-  handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen }) {
-    if (checkParameters(shopDomain, scanId, productName) === false) {
+  handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen, accessKey }) {
+    if (checkParameters(shopDomain, scanId, productName, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     this.#tryOnSocketRef?.close();
-
     const url = `${APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
     this.#tryOnSocketRef = new WebSocket(url);
 
@@ -68,9 +62,9 @@ export default class Measurement {
     };
   }
 
-  #getMeasurementsCheck = async (onSuccess, onError, scanId) => {
+  #getMeasurementsCheck = async ({ scanId, onSuccess, onError, accessKey }) => {
     try {
-      const res = await this.getMeasurementStatus(scanId);
+      const res = await this.getMeasurementStatus(scanId, accessKey);
       if (res?.data && res?.data?.[0]?.isMeasured === true) {
         onSuccess?.(res?.data);
         clearInterval(this.#timerPollingRef);
@@ -81,10 +75,10 @@ export default class Measurement {
     }
   };
 
-  #handlePolling(onSuccess, onError) {
+  #handlePolling({ scanId, onSuccess, onError, accessKey }) {
     clearInterval(this.#timerPollingRef);
     this.#timerPollingRef = setInterval(() => {
-      this.#getMeasurementsCheck(onSuccess, onError);
+      this.#getMeasurementsCheck({ scanId, onSuccess, onError, accessKey });
     }, 5000);
   }
 
@@ -93,15 +87,15 @@ export default class Measurement {
     clearTimeout(this.#timerWaitingRef);
   };
 
-  #handleTimeOut = (onSuccess, onError) => {
+  #handleTimeOut = ({ scanId, onSuccess, onError, accessKey }) => {
     this.#timerWaitingRef = setTimeout(() => {
-      this.#handlePolling(onSuccess, onError);
+      this.#handlePolling({ scanId, onSuccess, onError, accessKey });
       this.#disconnectSocket();
     }, 2 * 60000);
   };
 
-  handleMeasurementSocket = ({ scanId, onError, onSuccess, onClose, onOpen }) => {
-    if (!scanId) {
+  handleMeasurementSocket = ({ scanId, onError, onSuccess, onClose, onOpen, accessKey }) => {
+    if (checkParameters(scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     setTimeout(() => {
@@ -111,7 +105,7 @@ export default class Measurement {
 
       this.#measurementSocketRef.onopen = () => {
         onOpen?.();
-        this.#handleTimeOut(onSuccess, onError);
+        this.#handleTimeOut({ scanId, onSuccess, onError, accessKey });
       };
 
       this.#measurementSocketRef.onmessage = (event) => {

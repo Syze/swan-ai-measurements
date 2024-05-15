@@ -3,14 +3,13 @@ import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, REQUIRED_MESS
 import { checkParameters } from "./utils.js";
 
 class TryOn {
-  #accessKey = null;
   #tryOnSocketRef = null;
   #timerWaitingRef = null;
-  constructor(accessKey) {
-    this.#accessKey = accessKey;
-  }
 
-  uploadFile(files, userId) {
+  uploadFile(files, userId, accessKey) {
+    if (!accessKey) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     return new Promise(async (resolve, reject) => {
       try {
         const payload = {
@@ -31,10 +30,11 @@ class TryOn {
     });
   }
 
-  #getSignedUrl(payload) {
+  #getSignedUrl(payload, accessKey) {
     return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
       headers: {
         "Content-Type": "application/json",
+        "X-Api-Key": accessKey,
       },
     });
   }
@@ -47,12 +47,22 @@ class TryOn {
     });
   }
 
-  getUploadedFiles(userId) {
-    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`);
+  getUploadedFiles(userId, accessKey) {
+    if (checkParameters(userId, accessKey) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`, {
+      headers: { "X-Api-Key": accessKey },
+    });
   }
 
-  deleteImage(userId, name) {
-    return axios.delete(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}?userId=${userId}&file=${name}`);
+  deleteImage({ userId, fileName, accessKey }) {
+    if (checkParameters(userId, fileName, accessKey) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    return axios.delete(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}?userId=${userId}&file=${fileName}`, {
+      headers: { "X-Api-Key": accessKey },
+    });
   }
 
   #disconnectSocket = () => {
@@ -60,15 +70,15 @@ class TryOn {
     clearTimeout(this.#timerWaitingRef);
   };
 
-  #handleTimeOut = ({ onSuccess, onError, shopDomain, userId, productName }) => {
+  #handleTimeOut = ({ onSuccess, onError, shopDomain, userId, productName, accessKey }) => {
     this.#timerWaitingRef = setTimeout(() => {
-      this.#handleGetTryOnResult({ shopDomain, userId, productName, onSuccess, onError });
+      this.#handleGetTryOnResult({ shopDomain, userId, productName, onSuccess, onError, accessKey });
       this.#disconnectSocket();
     }, 78000);
   };
 
-  handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen }) => {
-    if (checkParameters(shopDomain, userId, productName) === false) {
+  handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen, accessKey }) => {
+    if (checkParameters(shopDomain, userId, productName, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     this.#disconnectSocket();
@@ -76,9 +86,9 @@ class TryOn {
     this.#tryOnSocketRef = new WebSocket(url);
     this.#tryOnSocketRef.onopen = async () => {
       onOpen?.();
-      this.#handleTimeOut({ onSuccess, onError, shopDomain, userId, productName });
+      this.#handleTimeOut({ onSuccess, onError, shopDomain, userId, productName, accessKey });
       try {
-        await this.handleForLatestImage({ shopDomain, userId, productName });
+        await this.handleForLatestImage({ shopDomain, userId, productName, accessKey });
       } catch (error) {
         onError?.(error);
       }
@@ -86,7 +96,7 @@ class TryOn {
     this.#tryOnSocketRef.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data?.status === "success") {
-        this.#handleGetTryOnResult({ shopDomain, userId, productName, onError, onSuccess });
+        this.#handleGetTryOnResult({ shopDomain, userId, productName, onError, onSuccess, accessKey });
       } else {
         onError?.(data);
       }
@@ -101,14 +111,16 @@ class TryOn {
     };
   };
 
-  handleForLatestImage = async ({ userId, shopDomain, productName, onError }) => {
-    if (checkParameters(shopDomain, userId, productName) === false) {
+  handleForLatestImage = async ({ userId, shopDomain, productName, onError, accessKey }) => {
+    if (checkParameters(shopDomain, userId, productName, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     return new Promise(async (resolve, reject) => {
       try {
         const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-        const res = await axios.post(url);
+        const res = await axios.post(url, {
+          headers: { "X-Api-Key": accessKey },
+        });
         if (res?.data?.tryOnProcessStatus === "failed") {
           this.#disconnectSocket();
           reject(res?.data);
@@ -123,21 +135,23 @@ class TryOn {
     });
   };
 
-  #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userId, productName }) => {
+  #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userId, productName, accessKey }) => {
     try {
-      const data = await this.getTryOnResult({ shopDomain, userId, productName });
+      const data = await this.getTryOnResult({ shopDomain, userId, productName, accessKey });
       onSuccess?.(data?.data);
     } catch (error) {
       onError?.(error);
     }
   };
 
-  getTryOnResult = ({ userId, shopDomain, productName }) => {
-    if (checkParameters(shopDomain, userId, productName) === false) {
+  getTryOnResult = ({ userId, shopDomain, productName, accessKey }) => {
+    if (checkParameters(shopDomain, userId, productName, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-    return axios.post(url);
+    return axios.post(url, {
+      headers: { "X-Api-Key": accessKey },
+    });
   };
 }
 

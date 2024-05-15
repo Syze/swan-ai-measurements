@@ -1,13 +1,13 @@
-import { APP_POSE_DETECTION_WEbSOCKET_URL } from "./constants.js";
+import { APP_POSE_DETECTION_WEbSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { io } from "socket.io-client";
 
 export default class PoseDetection {
   #socketRef = null;
-  #accessKey;
-  constructor(key) {
-    this.#accessKey = key;
-  }
-  connect() {
+
+  connect(accessKey) {
+    if (!accessKey) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     return new Promise((resolve, reject) => {
       this.#socketRef = io.connect(APP_POSE_DETECTION_WEbSOCKET_URL);
       this.#socketRef?.on("connect", () => {
@@ -17,7 +17,11 @@ export default class PoseDetection {
     });
   }
 
-  videoEmit({ image, scanId }) {
+  videoEmit({ image, scanId, accessKey }) {
+    if (!accessKey) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+
     if (!this.#socketRef) {
       throw new Error("socket is not connected");
     }
@@ -31,7 +35,10 @@ export default class PoseDetection {
     this.#socketRef?.disconnect?.();
   }
 
-  poseStatus(callBack) {
+  poseStatus(accessKey, callBack) {
+    if (!accessKey) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     if (!this.#socketRef) {
       throw new Error("socket is not connected");
     }
