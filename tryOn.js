@@ -51,7 +51,7 @@ class TryOn {
     if (checkParameters(userId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`, {
+    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`, null, {
       headers: { "X-Api-Key": accessKey },
     });
   }
@@ -149,7 +149,7 @@ class TryOn {
       throw new Error(REQUIRED_MESSAGE);
     }
     const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-    return axios.post(url, {
+    return axios.post(url, null, {
       headers: { "X-Api-Key": accessKey },
     });
   };
