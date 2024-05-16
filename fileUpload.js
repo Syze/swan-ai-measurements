@@ -1,7 +1,7 @@
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import Uppy from "@uppy/core";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkParameters, fetchData } from "./utils.js";
+import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
 
 export default class FileUpload {
   #uppyIns;
