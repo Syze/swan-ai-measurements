@@ -1,6 +1,6 @@
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import Uppy from "@uppy/core";
-import { REQUIRED_MESSAGE, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
 import { checkParameters, fetchData } from "./utils.js";
 
 export default class FileUpload {
@@ -9,6 +9,9 @@ export default class FileUpload {
   uploadFile({ file, objMetaData, scanId, accessKey }) {
     if (checkParameters(file, objMetaData, scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
+    }
+    if (checkMetaDataValue(objMetaData) === false) {
+      throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {

@@ -28,5 +28,15 @@ export const API_ENDPOINTS = {
   TRY_ON: "/tryon",
   AUTH: "/auth",
 };
-
+export const requiredMetaData = [
+  "gender",
+  "scan_id",
+  "email",
+  "focal_length",
+  "height",
+  "customer_store_url",
+  "scan_type",
+  "callback_url",
+];
 export const REQUIRED_MESSAGE = "Please verify required parameters";
+export const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";

@@ -30,3 +30,21 @@ export const checkParameters = (...args) => {
   }
   return true;
 };
+
+export const checkMetaDataValue = (obj) => {
+  for (const key of requiredMetaData) {
+    if (
+      !obj.hasOwnProperty(key) ||
+      obj[key] === undefined ||
+      obj[key] === null ||
+      obj[key] === "" ||
+      typeof obj[key] === "number"
+    ) {
+      return false;
+    }
+  }
+  if (!obj.callback_url.startsWith("https")) {
+    return false;
+  }
+  return true;
+};
