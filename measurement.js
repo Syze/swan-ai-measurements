@@ -69,8 +69,14 @@ export default class Measurement {
         onSuccess?.(res?.data);
         clearInterval(this.#timerPollingRef);
       } else {
-        this.#count++;
-        this.#handlePolling({ scanId, onSuccess, onError, accessKey });
+        if (this.#count < 8) {
+          this.#count++;
+          this.#handlePolling({ scanId, onSuccess, onError, accessKey });
+        } else {
+          this.#count = 1;
+          clearInterval(this.#timerPollingRef);
+          onError?.({ scanStatus: "failed", message: "failed to get measurement" });
+        }
       }
     } catch (e) {
       clearInterval(this.#timerPollingRef);
@@ -80,11 +86,9 @@ export default class Measurement {
 
   #handlePolling({ scanId, onSuccess, onError, accessKey }) {
     clearInterval(this.#timerPollingRef);
-    if (this.#count < 8) {
-      this.#timerPollingRef = setTimeout(() => {
-        this.#getMeasurementsCheck({ scanId, onSuccess, onError, accessKey });
-      }, this.#count * 5000);
-    }
+    this.#timerPollingRef = setTimeout(() => {
+      this.#getMeasurementsCheck({ scanId, onSuccess, onError, accessKey });
+    }, this.#count * 5000);
   }
 
   #disconnectSocket = () => {
