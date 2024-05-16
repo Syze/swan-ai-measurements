@@ -13,7 +13,7 @@ export default class Measurement {
   #measurementSocketRef = null;
   #timerPollingRef = null;
   #timerWaitingRef = null;
-
+  #count = 1;
   getMeasurementStatus(scanId, accessKey) {
     if (checkParameters(scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
@@ -68,6 +68,9 @@ export default class Measurement {
       if (res?.data && res?.data?.[0]?.isMeasured === true) {
         onSuccess?.(res?.data);
         clearInterval(this.#timerPollingRef);
+      } else {
+        this.#count++;
+        this.#handlePolling({ scanId, onSuccess, onError, accessKey });
       }
     } catch (e) {
       clearInterval(this.#timerPollingRef);
@@ -77,9 +80,11 @@ export default class Measurement {
 
   #handlePolling({ scanId, onSuccess, onError, accessKey }) {
     clearInterval(this.#timerPollingRef);
-    this.#timerPollingRef = setInterval(() => {
-      this.#getMeasurementsCheck({ scanId, onSuccess, onError, accessKey });
-    }, 5000);
+    if (this.#count < 8) {
+      this.#timerPollingRef = setTimeout(() => {
+        this.#getMeasurementsCheck({ scanId, onSuccess, onError, accessKey });
+      }, this.#count * 5000);
+    }
   }
 
   #disconnectSocket = () => {
@@ -88,6 +93,7 @@ export default class Measurement {
   };
 
   #handleTimeOut = ({ scanId, onSuccess, onError, accessKey }) => {
+    this.#count = 1;
     this.#timerWaitingRef = setTimeout(() => {
       this.#handlePolling({ scanId, onSuccess, onError, accessKey });
       this.#disconnectSocket();
