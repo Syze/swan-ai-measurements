@@ -37,6 +37,7 @@ export const requiredMetaData = [
   "customer_store_url",
   "scan_type",
   "callback_url",
+  "clothes_fit",
 ];
 export const REQUIRED_MESSAGE = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
