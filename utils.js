@@ -31,19 +31,32 @@ export const checkParameters = (...args) => {
   return true;
 };
 
-export const checkMetaDataValue = (obj) => {
+export const checkMetaDataValue = (arr) => {
   for (const key of requiredMetaData) {
-    if (
-      !obj.hasOwnProperty(key) ||
-      obj[key] === undefined ||
-      obj[key] === null ||
-      obj[key] === "" ||
-      typeof obj[key] === "number"
-    ) {
+    let hasRequiredKey = false;
+    inner: for (const obj of arr) {
+      if (
+        obj.hasOwnProperty(key) &&
+        obj[key] !== undefined &&
+        obj[key] !== null &&
+        obj[key] !== "" &&
+        typeof obj[key] !== "number"
+      ) {
+        hasRequiredKey = true;
+        break inner;
+      }
+    }
+    if (!hasRequiredKey) {
       return false;
     }
   }
-  if (!obj.callback_url.startsWith("https")) {
+  let correctFormat = false;
+  for (const obj of arr) {
+    if (obj.callback_url && obj.callback_url.startsWith("https")) {
+      correctFormat = true;
+    }
+  }
+  if (!correctFormat) {
     return false;
   }
   return true;
