@@ -75,7 +75,7 @@ export default class Measurement {
         } else {
           this.#count = 1;
           clearInterval(this.#timerPollingRef);
-          onError?.({ scanStatus: "failed", message: "failed to get measurement" });
+          onError?.({ scanStatus: "failed", message: "Scan not found" });
         }
       }
     } catch (e) {
