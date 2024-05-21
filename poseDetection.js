@@ -1,7 +1,7 @@
-import { APP_POSE_DETECTION_WEbSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { io } from "socket.io-client";
+const { APP_POSE_DETECTION_WEbSOCKET_URL, REQUIRED_MESSAGE } = require("./constants.js");
+const { io } = require("socket.io-client");
 
-export default class PoseDetection {
+class PoseDetection {
   #socketRef = null;
 
   connect(accessKey) {
@@ -51,3 +51,5 @@ export default class PoseDetection {
     return !!this.#socketRef?.connected;
   }
 }
+
+module.exports = PoseDetection;

@@ -1,8 +1,8 @@
-import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { checkParameters } from "./utils.js";
+const axios = require("axios");
+const { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } = require("./constants.js");
+const { checkParameters } = require("./utils.js");
 
-export default class Custom {
+class Custom {
   getCustomCustomerConfig = (store_url, accessKey) => {
     if (checkParameters(store_url, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
@@ -20,3 +20,5 @@ export default class Custom {
     return axios.get(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.MODEL}/${id}`, { headers: { "X-Api-Key": accessKey } });
   };
 }
+
+module.exports = Custom;

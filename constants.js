@@ -1,19 +1,18 @@
-export const APP_BASE_URL = "https://fitview-server-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com";
-export const APP_AUTH_BASE_URL = "https://staging.api.getswan.co";
-export const APP_AUTH_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co";
-export const APP_TRY_ON_WEBSOCKET_URL = "wss://bucbzczxjk.execute-api.ap-south-1.amazonaws.com";
-export const APP_RECOMMENDATION_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co/scanning";
-export const APP_POSE_DETECTION_WEbSOCKET_URL =
-  "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com";
+const APP_BASE_URL = "https://fitview-server-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com";
+const APP_AUTH_BASE_URL = "https://staging.api.getswan.co";
+const APP_AUTH_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co";
+const APP_TRY_ON_WEBSOCKET_URL = "wss://bucbzczxjk.execute-api.ap-south-1.amazonaws.com";
+const APP_RECOMMENDATION_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co/scanning";
+const APP_POSE_DETECTION_WEbSOCKET_URL = "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com";
 
-export const UPPY_FILE_UPLOAD_ENDPOINT = {
+const UPPY_FILE_UPLOAD_ENDPOINT = {
   UPLOAD_START: "/upload/start",
   UPLOAD_COMPLETE: "/upload/complete",
   UPLOAD_SIGN_PART: "/upload/signpart",
   UPLOAD_ABORT: "/upload/abort",
 };
 
-export const API_ENDPOINTS = {
+const API_ENDPOINTS = {
   GET_USER_DETAIL: "/api/user",
   REGISTER_USER: "/auth/register",
   VERIFY_USER: "/auth/verify",
@@ -28,16 +27,20 @@ export const API_ENDPOINTS = {
   TRY_ON: "/tryon",
   AUTH: "/auth",
 };
-export const requiredMetaData = [
-  "gender",
-  "scan_id",
-  "email",
-  "focal_length",
-  "height",
-  "customer_store_url",
-  "scan_type",
-  "callback_url",
-  "clothes_fit",
-];
-export const REQUIRED_MESSAGE = "Please verify required parameters";
-export const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
+const requiredMetaData = ["gender", "scan_id", "email", "focal_length", "height", "customer_store_url", "scan_type", "callback_url", "clothes_fit"];
+const REQUIRED_MESSAGE = "Please verify required parameters";
+const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
+
+module.exports = {
+  APP_BASE_URL,
+  APP_AUTH_BASE_URL,
+  APP_AUTH_WEBSOCKET_URL,
+  APP_TRY_ON_WEBSOCKET_URL,
+  APP_RECOMMENDATION_WEBSOCKET_URL,
+  APP_POSE_DETECTION_WEbSOCKET_URL,
+  REQUIRED_MESSAGE_FOR_META_DATA,
+  REQUIRED_MESSAGE,
+  requiredMetaData,
+  API_ENDPOINTS,
+  UPPY_FILE_UPLOAD_ENDPOINT,
+};

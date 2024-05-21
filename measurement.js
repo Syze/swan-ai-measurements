@@ -1,19 +1,14 @@
-import axios from "axios";
-import {
-  API_ENDPOINTS,
-  APP_AUTH_BASE_URL,
-  APP_RECOMMENDATION_WEBSOCKET_URL,
-  APP_TRY_ON_WEBSOCKET_URL,
-  REQUIRED_MESSAGE,
-} from "./constants.js";
-import { checkParameters } from "./utils.js";
+const axios = require("axios");
+const { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } = require("./constants.js");
+const { checkParameters } = require("./utils.js");
 
-export default class Measurement {
+class Measurement {
   #tryOnSocketRef = null;
   #measurementSocketRef = null;
   #timerPollingRef = null;
   #timerWaitingRef = null;
   #count = 1;
+
   getMeasurementStatus(scanId, accessKey) {
     if (checkParameters(scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
@@ -75,7 +70,7 @@ export default class Measurement {
         } else {
           this.#count = 1;
           clearInterval(this.#timerPollingRef);
-          onError?.({ scanStatus: "failed", message: "Scan not found" });
+          onError?.({ scanStatus: "failed", message: "Scan not found", isMeasured: false });
         }
       }
     } catch (e) {
@@ -112,7 +107,6 @@ export default class Measurement {
       this.#disconnectSocket();
       const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
       this.#measurementSocketRef = new WebSocket(url);
-
       this.#measurementSocketRef.onopen = () => {
         onOpen?.();
         this.#handleTimeOut({ scanId, onSuccess, onError, accessKey });
@@ -138,3 +132,5 @@ export default class Measurement {
     }, 5000);
   };
 }
+
+module.exports = Measurement;

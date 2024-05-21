@@ -3,7 +3,6 @@
   "version": "1.0.52",
   "description": "provides ai measurement suggestion",
   "main": "index.js",
-  "type": "module",
   "dependencies": {
     "@uppy/aws-s3-multipart": "^3.10.2",
     "@uppy/core": "^3.9.3",

@@ -1,24 +1,38 @@
-import AwsS3Multipart from "@uppy/aws-s3-multipart";
-import Uppy from "@uppy/core";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
+const { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } = require("./constants.js");
+const { checkMetaDataValue, checkParameters, fetchData } = require("./utils.js");
 
-export default class FileUpload {
+class FileUpload {
   #uppyIns;
+  #Uppy;
+  #AwsS3Multipart;
 
-  uploadFile({ file, objMetaData, scanId, accessKey }) {
+  constructor() {
+    this.initializeModules();
+  }
+
+  async initializeModules() {
+    this.#Uppy = (await import("@uppy/core")).default;
+    this.#AwsS3Multipart = (await import("@uppy/aws-s3-multipart")).default;
+  }
+
+  async uploadFile({ file, objMetaData, scanId, accessKey }) {
     if (checkParameters(file, objMetaData, scanId, accessKey) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     if (checkMetaDataValue(objMetaData) === false) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
+
+    if (!this.#Uppy || !this.#AwsS3Multipart) {
+      await this.initializeModules();
+    }
+
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {
         this.#uppyIns.close();
       }
-      this.#uppyIns = new Uppy({ autoProceed: true });
-      this.#uppyIns.use(AwsS3Multipart, {
+      this.#uppyIns = new this.#Uppy({ autoProceed: true });
+      this.#uppyIns.use(this.#AwsS3Multipart, {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,
@@ -45,7 +59,6 @@ export default class FileUpload {
               originalFileName: file.name,
             },
           }),
-
         signPart: (file, partData) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
@@ -56,7 +69,6 @@ export default class FileUpload {
               partNumber: partData.partNumber,
             },
           }),
-
         abortMultipartUpload: (file, { uploadId, key }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
@@ -90,3 +102,5 @@ export default class FileUpload {
     });
   }
 }
+
+module.exports = FileUpload;

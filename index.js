@@ -1,10 +1,10 @@
-import Auth from "./auth.js";
-import Custom from "./custom.js";
-import FileUpload from "./fileUpload.js";
-import Measurement from "./measurement.js";
-import PoseDetection from "./poseDetection.js";
-import TryOn from "./tryOn.js";
-export default class Swan {
+const Auth = require("./auth.js");
+const Custom = require("./custom.js");
+const FileUpload = require("./fileUpload.js");
+const Measurement = require("./measurement.js");
+const PoseDetection = require("./poseDetection.js");
+const TryOn = require("./tryOn.js");
+class Swan {
   auth = new Auth();
 
   custom = new Custom();
@@ -17,3 +17,5 @@ export default class Swan {
 
   tryOn = new TryOn();
 }
+
+module.exports = Swan;
