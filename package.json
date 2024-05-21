@@ -7,7 +7,7 @@
   "files": [
     "index.js",
     "auth.js",
-    "constant.js",
+    "constants.js",
     "custom.js",
     "fileUpload.js",
     "measurement.js",
