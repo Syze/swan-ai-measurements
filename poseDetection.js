@@ -1,5 +1,5 @@
 const { APP_POSE_DETECTION_WEBSOCKET_URL, REQUIRED_MESSAGE } = require("./constants.js");
-const io = require("socket.io-client");
+const io = require("socket.io");
 
 /**
  * Class representing pose detection functionality.
