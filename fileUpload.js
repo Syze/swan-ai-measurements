@@ -1,22 +1,62 @@
 const { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } = require("./constants.js");
 const { checkMetaDataValue, checkParameters, fetchData } = require("./utils.js");
-
+/**
+ * Class representing a file uploader using Uppy for multipart uploads.
+ */
 class FileUpload {
+  /**
+   * The Uppy instance.
+   * @type {Object}
+   * @private
+   */
   #uppyIns;
+
+  /**
+   * Reference to the Uppy module.
+   * @type {Object}
+   * @private
+   */
   #Uppy;
+  /**
+   * Reference to the AwsS3Multipart module.
+   * @type {Object}
+   * @private
+   */
+
   #AwsS3Multipart;
-
-  constructor() {
+  /**
+   * The access key used for authentication.
+   * @type {string}
+   * @private
+   */
+  #accessKey;
+  /**
+   * Constructs a new instance of the FileUpload class.
+   * @param {string} accessKey - The access key used for authentication.
+   */
+  constructor(accessKey) {
     this.initializeModules();
+    this.#accessKey = accessKey;
   }
-
+  /**
+   * Asynchronously initializes the Uppy and AwsS3Multipart modules.
+   * @private
+   */
   async initializeModules() {
     this.#Uppy = (await import("@uppy/core")).default;
     this.#AwsS3Multipart = (await import("@uppy/aws-s3-multipart")).default;
   }
-
-  async uploadFile({ file, objMetaData, scanId, accessKey }) {
-    if (checkParameters(file, objMetaData, scanId, accessKey) === false) {
+  /**
+   * Uploads a file with optional metadata and scan ID.
+   * @param {Object} params - The parameters for file upload.
+   * @param {File} params.file - The file to upload.
+   * @param {Object} params.objMetaData - Optional. Metadata associated with the file.
+   * @param {string} params.scanId - Optional. The ID of the scan.
+   * @returns {Promise} - A promise that resolves when the file is uploaded successfully.
+   * @throws {Error} - If required parameters are missing or metadata value is invalid.
+   */
+  async uploadFile({ file, objMetaData, scanId }) {
+    if (checkParameters(file, objMetaData, scanId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     if (checkMetaDataValue(objMetaData) === false) {
@@ -40,7 +80,7 @@ class FileUpload {
           const objectKey = `${scanId}.${file.extension}`;
           return fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-            apiKey: accessKey,
+            apiKey: this.#accessKey,
             body: {
               objectKey,
               contentType: file.type,
@@ -51,7 +91,7 @@ class FileUpload {
         completeMultipartUpload: (file, { uploadId, key, parts }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-            apiKey: accessKey,
+            apiKey: this.#accessKey,
             body: {
               uploadId,
               objectKey: key,
@@ -62,7 +102,7 @@ class FileUpload {
         signPart: (file, partData) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-            apiKey: accessKey,
+            apiKey: this.#accessKey,
             body: {
               objectKey: partData.key,
               uploadId: partData.uploadId,
@@ -72,7 +112,7 @@ class FileUpload {
         abortMultipartUpload: (file, { uploadId, key }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-            apiKey: accessKey,
+            apiKey: this.#accessKey,
             body: {
               uploadId,
               objectKey: key,

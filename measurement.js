@@ -2,33 +2,71 @@ const axios = require("axios");
 const { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } = require("./constants.js");
 const { checkParameters } = require("./utils.js");
 
+/**
+ * Class representing measurement-related functionality.
+ */
 class Measurement {
   #tryOnSocketRef = null;
   #measurementSocketRef = null;
   #timerPollingRef = null;
   #timerWaitingRef = null;
   #count = 1;
+  #accessKey;
 
-  getMeasurementStatus(scanId, accessKey) {
-    if (checkParameters(scanId, accessKey) === false) {
+  /**
+   * Constructs a new instance of the Measurement class.
+   * @param {string} accessKey - The access key used for authentication.
+   */
+  constructor(accessKey) {
+    this.#accessKey = accessKey;
+  }
+
+  /**
+   * Retrieves the measurement status for a given scan ID.
+   * @param {string} scanId - The ID of the scan.
+   * @returns {Promise} - The axios response promise.
+   * @throws {Error} - If the required parameter is missing.
+   */
+  getMeasurementStatus(scanId) {
+    if (checkParameters(scanId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
     return axios.get(url, {
-      headers: { "X-Api-Key": accessKey },
+      headers: { "X-Api-Key": this.#accessKey },
     });
   }
 
-  getTryOnMeasurements({ scanId, shopDomain, productName, accessKey }) {
-    if (checkParameters(scanId, shopDomain, productName, accessKey) === false) {
+  /**
+   * Retrieves the try-on measurements for a given scan ID, shop domain, and product name.
+   * @param {Object} params - The parameters for the try-on measurements.
+   * @param {string} params.scanId - The ID of the scan.
+   * @param {string} params.shopDomain - The shop domain.
+   * @param {string} params.productName - The product name.
+   * @returns {Promise} - The axios response promise.
+   * @throws {Error} - If the required parameters are missing.
+   */
+  getTryOnMeasurements({ scanId, shopDomain, productName }) {
+    if (checkParameters(scanId, shopDomain, productName) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
-    return axios.get(tryOnUrl, { headers: { "X-Api-Key": accessKey } });
+    return axios.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
   }
 
-  handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen, accessKey }) {
-    if (checkParameters(shopDomain, scanId, productName, accessKey) === false) {
+  /**
+   * Handles the try-on WebSocket connection.
+   * @param {Object} params - The parameters for the WebSocket connection.
+   * @param {string} params.shopDomain - The shop domain.
+   * @param {string} params.scanId - The ID of the scan.
+   * @param {string} params.productName - The product name.
+   * @param {function} [params.onError] - Optional. Callback function to handle errors.
+   * @param {function} [params.onSuccess] - Optional. Callback function to handle successful messages.
+   * @param {function} [params.onClose] - Optional. Callback function to handle WebSocket close event.
+   * @param {function} [params.onOpen] - Optional. Callback function to handle WebSocket open event.
+   */
+  handleTryOnSocket({ shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen }) {
+    if (checkParameters(shopDomain, scanId, productName) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     this.#tryOnSocketRef?.close();
@@ -57,16 +95,24 @@ class Measurement {
     };
   }
 
-  #getMeasurementsCheck = async ({ scanId, onSuccess, onError, accessKey }) => {
+  /**
+   * Checks the measurement status and handles polling.
+   * @param {Object} params - The parameters for checking measurements.
+   * @param {string} params.scanId - The ID of the scan.
+   * @param {function} [params.onSuccess] - Optional. Callback function to handle successful status check.
+   * @param {function} [params.onError] - Optional. Callback function to handle errors.
+   * @private
+   */
+  async #getMeasurementsCheck({ scanId, onSuccess, onError }) {
     try {
-      const res = await this.getMeasurementStatus(scanId, accessKey);
+      const res = await this.getMeasurementStatus(scanId);
       if (res?.data && res?.data?.[0]?.isMeasured === true) {
         onSuccess?.(res?.data);
         clearInterval(this.#timerPollingRef);
       } else {
         if (this.#count < 8) {
           this.#count++;
-          this.#handlePolling({ scanId, onSuccess, onError, accessKey });
+          this.#handlePolling({ scanId, onSuccess, onError });
         } else {
           this.#count = 1;
           clearInterval(this.#timerPollingRef);
@@ -77,30 +123,59 @@ class Measurement {
       clearInterval(this.#timerPollingRef);
       onError?.(e);
     }
-  };
+  }
 
-  #handlePolling({ scanId, onSuccess, onError, accessKey }) {
+  /**
+   * Handles polling for measurements.
+   * @param {Object} params - The parameters for polling.
+   * @param {string} params.scanId - The ID of the scan.
+   * @param {function} [params.onSuccess] - Optional. Callback function to handle successful polling.
+   * @param {function} [params.onError] - Optional. Callback function to handle errors.
+   * @private
+   */
+  #handlePolling({ scanId, onSuccess, onError }) {
     clearInterval(this.#timerPollingRef);
     this.#timerPollingRef = setTimeout(() => {
-      this.#getMeasurementsCheck({ scanId, onSuccess, onError, accessKey });
+      this.#getMeasurementsCheck({ scanId, onSuccess, onError });
     }, this.#count * 5000);
   }
 
-  #disconnectSocket = () => {
+  /**
+   * Disconnects the measurement WebSocket and clears the timeout.
+   * @private
+   */
+  #disconnectSocket() {
     this.#measurementSocketRef?.close();
     clearTimeout(this.#timerWaitingRef);
-  };
+  }
 
-  #handleTimeOut = ({ scanId, onSuccess, onError, accessKey }) => {
+  /**
+   * Handles the timeout for the measurement WebSocket.
+   * @param {Object} params - The parameters for handling timeout.
+   * @param {string} params.scanId - The ID of the scan.
+   * @param {function} [params.onSuccess] - Optional. Callback function to handle successful timeout.
+   * @param {function} [params.onError] - Optional. Callback function to handle errors.
+   * @private
+   */
+  #handleTimeOut({ scanId, onSuccess, onError }) {
     this.#count = 1;
     this.#timerWaitingRef = setTimeout(() => {
-      this.#handlePolling({ scanId, onSuccess, onError, accessKey });
+      this.#handlePolling({ scanId, onSuccess, onError });
       this.#disconnectSocket();
     }, 2 * 60000);
-  };
+  }
 
-  handleMeasurementSocket = ({ scanId, onError, onSuccess, onClose, onOpen, accessKey }) => {
-    if (checkParameters(scanId, accessKey) === false) {
+  /**
+   * Handles the measurement WebSocket connection.
+   * @param {Object} params - The parameters for the WebSocket connection.
+   * @param {string} params.scanId - The ID of the scan.
+   * @param {function} [params.onError] - Optional. Callback function to handle errors.
+   * @param {function} [params.onSuccess] - Optional. Callback function to handle successful messages.
+   * @param {function} [params.onClose] - Optional. Callback function to handle WebSocket close event.
+   * @param {function} [params.onOpen] - Optional. Callback function to handle WebSocket open event.
+   */
+  handleMeasurementSocket({ scanId, onError, onSuccess, onClose, onOpen }) {
+    if (checkParameters(scanId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     setTimeout(() => {
@@ -109,7 +184,7 @@ class Measurement {
       this.#measurementSocketRef = new WebSocket(url);
       this.#measurementSocketRef.onopen = () => {
         onOpen?.();
-        this.#handleTimeOut({ scanId, onSuccess, onError, accessKey });
+        this.#handleTimeOut({ scanId, onSuccess, onError });
       };
 
       this.#measurementSocketRef.onmessage = (event) => {
@@ -130,7 +205,7 @@ class Measurement {
         onError?.(event);
       };
     }, 5000);
-  };
+  }
 }
 
 module.exports = Measurement;
