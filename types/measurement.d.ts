@@ -44,10 +44,10 @@ declare class Measurement {
         shopDomain: string;
         scanId: string;
         productName: string;
-        onError?: Function;
-        onSuccess?: Function;
-        onClose?: Function;
-        onOpen?: Function;
+        onError?: Function | undefined;
+        onSuccess?: Function | undefined;
+        onClose?: Function | undefined;
+        onOpen?: Function | undefined;
     }): void;
     /**
      * Handles the measurement WebSocket connection.
@@ -60,10 +60,10 @@ declare class Measurement {
      */
     handleMeasurementSocket({ scanId, onError, onSuccess, onClose, onOpen }: {
         scanId: string;
-        onError?: Function;
-        onSuccess?: Function;
-        onClose?: Function;
-        onOpen?: Function;
+        onError?: Function | undefined;
+        onSuccess?: Function | undefined;
+        onClose?: Function | undefined;
+        onOpen?: Function | undefined;
     }): void;
     #private;
 }

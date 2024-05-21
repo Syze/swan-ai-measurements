@@ -24,7 +24,7 @@ declare class FileUpload {
      */
     uploadFile({ file, objMetaData, scanId }: {
         file: File;
-        objMetaData: any;
+        objMetaData: Object;
         scanId: string;
     }): Promise<any>;
     #private;

@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "emitDeclarationOnly": true,
+    "target": "es5",
+    "module": "commonjs",
     "outDir": "./types",
-    "allowJs": true,
-    "esModuleInterop": true
+    "strict": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "allowJs": true
   },
   "include": ["*.js"],
   "exclude": ["node_modules"]

@@ -4,10 +4,10 @@ export function fetchData({ path, body, queryParams, baseUrl, apiKey, headers, }
     path: any;
     body: any;
     queryParams: any;
-    baseUrl?: string;
-    apiKey?: string;
+    baseUrl?: string | undefined;
+    apiKey?: string | undefined;
     headers?: {
         "X-Api-Key": any;
         "Content-Type": string;
-    };
+    } | undefined;
 }): Promise<any>;

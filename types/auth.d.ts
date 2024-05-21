@@ -21,8 +21,8 @@ declare class Auth {
     registerUser({ email, appVerifyUrl, gender, height, username }: {
         email: string;
         appVerifyUrl: string;
-        gender?: string;
-        height?: string;
+        gender?: string | undefined;
+        height?: string | undefined;
         username: string;
     }): Promise<any>;
     /**
@@ -48,7 +48,7 @@ declare class Auth {
         name: string;
         height: string;
         gender: string;
-        offsetMarketingConsent?: boolean;
+        offsetMarketingConsent?: boolean | undefined;
     }) => Promise<any>;
     /**
      * Get user details.
@@ -69,10 +69,10 @@ declare class Auth {
     handleAuthSocket: ({ email, scanId, onError, onSuccess, onClose, onOpen }: {
         email: string;
         scanId: string;
-        onError?: Function;
-        onSuccess?: Function;
-        onClose?: Function;
-        onOpen?: Function;
+        onError?: Function | undefined;
+        onSuccess?: Function | undefined;
+        onClose?: Function | undefined;
+        onOpen?: Function | undefined;
     }) => void;
     #private;
 }

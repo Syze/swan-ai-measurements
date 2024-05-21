@@ -22,7 +22,7 @@ declare class TryOn {
      * @returns {Promise<Object>} - A promise that resolves with the uploaded files response.
      * @throws {Error} - If the parameters are invalid.
      */
-    getUploadedFiles(userId: string): Promise<any>;
+    getUploadedFiles(userId: string): Promise<Object>;
     /**
      * Deletes an uploaded image for a user.
      * @param {Object} params - The parameters for deleting the image.
@@ -34,7 +34,7 @@ declare class TryOn {
     deleteImage({ userId, fileName }: {
         userId: string;
         fileName: string;
-    }): Promise<any>;
+    }): Promise<Object>;
     /**
      * Handles the WebSocket connection for the try-on process.
      * @param {Object} params - The parameters for the WebSocket handler.
@@ -51,10 +51,10 @@ declare class TryOn {
         shopDomain: string;
         userId: string;
         productName: string;
-        onError?: Function;
-        onSuccess?: Function;
-        onClose?: Function;
-        onOpen?: Function;
+        onError?: Function | undefined;
+        onSuccess?: Function | undefined;
+        onClose?: Function | undefined;
+        onOpen?: Function | undefined;
     }) => void;
     /**
      * Handles getting the latest image for the try-on process.
@@ -71,7 +71,7 @@ declare class TryOn {
         shopDomain: string;
         productName: string;
         onError: Function;
-    }) => Promise<any>;
+    }) => Promise<Object>;
     /**
      * Retrieves the try-on result.
      * @param {Object} params - The parameters for fetching the try-on result.
