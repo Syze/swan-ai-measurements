@@ -10,14 +10,17 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var _Swan_accessKey;
 Object.defineProperty(exports, "__esModule", { value: true });
-const auth_1 = require("./auth");
-const custom_1 = require("./custom");
-const fileUpload_1 = require("./fileUpload");
-const measurement_1 = require("./measurement");
-const poseDetection_1 = require("./poseDetection");
-const tryOn_1 = require("./tryOn");
+const auth_1 = __importDefault(require("./auth"));
+const custom_1 = __importDefault(require("./custom"));
+const fileUpload_1 = __importDefault(require("./fileUpload"));
+const measurement_1 = __importDefault(require("./measurement"));
+const poseDetection_1 = __importDefault(require("./poseDetection"));
+const tryOn_1 = __importDefault(require("./tryOn"));
 class Swan {
     constructor(accessKey) {
         _Swan_accessKey.set(this, void 0);
