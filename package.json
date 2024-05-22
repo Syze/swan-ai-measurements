@@ -2,41 +2,37 @@
   "name": "@swan-admin/swan-ai-measurements",
   "version": "1.0.61",
   "description": "provides ai measurement suggestion",
-  "main": "index.js",
-  "type": "module",
-  "files": [
-    "index.js",
-    "auth.js",
-    "constants.js",
-    "custom.js",
-    "fileUpload.js",
-    "measurement.js",
-    "poseDetection.js",
-    "tryOn.js",
-    "utils.js"
-  ],
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
   "dependencies": {
     "@types/axios": "^0.14.0",
+    "@types/node": "^20.12.12",
     "@uppy/aws-s3-multipart": "^3.10.2",
     "@uppy/core": "^3.9.3",
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",
-    "socket.io": "^4.7.5",
-    "socket.io-client": "^4.7.5"
-  },
-  "devDependencies": {
     "nodemon": "^3.1.0",
-    "typescript": "^5.4.5",
-    "undici": "^6.18.0"
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "typescript": "^5.4.5"
   },
   "scripts": {
-    "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:types": "tsc"
+    "start": "nodemon dist/index.js",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start:dev": "nodemon src/index.ts",
+    "start:debug": "nodemon --inspect-brk src/index.ts",
+    "start:prod": "node dist/index.js",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://paras-swan@github.com/paras-swan/swan-ai-measurements.git"
+    "url": "https://github.com/paras-swan/swan-ai-measurements.git"
   },
   "keywords": [
     "swan",
@@ -48,5 +44,6 @@
   "bugs": {
     "url": "https://github.com/paras-swan/swan-ai-measurements/issues"
   },
-  "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme"
+  "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme",
+  "types": "dist/index.d.ts"
 }

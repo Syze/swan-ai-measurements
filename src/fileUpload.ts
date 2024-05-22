@@ -1,72 +1,48 @@
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
-/**
- * Class representing a file uploader using Uppy for multipart uploads.
- */
-class FileUpload {
-  /**
-   * The Uppy instance.
-   * @type {Object}
-   * @private
-   */
-  #uppyIns;
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants";
+import { checkMetaDataValue, checkParameters, fetchData } from "./utils";
 
-  /**
-   * Reference to the Uppy module.
-   * @type {Object}
-   * @private
-   */
-  #Uppy;
-  /**
-   * Reference to the AwsS3Multipart module.
-   * @type {Object}
-   * @private
-   */
+interface ObjMetaData {
+  gender: string;
+  scan_id: string;
+  email: string;
+  focal_length: string;
+  height: string;
+  customer_store_url: string;
+  clothes_fit: string;
+  scan_type: string;
+  callback_url: string;
+}
 
-  #AwsS3Multipart;
-  /**
-   * The access key used for authentication.
-   * @type {string}
-   * @private
-   */
-  #accessKey;
-  /**
-   * Constructs a new instance of the FileUpload class.
-   * @param {string} accessKey - The access key used for authentication.
-   */
-  constructor(accessKey) {
-    this.initializeModules();
+interface UploadOptions {
+  file: any;
+  arrayMetaData: ObjMetaData[];
+  scanId: string;
+}
+
+export default class FileUpload {
+  #uppyIns: any;
+  #accessKey: string;
+  #Uppy: any;
+  #AwsS3Multipart: any;
+  constructor(accessKey: string) {
+    this.#initializeModules();
     this.#accessKey = accessKey;
   }
-  /**
-   * Asynchronously initializes the Uppy and AwsS3Multipart modules.
-   * @private
-   */
-  async initializeModules() {
+  async #initializeModules() {
     this.#Uppy = (await import("@uppy/core")).default;
     this.#AwsS3Multipart = (await import("@uppy/aws-s3-multipart")).default;
   }
-  /**
-   * Uploads a file with optional metadata and scan ID.
-   * @param {Object} params - The parameters for file upload.
-   * @param {File} params.file - The file to upload.
-   * @param {Object} params.objMetaData - Optional. Metadata associated with the file.
-   * @param {string} params.scanId - Optional. The ID of the scan.
-   * @returns {Promise} - A promise that resolves when the file is uploaded successfully.
-   * @throws {Error} - If required parameters are missing or metadata value is invalid.
-   */
-  async uploadFile({ file, objMetaData, scanId }) {
-    if (checkParameters(file, objMetaData, scanId) === false) {
+  async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
+    if (checkParameters(file, arrayMetaData, scanId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (checkMetaDataValue(objMetaData) === false) {
+    if (checkMetaDataValue(arrayMetaData) === false) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
 
     if (!this.#Uppy || !this.#AwsS3Multipart) {
-      await this.initializeModules();
+      await this.#initializeModules();
     }
-
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {
         this.#uppyIns.close();
@@ -76,7 +52,7 @@ class FileUpload {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,
-        createMultipartUpload: (file) => {
+        createMultipartUpload: (file: any) => {
           const objectKey = `${scanId}.${file.extension}`;
           return fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -84,11 +60,11 @@ class FileUpload {
             body: {
               objectKey,
               contentType: file.type,
-              objectMetadata: objMetaData,
+              objectMetadata: arrayMetaData,
             },
           });
         },
-        completeMultipartUpload: (file, { uploadId, key, parts }) =>
+        completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
             apiKey: this.#accessKey,
@@ -99,7 +75,8 @@ class FileUpload {
               originalFileName: file.name,
             },
           }),
-        signPart: (file, partData) =>
+
+        signPart: (file: any, partData: any) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
             apiKey: this.#accessKey,
@@ -109,7 +86,8 @@ class FileUpload {
               partNumber: partData.partNumber,
             },
           }),
-        abortMultipartUpload: (file, { uploadId, key }) =>
+
+        abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
             apiKey: this.#accessKey,
@@ -128,13 +106,13 @@ class FileUpload {
         data: file,
       });
 
-      this.#uppyIns.on("upload-error", (file, error, response) => {
+      this.#uppyIns.on("upload-error", (file: any, error: any, response: any) => {
         reject(error);
       });
       this.#uppyIns.on("upload-success", () => {
         resolve({ message: "file uploaded successfully" });
       });
-      this.#uppyIns.on("complete", (result) => {
+      this.#uppyIns.on("complete", (result: any) => {
         if (this.#uppyIns) {
           this.#uppyIns.close();
         }
@@ -142,5 +120,3 @@ class FileUpload {
     });
   }
 }
-
-export default FileUpload;
