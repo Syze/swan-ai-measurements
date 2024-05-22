@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "module": "NodeNext",
-    "outDir": "./types",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
     "strict": true,
     "declaration": true,
     "esModuleInterop": true,
     "allowJs": true,
-    "moduleResolution": "NodeNext",
-    "lib": ["esnext", "dom"]
+    "resolveJsonModule": true
   },
   "include": ["*.js"],
   "exclude": ["node_modules"]
 }
+
+
