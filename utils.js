@@ -1,6 +1,6 @@
-const { APP_AUTH_BASE_URL, requiredMetaData } = require("./constants.js");
-const axios = require("axios");
-async function fetchData({
+import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
+import axios from "axios";
+export async function fetchData({
   path,
   body,
   queryParams,
@@ -22,7 +22,7 @@ async function fetchData({
   }
 }
 
-const checkParameters = (...args) => {
+export const checkParameters = (...args) => {
   for (const element of args) {
     if (!element) {
       return false;
@@ -31,7 +31,7 @@ const checkParameters = (...args) => {
   return true;
 };
 
-const checkMetaDataValue = (arr) => {
+export const checkMetaDataValue = (arr) => {
   for (const key of requiredMetaData) {
     let hasRequiredKey = false;
     inner: for (const obj of arr) {
@@ -55,5 +55,3 @@ const checkMetaDataValue = (arr) => {
   }
   return true;
 };
-
-module.exports = { checkMetaDataValue, checkParameters, fetchData };

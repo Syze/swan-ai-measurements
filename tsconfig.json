@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "NodeNext",
     "outDir": "./types",
     "strict": true,
     "declaration": true,
     "esModuleInterop": true,
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "NodeNext",
+    "lib": ["esnext", "dom"]
   },
   "include": ["*.js"],
   "exclude": ["node_modules"]

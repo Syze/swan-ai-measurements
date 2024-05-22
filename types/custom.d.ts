@@ -1,4 +1,4 @@
-export = Custom;
+export default Custom;
 /**
  * Represents a Custom class for handling custom operations.
  */

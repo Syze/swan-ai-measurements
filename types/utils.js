@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,9 +34,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _a = require("./constants.js"), APP_AUTH_BASE_URL = _a.APP_AUTH_BASE_URL, requiredMetaData = _a.requiredMetaData;
-var axios = require("axios");
-function fetchData(_a) {
+import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
+import axios from "axios";
+export function fetchData(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
         var apiUrl, res, error_1;
         var path = _b.path, body = _b.body, queryParams = _b.queryParams, _c = _b.baseUrl, baseUrl = _c === void 0 ? APP_AUTH_BASE_URL : _c, _d = _b.apiKey, apiKey = _d === void 0 ? "" : _d, _e = _b.headers, headers = _e === void 0 ? { "X-Api-Key": apiKey, "Content-Type": "application/json" } : _e;
@@ -65,7 +64,7 @@ function fetchData(_a) {
         });
     });
 }
-var checkParameters = function () {
+export var checkParameters = function () {
     var args = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         args[_i] = arguments[_i];
@@ -78,7 +77,7 @@ var checkParameters = function () {
     }
     return true;
 };
-var checkMetaDataValue = function (arr) {
+export var checkMetaDataValue = function (arr) {
     for (var _i = 0, requiredMetaData_1 = requiredMetaData; _i < requiredMetaData_1.length; _i++) {
         var key = requiredMetaData_1[_i];
         var hasRequiredKey = false;
@@ -105,4 +104,3 @@ var checkMetaDataValue = function (arr) {
     }
     return true;
 };
-module.exports = { checkMetaDataValue: checkMetaDataValue, checkParameters: checkParameters, fetchData: fetchData };

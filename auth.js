@@ -1,11 +1,11 @@
-const axios = require("axios");
-const { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL, REQUIRED_MESSAGE } = require("./constants.js");
-const { checkParameters } = require("./utils.js");
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 /**
  * Represents a Auth class for handling authentication operations.
  */
-class Auth {
+export default class Auth {
   #socketRef;
 
   /**
@@ -149,5 +149,3 @@ class Auth {
     };
   };
 }
-
-module.exports = Auth;

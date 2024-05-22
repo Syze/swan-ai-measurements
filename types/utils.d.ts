@@ -1,5 +1,3 @@
-export function checkMetaDataValue(arr: any): boolean;
-export function checkParameters(...args: any[]): boolean;
 export function fetchData({ path, body, queryParams, baseUrl, apiKey, headers, }: {
     path: any;
     body: any;
@@ -11,3 +9,5 @@ export function fetchData({ path, body, queryParams, baseUrl, apiKey, headers, }
         "Content-Type": string;
     } | undefined;
 }): Promise<any>;
+export function checkParameters(...args: any[]): boolean;
+export function checkMetaDataValue(arr: any): boolean;

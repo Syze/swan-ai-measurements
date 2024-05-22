@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -47,9 +46,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _Measurement_instances, _Measurement_tryOnSocketRef, _Measurement_measurementSocketRef, _Measurement_timerPollingRef, _Measurement_timerWaitingRef, _Measurement_count, _Measurement_accessKey, _Measurement_getMeasurementsCheck, _Measurement_handlePolling, _Measurement_disconnectSocket, _Measurement_handleTimeOut;
-var axios = require("axios");
-var _a = require("./constants.js"), API_ENDPOINTS = _a.API_ENDPOINTS, APP_AUTH_BASE_URL = _a.APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL = _a.APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL = _a.APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE = _a.REQUIRED_MESSAGE;
-var checkParameters = require("./utils.js").checkParameters;
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 /**
  * Class representing measurement-related functionality.
  */
@@ -240,4 +239,4 @@ _Measurement_tryOnSocketRef = new WeakMap(), _Measurement_measurementSocketRef =
         __classPrivateFieldGet(_this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(_this);
     }, 2 * 60000), "f");
 };
-module.exports = Measurement;
+export default Measurement;

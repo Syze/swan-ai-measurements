@@ -4,6 +4,7 @@
   "description": "provides ai measurement suggestion",
   "main": "index.js",
   "types": "types/index.d.ts",
+  "type": "module",
   "files": [
     "index.js",
     "auth.js",
@@ -27,7 +28,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "undici": "^6.18.0"
   },
   "scripts": {
     "start": "nodemon index.js",

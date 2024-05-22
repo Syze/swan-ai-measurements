@@ -1,4 +1,4 @@
-export = Swan;
+export default Swan;
 declare class Swan {
     constructor(accessKey: any);
     auth: Auth;
@@ -9,9 +9,9 @@ declare class Swan {
     tryOn: TryOn;
     #private;
 }
-import Auth = require("./auth.js");
-import Custom = require("./custom.js");
-import FileUpload = require("./fileUpload.js");
-import Measurement = require("./measurement.js");
-import PoseDetection = require("./poseDetection.js");
-import TryOn = require("./tryOn.js");
+import Auth from "./auth.js";
+import Custom from "./custom.js";
+import FileUpload from "./fileUpload.js";
+import Measurement from "./measurement.js";
+import PoseDetection from "./poseDetection.js";
+import TryOn from "./tryOn.js";

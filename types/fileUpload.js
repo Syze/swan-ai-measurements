@@ -1,27 +1,3 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -70,8 +46,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _FileUpload_uppyIns, _FileUpload_Uppy, _FileUpload_AwsS3Multipart, _FileUpload_accessKey;
-var _a = require("./constants.js"), REQUIRED_MESSAGE = _a.REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA = _a.REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT = _a.UPPY_FILE_UPLOAD_ENDPOINT;
-var _b = require("./utils.js"), checkMetaDataValue = _b.checkMetaDataValue, checkParameters = _b.checkParameters, fetchData = _b.fetchData;
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
 /**
  * Class representing a file uploader using Uppy for multipart uploads.
  */
@@ -119,11 +95,11 @@ var FileUpload = /** @class */ (function () {
                 switch (_c.label) {
                     case 0:
                         _a = [this, _FileUpload_Uppy];
-                        return [4 /*yield*/, Promise.resolve().then(function () { return __importStar(require("@uppy/core")); })];
+                        return [4 /*yield*/, import("@uppy/core")];
                     case 1:
                         __classPrivateFieldSet.apply(void 0, _a.concat([(_c.sent()).default, "f"]));
                         _b = [this, _FileUpload_AwsS3Multipart];
-                        return [4 /*yield*/, Promise.resolve().then(function () { return __importStar(require("@uppy/aws-s3-multipart")); })];
+                        return [4 /*yield*/, import("@uppy/aws-s3-multipart")];
                     case 2:
                         __classPrivateFieldSet.apply(void 0, _b.concat([(_c.sent()).default, "f"]));
                         return [2 /*return*/];
@@ -241,4 +217,4 @@ var FileUpload = /** @class */ (function () {
     return FileUpload;
 }());
 _FileUpload_uppyIns = new WeakMap(), _FileUpload_Uppy = new WeakMap(), _FileUpload_AwsS3Multipart = new WeakMap(), _FileUpload_accessKey = new WeakMap();
-module.exports = FileUpload;
+export default FileUpload;

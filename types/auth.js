@@ -1,4 +1,3 @@
-"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -22,9 +21,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _Auth_socketRef, _Auth_accessKey;
-var axios = require("axios");
-var _a = require("./constants.js"), API_ENDPOINTS = _a.API_ENDPOINTS, APP_AUTH_BASE_URL = _a.APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL = _a.APP_AUTH_WEBSOCKET_URL, APP_BASE_URL = _a.APP_BASE_URL, REQUIRED_MESSAGE = _a.REQUIRED_MESSAGE;
-var checkParameters = require("./utils.js").checkParameters;
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 /**
  * Represents a Auth class for handling authentication operations.
  */
@@ -162,4 +161,4 @@ var Auth = /** @class */ (function () {
     return Auth;
 }());
 _Auth_socketRef = new WeakMap(), _Auth_accessKey = new WeakMap();
-module.exports = Auth;
+export default Auth;

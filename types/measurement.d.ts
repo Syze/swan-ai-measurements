@@ -1,4 +1,4 @@
-export = Measurement;
+export default Measurement;
 /**
  * Class representing measurement-related functionality.
  */

@@ -1,9 +1,9 @@
-const Auth = require("./auth.js");
-const Custom = require("./custom.js");
-const FileUpload = require("./fileUpload.js");
-const Measurement = require("./measurement.js");
-const PoseDetection = require("./poseDetection.js");
-const TryOn = require("./tryOn.js");
+import Auth from "./auth.js";
+import Custom from "./custom.js";
+import FileUpload from "./fileUpload.js";
+import Measurement from "./measurement.js";
+import PoseDetection from "./poseDetection.js";
+import TryOn from "./tryOn.js";
 class Swan {
   #accessKey;
   constructor(accessKey) {
@@ -22,4 +22,4 @@ class Swan {
   tryOn = new TryOn(this.#accessKey);
 }
 
-module.exports = Swan;
+export default Swan;

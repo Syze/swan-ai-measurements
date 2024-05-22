@@ -1,4 +1,3 @@
-"use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
@@ -11,9 +10,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _Custom_accessKey;
-var axios = require("axios");
-var _a = require("./constants.js"), API_ENDPOINTS = _a.API_ENDPOINTS, APP_AUTH_BASE_URL = _a.APP_AUTH_BASE_URL, REQUIRED_MESSAGE = _a.REQUIRED_MESSAGE;
-var checkParameters = require("./utils.js").checkParameters;
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 /**
  * Represents a Custom class for handling custom operations.
  */
@@ -62,4 +61,4 @@ var Custom = /** @class */ (function () {
     return Custom;
 }());
 _Custom_accessKey = new WeakMap();
-module.exports = Custom;
+export default Custom;

@@ -1,6 +1,6 @@
-const axios = require("axios");
-const { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, REQUIRED_MESSAGE } = require("./constants.js");
-const { checkParameters } = require("./utils.js");
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 class TryOn {
   #tryOnSocketRef = null;
@@ -249,4 +249,4 @@ class TryOn {
   };
 }
 
-module.exports = TryOn;
+export default TryOn;

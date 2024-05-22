@@ -1,4 +1,4 @@
-export = FileUpload;
+export default FileUpload;
 /**
  * Class representing a file uploader using Uppy for multipart uploads.
  */

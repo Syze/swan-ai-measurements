@@ -1,4 +1,3 @@
-"use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
@@ -11,12 +10,12 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _Swan_accessKey;
-var Auth = require("./auth.js");
-var Custom = require("./custom.js");
-var FileUpload = require("./fileUpload.js");
-var Measurement = require("./measurement.js");
-var PoseDetection = require("./poseDetection.js");
-var TryOn = require("./tryOn.js");
+import Auth from "./auth.js";
+import Custom from "./custom.js";
+import FileUpload from "./fileUpload.js";
+import Measurement from "./measurement.js";
+import PoseDetection from "./poseDetection.js";
+import TryOn from "./tryOn.js";
 var Swan = /** @class */ (function () {
     function Swan(accessKey) {
         _Swan_accessKey.set(this, void 0);
@@ -31,4 +30,4 @@ var Swan = /** @class */ (function () {
     return Swan;
 }());
 _Swan_accessKey = new WeakMap();
-module.exports = Swan;
+export default Swan;

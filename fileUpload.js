@@ -1,5 +1,5 @@
-const { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } = require("./constants.js");
-const { checkMetaDataValue, checkParameters, fetchData } = require("./utils.js");
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
 /**
  * Class representing a file uploader using Uppy for multipart uploads.
  */
@@ -143,4 +143,4 @@ class FileUpload {
   }
 }
 
-module.exports = FileUpload;
+export default FileUpload;

@@ -1,8 +1,7 @@
-export = Auth;
 /**
  * Represents a Auth class for handling authentication operations.
  */
-declare class Auth {
+export default class Auth {
     /**
      * Constructs a new instance of the Auth class.
      * @param {string} accessKey - The access key used for authentication.

@@ -1,6 +1,6 @@
-const axios = require("axios");
-const { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } = require("./constants.js");
-const { checkParameters } = require("./utils.js");
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 /**
  * Class representing measurement-related functionality.
@@ -208,4 +208,4 @@ class Measurement {
   }
 }
 
-module.exports = Measurement;
+export default Measurement;

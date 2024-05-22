@@ -1,4 +1,4 @@
-export = PoseDetection;
+export default PoseDetection;
 /**
  * Class representing pose detection functionality.
  */

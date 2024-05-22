@@ -1,4 +1,4 @@
-export = TryOn;
+export default TryOn;
 declare class TryOn {
     /**
      * Constructs a new instance of the TryOn class.

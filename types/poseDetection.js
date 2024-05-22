@@ -1,4 +1,3 @@
-"use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
@@ -11,8 +10,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _PoseDetection_socketRef, _PoseDetection_accessKey;
-var _a = require("./constants.js"), APP_POSE_DETECTION_WEBSOCKET_URL = _a.APP_POSE_DETECTION_WEBSOCKET_URL, REQUIRED_MESSAGE = _a.REQUIRED_MESSAGE;
-var io = require("socket.io");
+import { io } from "socket.io-client";
+import { APP_POSE_DETECTION_WEbSOCKET_URL } from "./constants.js";
 /**
  * Class representing pose detection functionality.
  */
@@ -34,7 +33,7 @@ var PoseDetection = /** @class */ (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var _a, _b;
-            __classPrivateFieldSet(_this, _PoseDetection_socketRef, io.connect(APP_POSE_DETECTION_WEBSOCKET_URL), "f");
+            __classPrivateFieldSet(_this, _PoseDetection_socketRef, io.connect(APP_POSE_DETECTION_WEbSOCKET_URL), "f");
             (_a = __classPrivateFieldGet(_this, _PoseDetection_socketRef, "f")) === null || _a === void 0 ? void 0 : _a.on("connect", function () {
                 resolve(__classPrivateFieldGet(_this, _PoseDetection_socketRef, "f").id);
             });
@@ -89,4 +88,4 @@ var PoseDetection = /** @class */ (function () {
     return PoseDetection;
 }());
 _PoseDetection_socketRef = new WeakMap(), _PoseDetection_accessKey = new WeakMap();
-module.exports = PoseDetection;
+export default PoseDetection;

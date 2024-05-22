@@ -1,6 +1,6 @@
-const axios = require("axios");
-const { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } = require("./constants.js");
-const { checkParameters } = require("./utils.js");
+import axios from "axios";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 /**
  * Represents a Custom class for handling custom operations.
@@ -51,4 +51,4 @@ class Custom {
   };
 }
 
-module.exports = Custom;
+export default Custom;
