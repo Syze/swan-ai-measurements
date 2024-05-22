@@ -55,7 +55,7 @@ export default class Auth {
    * @returns {Promise}
    */
 
-  verifyToken = (token, accessKey) => {
+  verifyToken = (token) => {
     if (checkParameters(token) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }

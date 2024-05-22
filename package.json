@@ -3,7 +3,6 @@
   "version": "1.0.59",
   "description": "provides ai measurement suggestion",
   "main": "index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
   "files": [
     "index.js",
@@ -14,8 +13,7 @@
     "measurement.js",
     "poseDetection.js",
     "tryOn.js",
-    "utils.js",
-    "dist/"
+    "utils.js"
   ],
   "dependencies": {
     "@types/axios": "^0.14.0",
