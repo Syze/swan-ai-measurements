@@ -27,10 +27,9 @@ export default class FileUpload {
 
   constructor(accessKey: string) {
     this.#accessKey = accessKey;
-    this.#initializeModules();
   }
 
-  async #initializeModules() {
+  async initializeModules() {
     if (!this.#Uppy || !this.#AwsS3Multipart) {
       // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
       const Uppy = () => import("@uppy/core").then(({ default: Uppy }) => Uppy);
@@ -49,6 +48,7 @@ export default class FileUpload {
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
+    await this.initializeModules();
 
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {

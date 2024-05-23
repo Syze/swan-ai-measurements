@@ -18,18 +18,29 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _FileUpload_instances, _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_Uppy, _FileUpload_AwsS3Multipart, _FileUpload_initializeModules;
+var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_Uppy, _FileUpload_AwsS3Multipart;
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants";
 import { checkMetaDataValue, checkParameters, fetchData } from "./utils";
 class FileUpload {
     constructor(accessKey) {
-        _FileUpload_instances.add(this);
         _FileUpload_uppyIns.set(this, void 0);
         _FileUpload_accessKey.set(this, void 0);
         _FileUpload_Uppy.set(this, void 0);
         _FileUpload_AwsS3Multipart.set(this, void 0);
         __classPrivateFieldSet(this, _FileUpload_accessKey, accessKey, "f");
-        __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_initializeModules).call(this);
+    }
+    initializeModules() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!__classPrivateFieldGet(this, _FileUpload_Uppy, "f") || !__classPrivateFieldGet(this, _FileUpload_AwsS3Multipart, "f")) {
+                // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+                const Uppy = () => import("@uppy/core").then(({ default: Uppy }) => Uppy);
+                const AwsS3Multipart = () => import("@uppy/aws-s3-multipart").then(({ default: AwsS3Multipart }) => AwsS3Multipart);
+                // const { default: Uppy } = await import("@uppy/core");
+                // const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
+                __classPrivateFieldSet(this, _FileUpload_Uppy, Uppy, "f");
+                __classPrivateFieldSet(this, _FileUpload_AwsS3Multipart, AwsS3Multipart, "f");
+            }
+        });
     }
     uploadFile(_a) {
         return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
@@ -39,6 +50,7 @@ class FileUpload {
             if (!checkMetaDataValue(arrayMetaData)) {
                 throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
             }
+            yield this.initializeModules();
             return new Promise((resolve, reject) => {
                 if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
                     __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
@@ -110,17 +122,5 @@ class FileUpload {
         });
     }
 }
-_FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_Uppy = new WeakMap(), _FileUpload_AwsS3Multipart = new WeakMap(), _FileUpload_instances = new WeakSet(), _FileUpload_initializeModules = function _FileUpload_initializeModules() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!__classPrivateFieldGet(this, _FileUpload_Uppy, "f") || !__classPrivateFieldGet(this, _FileUpload_AwsS3Multipart, "f")) {
-            // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-            const Uppy = () => import("@uppy/core").then(({ default: Uppy }) => Uppy);
-            const AwsS3Multipart = () => import("@uppy/aws-s3-multipart").then(({ default: AwsS3Multipart }) => AwsS3Multipart);
-            // const { default: Uppy } = await import("@uppy/core");
-            // const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
-            __classPrivateFieldSet(this, _FileUpload_Uppy, Uppy, "f");
-            __classPrivateFieldSet(this, _FileUpload_AwsS3Multipart, AwsS3Multipart, "f");
-        }
-    });
-};
+_FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_Uppy = new WeakMap(), _FileUpload_AwsS3Multipart = new WeakMap();
 export default FileUpload;
