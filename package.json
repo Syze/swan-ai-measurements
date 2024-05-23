@@ -3,7 +3,8 @@
   "version": "1.0.63",
   "description": "provides ai measurement suggestion",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "@types/axios": "^0.14.0",
     "@types/node": "^20.12.12",
@@ -17,7 +18,7 @@
   },
   "scripts": {
     "start": "nodemon dist/index.js",
-    "build": "tsc",
+    "build": "tsc && tsc --project tsconfig.esm.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:dev": "nodemon src/index.ts",
     "start:debug": "nodemon --inspect-brk src/index.ts",
@@ -44,7 +45,6 @@
     "url": "https://github.com/paras-swan/swan-ai-measurements/issues"
   },
   "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme",
-  "types": "dist/index.d.ts",
   "devDependencies": {
     "nodemon": "^3.1.0"
   }
