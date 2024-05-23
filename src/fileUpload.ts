@@ -27,12 +27,16 @@ export default class FileUpload {
 
   constructor(accessKey: string) {
     this.#accessKey = accessKey;
+    this.#initializeModules();
   }
 
   async #initializeModules() {
     if (!this.#Uppy || !this.#AwsS3Multipart) {
-      const { default: Uppy } = await import("@uppy/core");
-      const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
+      // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+      const Uppy = () => import("@uppy/core").then(({ default: Uppy }) => Uppy);
+      const AwsS3Multipart = () => import("@uppy/aws-s3-multipart").then(({ default: AwsS3Multipart }) => AwsS3Multipart);
+      // const { default: Uppy } = await import("@uppy/core");
+      // const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
       this.#Uppy = Uppy;
       this.#AwsS3Multipart = AwsS3Multipart;
     }
@@ -45,8 +49,6 @@ export default class FileUpload {
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
-
-    await this.#initializeModules();
 
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {

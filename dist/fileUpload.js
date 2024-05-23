@@ -32,11 +32,15 @@ class FileUpload {
     #AwsS3Multipart;
     constructor(accessKey) {
         this.#accessKey = accessKey;
+        this.#initializeModules();
     }
     async #initializeModules() {
         if (!this.#Uppy || !this.#AwsS3Multipart) {
-            const { default: Uppy } = await Promise.resolve().then(() => __importStar(require("@uppy/core")));
-            const { default: AwsS3Multipart } = await Promise.resolve().then(() => __importStar(require("@uppy/aws-s3-multipart")));
+            // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+            const Uppy = () => Promise.resolve().then(() => __importStar(require("@uppy/core"))).then(({ default: Uppy }) => Uppy);
+            const AwsS3Multipart = () => Promise.resolve().then(() => __importStar(require("@uppy/aws-s3-multipart"))).then(({ default: AwsS3Multipart }) => AwsS3Multipart);
+            // const { default: Uppy } = await import("@uppy/core");
+            // const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
             this.#Uppy = Uppy;
             this.#AwsS3Multipart = AwsS3Multipart;
         }
@@ -48,7 +52,6 @@ class FileUpload {
         if (!(0, utils_1.checkMetaDataValue)(arrayMetaData)) {
             throw new Error(constants_1.REQUIRED_MESSAGE_FOR_META_DATA);
         }
-        await this.#initializeModules();
         return new Promise((resolve, reject) => {
             if (this.#uppyIns) {
                 this.#uppyIns.close();
