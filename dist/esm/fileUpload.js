@@ -7,16 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _FileUpload_instances, _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_Uppy, _FileUpload_AwsS3Multipart, _FileUpload_initializeModules;
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants";
@@ -28,20 +28,17 @@ class FileUpload {
         _FileUpload_accessKey.set(this, void 0);
         _FileUpload_Uppy.set(this, void 0);
         _FileUpload_AwsS3Multipart.set(this, void 0);
-        __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_initializeModules).call(this);
         __classPrivateFieldSet(this, _FileUpload_accessKey, accessKey, "f");
     }
     uploadFile(_a) {
         return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
-            if (checkParameters(file, arrayMetaData, scanId) === false) {
+            if (!checkParameters(file, arrayMetaData, scanId)) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            if (checkMetaDataValue(arrayMetaData) === false) {
+            if (!checkMetaDataValue(arrayMetaData)) {
                 throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
             }
-            if (!__classPrivateFieldGet(this, _FileUpload_Uppy, "f") || !__classPrivateFieldGet(this, _FileUpload_AwsS3Multipart, "f")) {
-                yield __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_initializeModules).call(this);
-            }
+            yield __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_initializeModules).call(this);
             return new Promise((resolve, reject) => {
                 if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
                     __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
@@ -115,8 +112,12 @@ class FileUpload {
 }
 _FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_Uppy = new WeakMap(), _FileUpload_AwsS3Multipart = new WeakMap(), _FileUpload_instances = new WeakSet(), _FileUpload_initializeModules = function _FileUpload_initializeModules() {
     return __awaiter(this, void 0, void 0, function* () {
-        __classPrivateFieldSet(this, _FileUpload_Uppy, (yield import("@uppy/core")).default, "f");
-        __classPrivateFieldSet(this, _FileUpload_AwsS3Multipart, (yield import("@uppy/aws-s3-multipart")).default, "f");
+        if (!__classPrivateFieldGet(this, _FileUpload_Uppy, "f") || !__classPrivateFieldGet(this, _FileUpload_AwsS3Multipart, "f")) {
+            const { default: Uppy } = yield import("@uppy/core");
+            const { default: AwsS3Multipart } = yield import("@uppy/aws-s3-multipart");
+            __classPrivateFieldSet(this, _FileUpload_Uppy, Uppy, "f");
+            __classPrivateFieldSet(this, _FileUpload_AwsS3Multipart, AwsS3Multipart, "f");
+        }
     });
 };
 export default FileUpload;

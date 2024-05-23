@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "esnext",  // Ensure ESNext to support dynamic imports
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",

@@ -24,25 +24,30 @@ export default class FileUpload {
   #accessKey: string;
   #Uppy: any;
   #AwsS3Multipart: any;
+
   constructor(accessKey: string) {
-    this.#initializeModules();
     this.#accessKey = accessKey;
   }
+
   async #initializeModules() {
-    this.#Uppy = (await import("@uppy/core")).default;
-    this.#AwsS3Multipart = (await import("@uppy/aws-s3-multipart")).default;
+    if (!this.#Uppy || !this.#AwsS3Multipart) {
+      const { default: Uppy } = await import("@uppy/core");
+      const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
+      this.#Uppy = Uppy;
+      this.#AwsS3Multipart = AwsS3Multipart;
+    }
   }
+
   async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
-    if (checkParameters(file, arrayMetaData, scanId) === false) {
+    if (!checkParameters(file, arrayMetaData, scanId)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (checkMetaDataValue(arrayMetaData) === false) {
+    if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
 
-    if (!this.#Uppy || !this.#AwsS3Multipart) {
-      await this.#initializeModules();
-    }
+    await this.#initializeModules();
+
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {
         this.#uppyIns.close();
