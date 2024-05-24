@@ -20,7 +20,8 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "fix-esm": "^1.0.1"
   },
   "scripts": {
     "start": "nodemon dist/index.js",
@@ -52,7 +53,6 @@
   },
   "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme",
   "devDependencies": {
-    "fix-esm": "^1.0.1",
     "nodemon": "^3.1.0"
   }
 }
