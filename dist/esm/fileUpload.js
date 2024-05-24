@@ -86,17 +86,17 @@ class FileUpload {
               },
             });
           },
-          completeMultipartUpload: (file, { uploadId, key, parts }) =>
-            fetchData({
-              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-              body: {
-                uploadId,
-                objectKey: key,
-                parts,
-                originalFileName: file.name,
-              },
-            }),
+          // completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
+          //   fetchData({
+          //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+          //     apiKey: this.#accessKey,
+          //     body: {
+          //       uploadId,
+          //       objectKey: key,
+          //       parts,
+          //       originalFileName: file.name,
+          //     },
+          //   }),
           signPart: (file, partData) =>
             fetchData({
               path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
