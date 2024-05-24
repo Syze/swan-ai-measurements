@@ -11,8 +11,7 @@ import axios from "axios";
 import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
 export function fetchData(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
-        console.log(body, "body", path, "path");
+        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
         const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
             const res = yield axios.post(apiUrl, body, { headers });
@@ -20,10 +19,16 @@ export function fetchData(options) {
                 return res.data;
             }
             console.error(`Error: Unexpected response status ${res.status}`);
+            if (throwError) {
+                throw new Error(`Failed to upload`);
+            }
             return {};
         }
         catch (error) {
             console.error(error, "while uploading");
+            if (throwError) {
+                throw new Error(`Failed to upload: ${error.message}`);
+            }
             return {};
         }
     });
@@ -59,4 +64,14 @@ export function checkMetaDataValue(arr) {
         return false;
     }
     return true;
+}
+export function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {
+    const totalSize = file.size;
+    const chunks = [];
+    let start = 0;
+    while (start < totalSize) {
+        chunks.push(file.slice(start, start + chunkSize));
+        start += chunkSize;
+    }
+    return chunks;
 }

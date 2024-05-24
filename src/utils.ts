@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { APP_AUTH_BASE_URL, ObjMetaData, requiredMetaData } from "./constants.js";
 
 export interface FetchDataOptions {
@@ -8,6 +8,7 @@ export interface FetchDataOptions {
   baseUrl?: string;
   apiKey?: string;
   headers?: Record<string, string>;
+  throwError?: boolean;
 }
 
 export async function fetchData(options: FetchDataOptions): Promise<any> {
@@ -17,10 +18,9 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     queryParams,
     baseUrl = APP_AUTH_BASE_URL,
     apiKey = "",
+    throwError = false,
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
   } = options;
-
-  console.log(body, "body", path, "path");
 
   const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
@@ -29,9 +29,15 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
       return res.data;
     }
     console.error(`Error: Unexpected response status ${res.status}`);
+    if (throwError) {
+      throw new Error(`Failed to upload`);
+    }
     return {};
-  } catch (error) {
+  } catch (error: any) {
     console.error(error, "while uploading");
+    if (throwError) {
+      throw new Error(`Failed to upload: ${error.message}`);
+    }
     return {};
   }
 }
@@ -68,4 +74,15 @@ export function checkMetaDataValue(arr: ObjMetaData[]): boolean {
     return false;
   }
   return true;
+}
+
+export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024) {
+  const totalSize = file.size;
+  const chunks = [];
+  let start = 0;
+  while (start < totalSize) {
+    chunks.push(file.slice(start, start + chunkSize));
+    start += chunkSize;
+  }
+  return chunks;
 }

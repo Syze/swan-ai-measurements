@@ -17,6 +17,9 @@ interface UploadOptions {
 export default class FileUpload {
     #private;
     constructor(accessKey: string);
-    uploadFile({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
+    uploadFileFrontend({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
+    uploadFileBackend({ file, arrayMetaData, scanId }: UploadOptions): Promise<{
+        message: string;
+    }>;
 }
 export {};

@@ -1,5 +1,6 @@
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
+import axios from "axios";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData, getFileChunks } from "./utils.js";
 const Uppy = require("fix-esm").require("@uppy/core");
 const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
 interface ObjMetaData {
@@ -28,7 +29,7 @@ export default class FileUpload {
     this.#accessKey = accessKey;
   }
 
-  async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
+  async uploadFileFrontend({ file, arrayMetaData, scanId }: UploadOptions) {
     if (!checkParameters(file, arrayMetaData, scanId)) {
       throw new Error(REQUIRED_MESSAGE);
     }
@@ -43,13 +44,12 @@ export default class FileUpload {
       this.#uppyIns = new Uppy.default({ autoProceed: true });
       this.#uppyIns.use(AwsS3Multipart.default, {
         limit: 10,
-        companionUrl: "http://localhost:3002/",
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,
         createMultipartUpload: (file: any) => {
           const objectKey = `${scanId}.${file.extension}`;
           return fetchData({
-            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+            path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
             apiKey: this.#accessKey,
             body: {
               objectKey,
@@ -60,7 +60,7 @@ export default class FileUpload {
         },
         completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
           fetchData({
-            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+            path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
             apiKey: this.#accessKey,
             body: {
               uploadId,
@@ -72,7 +72,7 @@ export default class FileUpload {
 
         signPart: (file: any, partData: any) =>
           fetchData({
-            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+            path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
             apiKey: this.#accessKey,
             body: {
               objectKey: partData.key,
@@ -101,5 +101,42 @@ export default class FileUpload {
         }
       });
     });
+  }
+
+  async uploadFileBackend({ file, arrayMetaData, scanId }: UploadOptions) {
+    if (!checkParameters(file, arrayMetaData, scanId)) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    if (!checkMetaDataValue(arrayMetaData)) {
+      throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
+    }
+
+    try {
+      const res: { key: string; uploadId: string } = await fetchData({
+        path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+        apiKey: this.#accessKey,
+        body: {
+          objectKey: file.name,
+          contentType: file.type,
+          objectMetadata: arrayMetaData,
+        },
+      });
+      const totalChunks = getFileChunks(file);
+      for (let i = 0; i < totalChunks.length; i++) {
+        const data: { url: string } = await fetchData({
+          path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+          apiKey: this.#accessKey,
+          body: {
+            objectKey: res?.key,
+            uploadId: res?.uploadId,
+            partNumber: i + 1,
+          },
+        });
+        await axios.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
+      }
+      return { message: "successfully uploaded" };
+    } catch (error: any) {
+      throw new Error(`Failed to upload: ${error?.message}`);
+    }
   }
 }

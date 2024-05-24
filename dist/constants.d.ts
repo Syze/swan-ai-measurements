@@ -4,7 +4,7 @@ export declare const APP_AUTH_WEBSOCKET_URL: string;
 export declare const APP_TRY_ON_WEBSOCKET_URL: string;
 export declare const APP_RECOMMENDATION_WEBSOCKET_URL: string;
 export declare const APP_POSE_DETECTION_WEBSOCKET_URL: string;
-export declare const UPPY_FILE_UPLOAD_ENDPOINT: {
+export declare const FILE_UPLOAD_ENDPOINT: {
     UPLOAD_START: string;
     UPLOAD_COMPLETE: string;
     UPLOAD_SIGN_PART: string;

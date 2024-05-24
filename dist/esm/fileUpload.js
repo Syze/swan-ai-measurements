@@ -47,8 +47,9 @@ var __classPrivateFieldGet =
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
   };
 var _FileUpload_uppyIns, _FileUpload_accessKey;
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
+import axios from "axios";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData, getFileChunks } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
@@ -57,7 +58,7 @@ class FileUpload {
     _FileUpload_accessKey.set(this, void 0);
     __classPrivateFieldSet(this, _FileUpload_accessKey, accessKey, "f");
   }
-  uploadFile(_a) {
+  uploadFileFrontend(_a) {
     return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
       if (!checkParameters(file, arrayMetaData, scanId)) {
         throw new Error(REQUIRED_MESSAGE);
@@ -72,13 +73,12 @@ class FileUpload {
         __classPrivateFieldSet(this, _FileUpload_uppyIns, new Uppy({ autoProceed: true }), "f");
         __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart, {
           limit: 10,
-          companionUrl: "http://localhost:3002/",
           retryDelays: [0, 1000, 3000, 5000],
           getChunkSize: () => 5 * 1024 * 1024,
           createMultipartUpload: (file) => {
             const objectKey = `${scanId}.${file.extension}`;
             return fetchData({
-              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+              path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
               body: {
                 objectKey,
@@ -89,7 +89,7 @@ class FileUpload {
           },
           completeMultipartUpload: (file, { uploadId, key, parts }) =>
             fetchData({
-              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+              path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
               body: {
                 uploadId,
@@ -100,7 +100,7 @@ class FileUpload {
             }),
           signPart: (file, partData) =>
             fetchData({
-              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+              path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
               body: {
                 objectKey: partData.key,
@@ -127,6 +127,45 @@ class FileUpload {
           }
         });
       });
+    });
+  }
+  uploadFileBackend(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
+      if (!checkParameters(file, arrayMetaData, scanId)) {
+        throw new Error(REQUIRED_MESSAGE);
+      }
+      if (!checkMetaDataValue(arrayMetaData)) {
+        throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
+      }
+      try {
+        const res = yield fetchData({
+          path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+          apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+          body: {
+            objectKey: file.name,
+            contentType: file.type,
+            objectMetadata: arrayMetaData,
+          },
+        });
+        const totalChunks = getFileChunks(file);
+        for (let i = 0; i < totalChunks.length; i++) {
+          const data = yield fetchData({
+            path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+            apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+            body: {
+              objectKey: res === null || res === void 0 ? void 0 : res.key,
+              uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
+              partNumber: i + 1,
+            },
+          });
+          yield axios.put(data === null || data === void 0 ? void 0 : data.url, totalChunks[i], {
+            headers: { "Content-Type": file.type, "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") },
+          });
+        }
+        return { message: "successfully uploaded" };
+      } catch (error) {
+        throw new Error(`Failed to upload: ${error === null || error === void 0 ? void 0 : error.message}`);
+      }
     });
   }
 }

@@ -4,7 +4,7 @@ export const APP_AUTH_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co";
 export const APP_TRY_ON_WEBSOCKET_URL = "wss://bucbzczxjk.execute-api.ap-south-1.amazonaws.com";
 export const APP_RECOMMENDATION_WEBSOCKET_URL = "wss://staging.wsnotify.api.getswan.co/scanning";
 export const APP_POSE_DETECTION_WEBSOCKET_URL = "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com";
-export const UPPY_FILE_UPLOAD_ENDPOINT = {
+export const FILE_UPLOAD_ENDPOINT = {
     UPLOAD_START: "/upload/start",
     UPLOAD_COMPLETE: "/upload/complete",
     UPLOAD_SIGN_PART: "/upload/signpart",
