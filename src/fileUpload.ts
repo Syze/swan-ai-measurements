@@ -57,17 +57,17 @@ export default class FileUpload {
             },
           });
         },
-        // completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
-        //   fetchData({
-        //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-        //     apiKey: this.#accessKey,
-        //     body: {
-        //       uploadId,
-        //       objectKey: key,
-        //       parts,
-        //       originalFileName: file.name,
-        //     },
-        //   }),
+        completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
+          fetchData({
+            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+            apiKey: this.#accessKey,
+            body: {
+              uploadId,
+              objectKey: key,
+              parts,
+              originalFileName: file.name,
+            },
+          }),
 
         signPart: (file: any, partData: any) =>
           fetchData({
@@ -80,16 +80,16 @@ export default class FileUpload {
             },
           }),
 
-        abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
-          fetchData({
-            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-            apiKey: this.#accessKey,
-            body: {
-              uploadId,
-              objectKey: key,
-              originalFileName: file.name,
-            },
-          }),
+        // abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
+        //   fetchData({
+        //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+        //     apiKey: this.#accessKey,
+        //     body: {
+        //       uploadId,
+        //       objectKey: key,
+        //       originalFileName: file.name,
+        //     },
+        //   }),
       });
 
       this.#uppyIns.addFile({

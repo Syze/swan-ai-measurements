@@ -38,17 +38,16 @@ class FileUpload {
                         },
                     });
                 },
-                // completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
-                //   fetchData({
-                //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-                //     apiKey: this.#accessKey,
-                //     body: {
-                //       uploadId,
-                //       objectKey: key,
-                //       parts,
-                //       originalFileName: file.name,
-                //     },
-                //   }),
+                completeMultipartUpload: (file, { uploadId, key, parts }) => (0, utils_js_1.fetchData)({
+                    path: constants_js_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+                    apiKey: this.#accessKey,
+                    body: {
+                        uploadId,
+                        objectKey: key,
+                        parts,
+                        originalFileName: file.name,
+                    },
+                }),
                 signPart: (file, partData) => (0, utils_js_1.fetchData)({
                     path: constants_js_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                     apiKey: this.#accessKey,
@@ -58,15 +57,16 @@ class FileUpload {
                         partNumber: partData.partNumber,
                     },
                 }),
-                abortMultipartUpload: (file, { uploadId, key }) => (0, utils_js_1.fetchData)({
-                    path: constants_js_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-                    apiKey: this.#accessKey,
-                    body: {
-                        uploadId,
-                        objectKey: key,
-                        originalFileName: file.name,
-                    },
-                }),
+                // abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
+                //   fetchData({
+                //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+                //     apiKey: this.#accessKey,
+                //     body: {
+                //       uploadId,
+                //       objectKey: key,
+                //       originalFileName: file.name,
+                //     },
+                //   }),
             });
             this.#uppyIns.addFile({
                 source: "manual",

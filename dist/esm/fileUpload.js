@@ -86,17 +86,17 @@ class FileUpload {
               },
             });
           },
-          // completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
-          //   fetchData({
-          //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-          //     apiKey: this.#accessKey,
-          //     body: {
-          //       uploadId,
-          //       objectKey: key,
-          //       parts,
-          //       originalFileName: file.name,
-          //     },
-          //   }),
+          completeMultipartUpload: (file, { uploadId, key, parts }) =>
+            fetchData({
+              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              body: {
+                uploadId,
+                objectKey: key,
+                parts,
+                originalFileName: file.name,
+              },
+            }),
           signPart: (file, partData) =>
             fetchData({
               path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
@@ -107,16 +107,16 @@ class FileUpload {
                 partNumber: partData.partNumber,
               },
             }),
-          abortMultipartUpload: (file, { uploadId, key }) =>
-            fetchData({
-              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-              body: {
-                uploadId,
-                objectKey: key,
-                originalFileName: file.name,
-              },
-            }),
+          // abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
+          //   fetchData({
+          //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+          //     apiKey: this.#accessKey,
+          //     body: {
+          //       uploadId,
+          //       objectKey: key,
+          //       originalFileName: file.name,
+          //     },
+          //   }),
         });
         __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").addFile({
           source: "manual",
