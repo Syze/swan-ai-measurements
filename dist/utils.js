@@ -8,6 +8,7 @@ const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 async function fetchData(options) {
     const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
+    console.log(body, "body", path, "path");
     const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
     try {
         const res = await axios_1.default.post(apiUrl, body, { headers });

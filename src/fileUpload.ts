@@ -29,6 +29,8 @@ export default class FileUpload {
   }
 
   async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
+    console.log(UPPY_FILE_UPLOAD_ENDPOINT);
+
     if (!checkParameters(file, arrayMetaData, scanId)) {
       throw new Error(REQUIRED_MESSAGE);
     }

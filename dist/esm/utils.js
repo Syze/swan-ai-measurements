@@ -12,6 +12,7 @@ import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
 export function fetchData(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
+        console.log(body, "body", path, "path");
         const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
             const res = yield axios.post(apiUrl, body, { headers });

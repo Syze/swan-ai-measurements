@@ -11,6 +11,7 @@ class FileUpload {
         this.#accessKey = accessKey;
     }
     async uploadFile({ file, arrayMetaData, scanId }) {
+        console.log(constants_js_1.UPPY_FILE_UPLOAD_ENDPOINT);
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
