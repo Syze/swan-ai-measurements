@@ -19,6 +19,8 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     apiKey = "",
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
   } = options;
+  console.log(body, "body", path, "path");
+
   const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
     const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers });
