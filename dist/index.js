@@ -1,9 +1,14 @@
-import Auth from "./auth.js";
-import Custom from "./custom.js";
-import FileUpload from "./fileUpload.js";
-import Measurement from "./measurement.js";
-import PoseDetection from "./poseDetection.js";
-import TryOn from "./tryOn.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const auth_js_1 = __importDefault(require("./auth.js"));
+const custom_js_1 = __importDefault(require("./custom.js"));
+const fileUpload_js_1 = __importDefault(require("./fileUpload.js"));
+const measurement_js_1 = __importDefault(require("./measurement.js"));
+const poseDetection_js_1 = __importDefault(require("./poseDetection.js"));
+const tryOn_js_1 = __importDefault(require("./tryOn.js"));
 class Swan {
     #accessKey;
     auth;
@@ -14,12 +19,12 @@ class Swan {
     tryOn;
     constructor(accessKey) {
         this.#accessKey = accessKey;
-        this.auth = new Auth(this.#accessKey);
-        this.custom = new Custom(this.#accessKey);
-        this.fileUpload = new FileUpload(this.#accessKey);
-        this.measurement = new Measurement(this.#accessKey);
-        this.poseDetection = new PoseDetection(this.#accessKey);
-        this.tryOn = new TryOn(this.#accessKey);
+        this.auth = new auth_js_1.default(this.#accessKey);
+        this.custom = new custom_js_1.default(this.#accessKey);
+        this.fileUpload = new fileUpload_js_1.default(this.#accessKey);
+        this.measurement = new measurement_js_1.default(this.#accessKey);
+        this.poseDetection = new poseDetection_js_1.default(this.#accessKey);
+        this.tryOn = new tryOn_js_1.default(this.#accessKey);
     }
 }
-export default Swan;
+exports.default = Swan;

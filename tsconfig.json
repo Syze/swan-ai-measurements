@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",  // Ensure ESNext to support dynamic imports
-    "module": "ES2022",
+    "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
     "declaration": true,

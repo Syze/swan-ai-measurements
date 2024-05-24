@@ -1,6 +1,11 @@
-import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { checkParameters } from "./utils.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
+const constants_js_1 = require("./constants.js");
+const utils_js_1 = require("./utils.js");
 class TryOn {
     #tryOnSocketRef = null;
     #timerWaitingRef = null;
@@ -28,7 +33,7 @@ class TryOn {
         }
     }
     #getSignedUrl(payload) {
-        return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
+        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
             headers: {
                 "Content-Type": "application/json",
                 "X-Api-Key": this.#accessKey,
@@ -36,25 +41,25 @@ class TryOn {
         });
     }
     #s3Upload(url, file) {
-        return axios.put(url, file, {
+        return axios_1.default.put(url, file, {
             headers: {
                 "Content-Type": file.type,
             },
         });
     }
     getUploadedFiles(userId) {
-        if (checkParameters(userId) === false) {
-            throw new Error(REQUIRED_MESSAGE);
+        if ((0, utils_js_1.checkParameters)(userId) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`, null, {
+        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`, null, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
     deleteImage({ userId, fileName }) {
-        if (checkParameters(userId, fileName) === false) {
-            throw new Error(REQUIRED_MESSAGE);
+        if ((0, utils_js_1.checkParameters)(userId, fileName) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios.delete(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}?userId=${userId}&file=${fileName}`, {
+        return axios_1.default.delete(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_URLS}?userId=${userId}&file=${fileName}`, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -71,11 +76,11 @@ class TryOn {
         }, 120000);
     };
     handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen }) => {
-        if (checkParameters(shopDomain, userId, productName) === false) {
-            throw new Error(REQUIRED_MESSAGE);
+        if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         this.#disconnectSocket();
-        const url = `${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.TRY_ON}/?store_url=${shopDomain}&product_name=${productName}&scan_id=${userId}`;
+        const url = `${constants_js_1.APP_AUTH_WEBSOCKET_URL}${constants_js_1.API_ENDPOINTS.TRY_ON}/?store_url=${shopDomain}&product_name=${productName}&scan_id=${userId}`;
         this.#tryOnSocketRef = new WebSocket(url);
         this.#tryOnSocketRef.onopen = async () => {
             onOpen?.();
@@ -110,12 +115,12 @@ class TryOn {
         };
     };
     handleForLatestImage = async ({ userId, shopDomain, productName, onError }) => {
-        if (checkParameters(shopDomain, userId, productName) === false) {
-            throw new Error(REQUIRED_MESSAGE);
+        if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         try {
-            const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON}/?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-            const res = await axios.post(url, null, {
+            const url = `${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON}/?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
+            const res = await axios_1.default.post(url, null, {
                 headers: { "X-Api-Key": this.#accessKey },
             });
             if (res?.data?.tryOnProcessStatus === "failed") {
@@ -142,13 +147,13 @@ class TryOn {
         }
     };
     getTryOnResult = ({ userId, shopDomain, productName }) => {
-        if (checkParameters(shopDomain, userId, productName) === false) {
-            throw new Error(REQUIRED_MESSAGE);
+        if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const url = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-        return axios.post(url, null, {
+        const url = `${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
+        return axios_1.default.post(url, null, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     };
 }
-export default TryOn;
+exports.default = TryOn;

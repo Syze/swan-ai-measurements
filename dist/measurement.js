@@ -1,6 +1,11 @@
-import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { checkParameters } from "./utils.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
+const constants_js_1 = require("./constants.js");
+const utils_js_1 = require("./utils.js");
 class Measurement {
     #tryOnSocketRef = null;
     #measurementSocketRef = null;
@@ -12,28 +17,28 @@ class Measurement {
         this.#accessKey = accessKey;
     }
     getMeasurementResult(scanId) {
-        if (!checkParameters(scanId)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(scanId)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
-        return axios.get(url, {
+        const url = `${constants_js_1.APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
+        return axios_1.default.get(url, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
     getTryOnMeasurements({ scanId, shopDomain, productName }) {
-        if (!checkParameters(scanId, shopDomain, productName)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
-        return axios.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
+        const tryOnUrl = `${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
+        return axios_1.default.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
     }
     handleTryOnSocket(options) {
         const { shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen } = options;
-        if (!checkParameters(shopDomain, scanId, productName)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(shopDomain, scanId, productName)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         this.#tryOnSocketRef?.close();
-        const url = `${APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
+        const url = `${constants_js_1.APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
         this.#tryOnSocketRef = new WebSocket(url);
         this.#tryOnSocketRef.onopen = () => {
             onOpen?.();
@@ -110,12 +115,12 @@ class Measurement {
     }
     handleMeasurementSocket(options) {
         const { scanId, onError, onSuccess, onClose, onOpen } = options;
-        if (!checkParameters(scanId)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(scanId)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         setTimeout(() => {
             this.#disconnectSocket();
-            const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
+            const url = `${constants_js_1.APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
             this.#measurementSocketRef = new WebSocket(url);
             this.#measurementSocketRef.onopen = () => {
                 onOpen?.();
@@ -142,4 +147,4 @@ class Measurement {
         }, 5000);
     }
 }
-export default Measurement;
+exports.default = Measurement;

@@ -1,7 +1,7 @@
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
 import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
-import Uppy from "@uppy/core";
-import AwsS3Multipart from "@uppy/aws-s3-multipart";
+const Uppy = require("fix-esm").require("@uppy/core");
+const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
 interface ObjMetaData {
   gender: string;
   scan_id: string;
@@ -40,8 +40,8 @@ export default class FileUpload {
       if (this.#uppyIns) {
         this.#uppyIns.close();
       }
-      this.#uppyIns = new Uppy({ autoProceed: true });
-      this.#uppyIns.use(AwsS3Multipart, {
+      this.#uppyIns = new Uppy.default({ autoProceed: true });
+      this.#uppyIns.use(AwsS3Multipart.default, {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,

@@ -1,54 +1,59 @@
-import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { checkParameters } from "./utils.js";
-export default class Auth {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
+const constants_js_1 = require("./constants.js");
+const utils_js_1 = require("./utils.js");
+class Auth {
     #socketRef;
     #accessKey;
     constructor(accessKey) {
         this.#accessKey = accessKey;
     }
     registerUser({ email, appVerifyUrl, gender, height, username }) {
-        if (!checkParameters(email, appVerifyUrl)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(email, appVerifyUrl)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         let body = { username, email, appVerifyUrl };
         if (gender && height) {
             body = { ...body, attributes: { gender, height } };
         }
-        return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.REGISTER_USER}`, body, {
+        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.REGISTER_USER}`, body, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
     verifyToken(token) {
-        if (!checkParameters(token)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(token)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.VERIFY_USER}`, null, {
+        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.VERIFY_USER}`, null, {
             params: { token },
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
     addUser({ scanId, email, name, height, gender, offsetMarketingConsent }) {
-        if (!checkParameters(scanId, email, height, gender)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(scanId, email, height, gender)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": this.#accessKey } });
+        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": this.#accessKey } });
     }
     getUserDetail(email) {
-        if (!checkParameters(email)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(email)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+        return axios_1.default.get(`${constants_js_1.APP_BASE_URL}${constants_js_1.API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
     handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }) {
-        if (!checkParameters(email, scanId)) {
-            throw new Error(REQUIRED_MESSAGE);
+        if (!(0, utils_js_1.checkParameters)(email, scanId)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         if (this.#socketRef)
             this.#socketRef.close();
-        this.#socketRef = new WebSocket(`${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.AUTH}`);
+        this.#socketRef = new WebSocket(`${constants_js_1.APP_AUTH_WEBSOCKET_URL}${constants_js_1.API_ENDPOINTS.AUTH}`);
         const detailObj = { email, scanId };
         this.#socketRef.onopen = () => {
             this.#socketRef?.send(JSON.stringify(detailObj));
@@ -66,3 +71,4 @@ export default class Auth {
         };
     }
 }
+exports.default = Auth;

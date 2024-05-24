@@ -1,10 +1,16 @@
-import axios from "axios";
-import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
-export async function fetchData(options) {
-    const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
+const axios_1 = __importDefault(require("axios"));
+const constants_js_1 = require("./constants.js");
+async function fetchData(options) {
+    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
     const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
     try {
-        const res = await axios.post(apiUrl, body, { headers });
+        const res = await axios_1.default.post(apiUrl, body, { headers });
         if (res.status >= 200 && res.status < 300) {
             return res.data;
         }
@@ -16,7 +22,8 @@ export async function fetchData(options) {
         return {};
     }
 }
-export function checkParameters(...args) {
+exports.fetchData = fetchData;
+function checkParameters(...args) {
     for (const element of args) {
         if (!element) {
             return false;
@@ -24,8 +31,9 @@ export function checkParameters(...args) {
     }
     return true;
 }
-export function checkMetaDataValue(arr) {
-    for (const key of requiredMetaData) {
+exports.checkParameters = checkParameters;
+function checkMetaDataValue(arr) {
+    for (const key of constants_js_1.requiredMetaData) {
         let hasRequiredKey = false;
         for (const obj of arr) {
             if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "" && typeof obj[key] !== "number") {
@@ -48,3 +56,4 @@ export function checkMetaDataValue(arr) {
     }
     return true;
 }
+exports.checkMetaDataValue = checkMetaDataValue;

@@ -1,5 +1,7 @@
-import { io } from "socket.io-client";
-import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const socket_io_client_1 = require("socket.io-client");
+const constants_js_1 = require("./constants.js");
 class PoseDetection {
     #socketRef = null;
     #accessKey;
@@ -8,7 +10,7 @@ class PoseDetection {
     }
     connect() {
         return new Promise((resolve, reject) => {
-            this.#socketRef = io(APP_POSE_DETECTION_WEBSOCKET_URL, {
+            this.#socketRef = (0, socket_io_client_1.io)(constants_js_1.APP_POSE_DETECTION_WEBSOCKET_URL, {
                 auth: {
                     token: this.#accessKey,
                 },
@@ -51,4 +53,4 @@ class PoseDetection {
         return !!this.#socketRef?.connected;
     }
 }
-export default PoseDetection;
+exports.default = PoseDetection;
