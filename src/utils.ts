@@ -8,7 +8,6 @@ export interface FetchDataOptions {
   baseUrl?: string;
   apiKey?: string;
   headers?: Record<string, string>;
-  timeout?: number;
 }
 
 export async function fetchData(options: FetchDataOptions): Promise<any> {
@@ -25,18 +24,12 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
 
   const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error: Unexpected response status ${response.status}`);
+    const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers });
+    if (res.status >= 200 && res.status < 300) {
+      return res.data;
     }
-
-    const data = await response.json();
-    return data;
+    console.error(`Error: Unexpected response status ${res.status}`);
+    return {};
   } catch (error) {
     console.error(error, "while uploading");
     return {};

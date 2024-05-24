@@ -57,7 +57,7 @@ export default class FileUpload {
             },
           });
         },
-        completeMultipartUpload: (file: any, { uploadId, key, parts }: any) =>
+        completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
             apiKey: this.#accessKey,
@@ -80,7 +80,7 @@ export default class FileUpload {
             },
           }),
 
-        abortMultipartUpload: (file: any, { uploadId, key }: any) =>
+        abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
             apiKey: this.#accessKey,
