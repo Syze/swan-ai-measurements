@@ -1,6 +1,6 @@
 {
   "name": "@swan-admin/swan-ai-measurements",
-  "version": "1.0.81",
+  "version": "1.0.82",
   "description": "provides ai measurement suggestion",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
