@@ -43,6 +43,7 @@ export default class FileUpload {
       this.#uppyIns = new Uppy.default({ autoProceed: true });
       this.#uppyIns.use(AwsS3Multipart.default, {
         limit: 10,
+        companionUrl: "http://localhost:3002/",
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,
         createMultipartUpload: (file: any) => {
@@ -77,17 +78,6 @@ export default class FileUpload {
               objectKey: partData.key,
               uploadId: partData.uploadId,
               partNumber: partData.partNumber,
-            },
-          }),
-
-        abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
-          fetchData({
-            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-            apiKey: this.#accessKey,
-            body: {
-              uploadId,
-              objectKey: key,
-              originalFileName: file.name,
             },
           }),
       });

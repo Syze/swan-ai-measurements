@@ -72,6 +72,7 @@ class FileUpload {
         __classPrivateFieldSet(this, _FileUpload_uppyIns, new Uppy({ autoProceed: true }), "f");
         __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart, {
           limit: 10,
+          companionUrl: "http://localhost:3002/",
           retryDelays: [0, 1000, 3000, 5000],
           getChunkSize: () => 5 * 1024 * 1024,
           createMultipartUpload: (file) => {
@@ -105,16 +106,6 @@ class FileUpload {
                 objectKey: partData.key,
                 uploadId: partData.uploadId,
                 partNumber: partData.partNumber,
-              },
-            }),
-          abortMultipartUpload: (file, { uploadId, key }) =>
-            fetchData({
-              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-              body: {
-                uploadId,
-                objectKey: key,
-                originalFileName: file.name,
               },
             }),
         });
