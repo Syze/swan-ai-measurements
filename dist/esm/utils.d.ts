@@ -1,4 +1,4 @@
-import { ObjMetaData } from "./constants";
+import { ObjMetaData } from "./constants.js";
 export interface FetchDataOptions {
     path: string;
     body?: any;

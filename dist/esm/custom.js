@@ -11,8 +11,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _Custom_accessKey;
 import axios from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants";
-import { checkParameters } from "./utils";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 class Custom {
     constructor(accessKey) {
         _Custom_accessKey.set(this, void 0);

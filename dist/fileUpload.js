@@ -1,70 +1,33 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("./constants");
-const utils_1 = require("./utils");
-class FileUpload {
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
+import Uppy from "@uppy/core";
+import AwsS3Multipart from "@uppy/aws-s3-multipart";
+export default class FileUpload {
     #uppyIns;
     #accessKey;
-    #Uppy;
-    #AwsS3Multipart;
     constructor(accessKey) {
         this.#accessKey = accessKey;
     }
-    async initializeModules() {
-        if (!this.#Uppy || !this.#AwsS3Multipart) {
-            // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-            const Uppy = () => Promise.resolve().then(() => __importStar(require("@uppy/core"))).then(({ default: Uppy }) => Uppy);
-            const AwsS3Multipart = () => Promise.resolve().then(() => __importStar(require("@uppy/aws-s3-multipart"))).then(({ default: AwsS3Multipart }) => AwsS3Multipart);
-            // const { default: Uppy } = await import("@uppy/core");
-            // const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
-            this.#Uppy = Uppy;
-            this.#AwsS3Multipart = AwsS3Multipart;
-        }
-    }
     async uploadFile({ file, arrayMetaData, scanId }) {
-        if (!(0, utils_1.checkParameters)(file, arrayMetaData, scanId)) {
-            throw new Error(constants_1.REQUIRED_MESSAGE);
+        if (!checkParameters(file, arrayMetaData, scanId)) {
+            throw new Error(REQUIRED_MESSAGE);
         }
-        if (!(0, utils_1.checkMetaDataValue)(arrayMetaData)) {
-            throw new Error(constants_1.REQUIRED_MESSAGE_FOR_META_DATA);
+        if (!checkMetaDataValue(arrayMetaData)) {
+            throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
         }
-        await this.initializeModules();
         return new Promise((resolve, reject) => {
             if (this.#uppyIns) {
                 this.#uppyIns.close();
             }
-            this.#uppyIns = new this.#Uppy({ autoProceed: true });
-            this.#uppyIns.use(this.#AwsS3Multipart, {
+            this.#uppyIns = new Uppy({ autoProceed: true });
+            this.#uppyIns.use(AwsS3Multipart, {
                 limit: 10,
                 retryDelays: [0, 1000, 3000, 5000],
                 getChunkSize: () => 5 * 1024 * 1024,
                 createMultipartUpload: (file) => {
                     const objectKey = `${scanId}.${file.extension}`;
-                    return (0, utils_1.fetchData)({
-                        path: constants_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+                    return fetchData({
+                        path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                         apiKey: this.#accessKey,
                         body: {
                             objectKey,
@@ -73,8 +36,8 @@ class FileUpload {
                         },
                     });
                 },
-                completeMultipartUpload: (file, { uploadId, key, parts }) => (0, utils_1.fetchData)({
-                    path: constants_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+                completeMultipartUpload: (file, { uploadId, key, parts }) => fetchData({
+                    path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                     apiKey: this.#accessKey,
                     body: {
                         uploadId,
@@ -83,8 +46,8 @@ class FileUpload {
                         originalFileName: file.name,
                     },
                 }),
-                signPart: (file, partData) => (0, utils_1.fetchData)({
-                    path: constants_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+                signPart: (file, partData) => fetchData({
+                    path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                     apiKey: this.#accessKey,
                     body: {
                         objectKey: partData.key,
@@ -92,8 +55,8 @@ class FileUpload {
                         partNumber: partData.partNumber,
                     },
                 }),
-                abortMultipartUpload: (file, { uploadId, key }) => (0, utils_1.fetchData)({
-                    path: constants_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+                abortMultipartUpload: (file, { uploadId, key }) => fetchData({
+                    path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
                     apiKey: this.#accessKey,
                     body: {
                         uploadId,
@@ -122,4 +85,3 @@ class FileUpload {
         });
     }
 }
-exports.default = FileUpload;

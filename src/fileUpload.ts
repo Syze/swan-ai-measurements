@@ -1,6 +1,7 @@
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants";
-import { checkMetaDataValue, checkParameters, fetchData } from "./utils";
-
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, UPPY_FILE_UPLOAD_ENDPOINT } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData } from "./utils.js";
+import Uppy from "@uppy/core";
+import AwsS3Multipart from "@uppy/aws-s3-multipart";
 interface ObjMetaData {
   gender: string;
   scan_id: string;
@@ -22,23 +23,9 @@ interface UploadOptions {
 export default class FileUpload {
   #uppyIns: any;
   #accessKey: string;
-  #Uppy: any;
-  #AwsS3Multipart: any;
 
   constructor(accessKey: string) {
     this.#accessKey = accessKey;
-  }
-
-  async initializeModules() {
-    if (!this.#Uppy || !this.#AwsS3Multipart) {
-      // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-      const Uppy = () => import("@uppy/core").then(({ default: Uppy }) => Uppy);
-      const AwsS3Multipart = () => import("@uppy/aws-s3-multipart").then(({ default: AwsS3Multipart }) => AwsS3Multipart);
-      // const { default: Uppy } = await import("@uppy/core");
-      // const { default: AwsS3Multipart } = await import("@uppy/aws-s3-multipart");
-      this.#Uppy = Uppy;
-      this.#AwsS3Multipart = AwsS3Multipart;
-    }
   }
 
   async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
@@ -48,14 +35,13 @@ export default class FileUpload {
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
-    await this.initializeModules();
 
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {
         this.#uppyIns.close();
       }
-      this.#uppyIns = new this.#Uppy({ autoProceed: true });
-      this.#uppyIns.use(this.#AwsS3Multipart, {
+      this.#uppyIns = new Uppy({ autoProceed: true });
+      this.#uppyIns.use(AwsS3Multipart, {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
         getChunkSize: () => 5 * 1024 * 1024,

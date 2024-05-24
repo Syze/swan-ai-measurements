@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "require": "./dist/index.js",
@@ -14,8 +15,8 @@
   "dependencies": {
     "@types/axios": "^0.14.0",
     "@types/node": "^20.12.12",
-    "@uppy/aws-s3-multipart": "^3.10.2",
-    "@uppy/core": "^3.9.3",
+    "@uppy/aws-s3-multipart": "^3.11.1",
+    "@uppy/core": "^3.11.3",
     "axios": "^1.6.7",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",

@@ -11,7 +11,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _PoseDetection_socketRef, _PoseDetection_accessKey;
 import { io } from "socket.io-client";
-import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants";
+import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants.js";
 class PoseDetection {
     constructor(accessKey) {
         _PoseDetection_socketRef.set(this, null);

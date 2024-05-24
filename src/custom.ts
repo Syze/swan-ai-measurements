@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants";
-import { checkParameters } from "./utils";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters } from "./utils.js";
 
 class Custom {
   #accessKey: string;

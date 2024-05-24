@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants";
+import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants.js";
 
 interface VideoEmitOptions {
   image: string;

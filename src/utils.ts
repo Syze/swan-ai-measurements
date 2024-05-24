@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { APP_AUTH_BASE_URL, ObjMetaData, requiredMetaData } from "./constants";
+import { APP_AUTH_BASE_URL, ObjMetaData, requiredMetaData } from "./constants.js";
 
 export interface FetchDataOptions {
   path: string;

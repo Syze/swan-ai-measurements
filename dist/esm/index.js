@@ -10,12 +10,12 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _Swan_accessKey;
-import Auth from "./auth";
-import Custom from "./custom";
-import FileUpload from "./fileUpload";
-import Measurement from "./measurement";
-import PoseDetection from "./poseDetection";
-import TryOn from "./tryOn";
+import Auth from "./auth.js";
+import Custom from "./custom.js";
+import FileUpload from "./fileUpload.js";
+import Measurement from "./measurement.js";
+import PoseDetection from "./poseDetection.js";
+import TryOn from "./tryOn.js";
 class Swan {
     constructor(accessKey) {
         _Swan_accessKey.set(this, void 0);
