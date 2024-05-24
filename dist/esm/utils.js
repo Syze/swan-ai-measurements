@@ -11,11 +11,12 @@ import axios from "axios";
 import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
 export function fetchData(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
+        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, timeout = 5000, // Default timeout value in milliseconds (adjust as needed)
+         } = options;
         console.log(body, "body", path, "path");
         const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
-            const res = yield axios.post(apiUrl, body, { headers });
+            const res = yield axios.post(apiUrl, body, { headers, timeout });
             if (res.status >= 200 && res.status < 300) {
                 return res.data;
             }

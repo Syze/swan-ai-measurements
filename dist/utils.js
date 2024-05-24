@@ -7,11 +7,12 @@ exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 async function fetchData(options) {
-    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
+    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, timeout = 5000, // Default timeout value in milliseconds (adjust as needed)
+     } = options;
     console.log(body, "body", path, "path");
     const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
     try {
-        const res = await axios_1.default.post(apiUrl, body, { headers });
+        const res = await axios_1.default.post(apiUrl, body, { headers, timeout });
         if (res.status >= 200 && res.status < 300) {
             return res.data;
         }

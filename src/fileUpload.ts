@@ -29,8 +29,6 @@ export default class FileUpload {
   }
 
   async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
-    console.log(UPPY_FILE_UPLOAD_ENDPOINT);
-
     if (!checkParameters(file, arrayMetaData, scanId)) {
       throw new Error(REQUIRED_MESSAGE);
     }
@@ -59,7 +57,7 @@ export default class FileUpload {
             },
           });
         },
-        completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
+        completeMultipartUpload: (file: any, { uploadId, key, parts }: any) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
             apiKey: this.#accessKey,
@@ -82,7 +80,7 @@ export default class FileUpload {
             },
           }),
 
-        abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
+        abortMultipartUpload: (file: any, { uploadId, key }: any) =>
           fetchData({
             path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
             apiKey: this.#accessKey,

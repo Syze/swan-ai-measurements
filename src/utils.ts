@@ -8,6 +8,7 @@ export interface FetchDataOptions {
   baseUrl?: string;
   apiKey?: string;
   headers?: Record<string, string>;
+  timeout?: number;
 }
 
 export async function fetchData(options: FetchDataOptions): Promise<any> {
@@ -18,12 +19,14 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     baseUrl = APP_AUTH_BASE_URL,
     apiKey = "",
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
+    timeout = 5000, // Default timeout value in milliseconds (adjust as needed)
   } = options;
+
   console.log(body, "body", path, "path");
 
   const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
-    const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers });
+    const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers, timeout });
     if (res.status >= 200 && res.status < 300) {
       return res.data;
     }

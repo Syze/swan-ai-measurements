@@ -6,6 +6,7 @@ export interface FetchDataOptions {
     baseUrl?: string;
     apiKey?: string;
     headers?: Record<string, string>;
+    timeout?: number;
 }
 export declare function fetchData(options: FetchDataOptions): Promise<any>;
 export declare function checkParameters(...args: any[]): boolean;
