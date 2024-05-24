@@ -80,16 +80,16 @@ export default class FileUpload {
             },
           }),
 
-        // abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
-        //   fetchData({
-        //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-        //     apiKey: this.#accessKey,
-        //     body: {
-        //       uploadId,
-        //       objectKey: key,
-        //       originalFileName: file.name,
-        //     },
-        //   }),
+        abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
+          fetchData({
+            path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+            apiKey: this.#accessKey,
+            body: {
+              uploadId,
+              objectKey: key,
+              originalFileName: file.name,
+            },
+          }),
       });
 
       this.#uppyIns.addFile({

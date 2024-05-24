@@ -107,16 +107,16 @@ class FileUpload {
                 partNumber: partData.partNumber,
               },
             }),
-          // abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
-          //   fetchData({
-          //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-          //     apiKey: this.#accessKey,
-          //     body: {
-          //       uploadId,
-          //       objectKey: key,
-          //       originalFileName: file.name,
-          //     },
-          //   }),
+          abortMultipartUpload: (file, { uploadId, key }) =>
+            fetchData({
+              path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              body: {
+                uploadId,
+                objectKey: key,
+                originalFileName: file.name,
+              },
+            }),
         });
         __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").addFile({
           source: "manual",

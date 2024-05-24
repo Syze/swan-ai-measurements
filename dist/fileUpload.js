@@ -57,16 +57,15 @@ class FileUpload {
                         partNumber: partData.partNumber,
                     },
                 }),
-                // abortMultipartUpload: (file: any, { uploadId, key }: { uploadId: string | number; key: string | number }) =>
-                //   fetchData({
-                //     path: UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
-                //     apiKey: this.#accessKey,
-                //     body: {
-                //       uploadId,
-                //       objectKey: key,
-                //       originalFileName: file.name,
-                //     },
-                //   }),
+                abortMultipartUpload: (file, { uploadId, key }) => (0, utils_js_1.fetchData)({
+                    path: constants_js_1.UPPY_FILE_UPLOAD_ENDPOINT.UPLOAD_ABORT,
+                    apiKey: this.#accessKey,
+                    body: {
+                        uploadId,
+                        objectKey: key,
+                        originalFileName: file.name,
+                    },
+                }),
             });
             this.#uppyIns.addFile({
                 source: "manual",
