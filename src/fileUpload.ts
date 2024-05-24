@@ -15,7 +15,7 @@ interface ObjMetaData {
 }
 
 interface UploadOptions {
-  file: any;
+  file: File;
   arrayMetaData: ObjMetaData[];
   scanId: string;
 }

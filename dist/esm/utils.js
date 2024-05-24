@@ -7,7 +7,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import axios from "axios";
 import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
 export function fetchData(options) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -15,12 +14,16 @@ export function fetchData(options) {
         console.log(body, "body", path, "path");
         const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
-            const res = yield axios.post(apiUrl, body, { headers });
-            if (res.status >= 200 && res.status < 300) {
-                return res.data;
+            const response = yield fetch(apiUrl, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(body),
+            });
+            if (!response.ok) {
+                throw new Error(`Error: Unexpected response status ${response.status}`);
             }
-            console.error(`Error: Unexpected response status ${res.status}`);
-            return {};
+            const data = yield response.json();
+            return data;
         }
         catch (error) {
             console.error(error, "while uploading");

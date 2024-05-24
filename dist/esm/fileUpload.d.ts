@@ -10,7 +10,7 @@ interface ObjMetaData {
     callback_url: string;
 }
 interface UploadOptions {
-    file: any;
+    file: File;
     arrayMetaData: ObjMetaData[];
     scanId: string;
 }
