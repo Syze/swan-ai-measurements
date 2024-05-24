@@ -19,19 +19,24 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     baseUrl = APP_AUTH_BASE_URL,
     apiKey = "",
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
-    timeout = 5000, // Default timeout value in milliseconds (adjust as needed)
   } = options;
 
   console.log(body, "body", path, "path");
 
   const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
-    const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers, timeout });
-    if (res.status >= 200 && res.status < 300) {
-      return res.data;
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: Unexpected response status ${response.status}`);
     }
-    console.error(`Error: Unexpected response status ${res.status}`);
-    return {};
+
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error(error, "while uploading");
     return {};
