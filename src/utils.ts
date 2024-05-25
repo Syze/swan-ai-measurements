@@ -36,7 +36,7 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
   } catch (error: any) {
     console.error(error, "while uploading");
     if (throwError) {
-      throw new Error(`Failed to upload: ${error.message}`);
+      throw new Error(`Failed to upload: ${error?.message || "something went wrong"}`);
     }
     return {};
   }
