@@ -100,9 +100,7 @@ class FileUpload {
                     },
                     throwError: true,
                 });
-                console.log(res, "res for start");
                 const totalChunks = (0, utils_js_1.getFileChunks)(file);
-                console.log(totalChunks, "total chunks");
                 const parts = [];
                 for (let i = 0; i < totalChunks.length; i++) {
                     const data = await (0, utils_js_1.fetchData)({
@@ -115,12 +113,10 @@ class FileUpload {
                         },
                         throwError: true,
                     });
-                    console.log(data, "data for signed url");
                     const val = await axios_1.default.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
                     parts.push({ PartNumber: i + 1, ETag: '"958057f9cd1d264e94fcc0d2ccabc09f"' });
-                    console.log(val?.data, "after uploading");
+                    console.log(val, "after uploading");
                 }
-                console.log(parts, "parts");
                 const completeValue = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                     apiKey: this.#accessKey,
@@ -132,7 +128,6 @@ class FileUpload {
                     },
                     throwError: true,
                 });
-                console.log(completeValue, "after complete");
                 resolve({ message: "successfully uploaded", data: completeValue });
             }
             catch (error) {
