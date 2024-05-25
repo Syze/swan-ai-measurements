@@ -120,6 +120,7 @@ class FileUpload {
                     parts.push({ PartNumber: i + 1, ETag: '"958057f9cd1d264e94fcc0d2ccabc09f"' });
                     console.log(val?.data, "after uploading");
                 }
+                console.log(parts, "parts");
                 const completeValue = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                     apiKey: this.#accessKey,
@@ -129,7 +130,9 @@ class FileUpload {
                         parts,
                         originalFileName: file.name,
                     },
+                    throwError: true,
                 });
+                console.log(completeValue, "after complete");
                 resolve({ message: "successfully uploaded", data: completeValue });
             }
             catch (error) {

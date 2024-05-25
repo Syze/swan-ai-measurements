@@ -172,6 +172,7 @@ class FileUpload {
               parts.push({ PartNumber: i + 1, ETag: '"958057f9cd1d264e94fcc0d2ccabc09f"' });
               console.log(val === null || val === void 0 ? void 0 : val.data, "after uploading");
             }
+            console.log(parts, "parts");
             const completeValue = yield fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
@@ -181,7 +182,9 @@ class FileUpload {
                 parts,
                 originalFileName: file.name,
               },
+              throwError: true,
             });
+            console.log(completeValue, "after complete");
             resolve({ message: "successfully uploaded", data: completeValue });
           } catch (error) {
             reject(error);
