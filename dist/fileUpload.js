@@ -97,8 +97,11 @@ class FileUpload {
                     contentType: file.type,
                     objectMetadata: arrayMetaData,
                 },
+                throwError: true,
             });
+            console.log(res, "res for start");
             const totalChunks = (0, utils_js_1.getFileChunks)(file);
+            console.log(totalChunks, "total chunks");
             for (let i = 0; i < totalChunks.length; i++) {
                 const data = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
@@ -108,13 +111,15 @@ class FileUpload {
                         uploadId: res?.uploadId,
                         partNumber: i + 1,
                     },
+                    throwError: true,
                 });
+                console.log(data, "data for signed url");
                 await axios_1.default.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
             }
             return { message: "successfully uploaded" };
         }
         catch (error) {
-            throw new Error(`Failed to upload: ${error?.message}`);
+            throw new Error(`Failed to upload: ${error?.message || "something went wrong"}`);
         }
     }
 }

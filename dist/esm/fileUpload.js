@@ -146,8 +146,11 @@ class FileUpload {
             contentType: file.type,
             objectMetadata: arrayMetaData,
           },
+          throwError: true,
         });
+        console.log(res, "res for start");
         const totalChunks = getFileChunks(file);
+        console.log(totalChunks, "total chunks");
         for (let i = 0; i < totalChunks.length; i++) {
           const data = yield fetchData({
             path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
@@ -157,14 +160,16 @@ class FileUpload {
               uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
               partNumber: i + 1,
             },
+            throwError: true,
           });
+          console.log(data, "data for signed url");
           yield axios.put(data === null || data === void 0 ? void 0 : data.url, totalChunks[i], {
             headers: { "Content-Type": file.type, "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") },
           });
         }
         return { message: "successfully uploaded" };
       } catch (error) {
-        throw new Error(`Failed to upload: ${error === null || error === void 0 ? void 0 : error.message}`);
+        throw new Error(`Failed to upload: ${(error === null || error === void 0 ? void 0 : error.message) || "something went wrong"}`);
       }
     });
   }

@@ -23,7 +23,7 @@ async function fetchData(options) {
     catch (error) {
         console.error(error, "while uploading");
         if (throwError) {
-            throw new Error(`Failed to upload: ${error.message}`);
+            throw new Error(`Failed to upload: ${error?.message || "something went wrong"}`);
         }
         return {};
     }
