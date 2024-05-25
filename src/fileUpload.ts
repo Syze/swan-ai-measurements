@@ -110,38 +110,52 @@ export default class FileUpload {
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
-
-    try {
-      const res: { key: string; uploadId: string } = await fetchData({
-        path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-        apiKey: this.#accessKey,
-        body: {
-          objectKey: file.name,
-          contentType: file.type,
-          objectMetadata: arrayMetaData,
-        },
-        throwError: true,
-      });
-      console.log(res, "res for start");
-      const totalChunks = getFileChunks(file);
-      console.log(totalChunks, "total chunks");
-      for (let i = 0; i < totalChunks.length; i++) {
-        const data: { url: string } = await fetchData({
-          path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res: { key: string; uploadId: string } = await fetchData({
+          path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
           apiKey: this.#accessKey,
           body: {
-            objectKey: res?.key,
-            uploadId: res?.uploadId,
-            partNumber: i + 1,
+            objectKey: file.name,
+            contentType: file.type,
+            objectMetadata: arrayMetaData,
           },
           throwError: true,
         });
-        console.log(data, "data for signed url");
-        await axios.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
+        console.log(res, "res for start");
+        const totalChunks = getFileChunks(file);
+        console.log(totalChunks, "total chunks");
+        const parts = [];
+        for (let i = 0; i < totalChunks.length; i++) {
+          const data: { url: string } = await fetchData({
+            path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+            apiKey: this.#accessKey,
+            body: {
+              objectKey: res?.key,
+              uploadId: res?.uploadId,
+              partNumber: i + 1,
+            },
+            throwError: true,
+          });
+          console.log(data, "data for signed url");
+          const val = await axios.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
+          parts.push({ PartNumber: i + 1, ETag: '"958057f9cd1d264e94fcc0d2ccabc09f"' });
+          console.log(val?.data, "after uploading");
+        }
+        const completeValue = await fetchData({
+          path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+          apiKey: this.#accessKey,
+          body: {
+            uploadId: res?.uploadId,
+            objectKey: res?.key,
+            parts,
+            originalFileName: file.name,
+          },
+        });
+        resolve({ message: "successfully uploaded", data: completeValue });
+      } catch (error: any) {
+        reject(error);
       }
-      return { message: "successfully uploaded" };
-    } catch (error: any) {
-      throw new Error(`Failed to upload: ${error?.message || "something went wrong"}`);
-    }
+    });
   }
 }

@@ -137,40 +137,57 @@ class FileUpload {
       if (!checkMetaDataValue(arrayMetaData)) {
         throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
       }
-      try {
-        const res = yield fetchData({
-          path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-          apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-          body: {
-            objectKey: file.name,
-            contentType: file.type,
-            objectMetadata: arrayMetaData,
-          },
-          throwError: true,
-        });
-        console.log(res, "res for start");
-        const totalChunks = getFileChunks(file);
-        console.log(totalChunks, "total chunks");
-        for (let i = 0; i < totalChunks.length; i++) {
-          const data = yield fetchData({
-            path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-            apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-            body: {
-              objectKey: res === null || res === void 0 ? void 0 : res.key,
-              uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
-              partNumber: i + 1,
-            },
-            throwError: true,
-          });
-          console.log(data, "data for signed url");
-          yield axios.put(data === null || data === void 0 ? void 0 : data.url, totalChunks[i], {
-            headers: { "Content-Type": file.type, "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") },
-          });
-        }
-        return { message: "successfully uploaded" };
-      } catch (error) {
-        throw new Error(`Failed to upload: ${(error === null || error === void 0 ? void 0 : error.message) || "something went wrong"}`);
-      }
+      return new Promise((resolve, reject) =>
+        __awaiter(this, void 0, void 0, function* () {
+          try {
+            const res = yield fetchData({
+              path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              body: {
+                objectKey: file.name,
+                contentType: file.type,
+                objectMetadata: arrayMetaData,
+              },
+              throwError: true,
+            });
+            console.log(res, "res for start");
+            const totalChunks = getFileChunks(file);
+            console.log(totalChunks, "total chunks");
+            const parts = [];
+            for (let i = 0; i < totalChunks.length; i++) {
+              const data = yield fetchData({
+                path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+                apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                body: {
+                  objectKey: res === null || res === void 0 ? void 0 : res.key,
+                  uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
+                  partNumber: i + 1,
+                },
+                throwError: true,
+              });
+              console.log(data, "data for signed url");
+              const val = yield axios.put(data === null || data === void 0 ? void 0 : data.url, totalChunks[i], {
+                headers: { "Content-Type": file.type, "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") },
+              });
+              parts.push({ PartNumber: i + 1, ETag: '"958057f9cd1d264e94fcc0d2ccabc09f"' });
+              console.log(val === null || val === void 0 ? void 0 : val.data, "after uploading");
+            }
+            const completeValue = yield fetchData({
+              path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+              apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              body: {
+                uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
+                objectKey: res === null || res === void 0 ? void 0 : res.key,
+                parts,
+                originalFileName: file.name,
+              },
+            });
+            resolve({ message: "successfully uploaded", data: completeValue });
+          } catch (error) {
+            reject(error);
+          }
+        })
+      );
     });
   }
 }

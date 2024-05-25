@@ -76,7 +76,7 @@ export function checkMetaDataValue(arr: ObjMetaData[]): boolean {
   return true;
 }
 
-export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024) {
+export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024): Blob[] {
   const totalSize = file.size;
   const chunks = [];
   let start = 0;
