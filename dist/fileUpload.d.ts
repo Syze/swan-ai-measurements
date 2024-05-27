@@ -18,6 +18,6 @@ export default class FileUpload {
     #private;
     constructor(accessKey: string, stagingUrl?: boolean);
     uploadFileFrontend({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
-    uploadFileBackend({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
+    uploadFile({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
 }
 export {};

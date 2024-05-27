@@ -37,6 +37,13 @@ class Custom {
         __classPrivateFieldSet(this, _Custom_accessKey, accessKey, "f");
         __classPrivateFieldSet(this, _Custom_stagingUrl, stagingUrl, "f");
     }
+    createCustomer(payload) {
+        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Custom_stagingUrl, "f") })}${API_ENDPOINTS.CREATE_CUSTOMER}`, {
+            payload,
+            headers: { "X-Api-Key": __classPrivateFieldGet(this, _Custom_accessKey, "f") },
+        });
+    }
+    ;
 }
 _Custom_accessKey = new WeakMap(), _Custom_stagingUrl = new WeakMap();
 export default Custom;

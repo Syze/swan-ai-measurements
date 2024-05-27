@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
     VERIFY_USER: "/auth/verify",
     ADD_USER: "/user",
     CUSTOM_CUSTOMER: "/customers/custom",
+    CREATE_CUSTOMER: "/customers",
     MODEL: "/model",
     TRY_ON_SCAN: "/tryon/scan",
     TRY_ON_IMAGE_UPLOAD: "/tryon/user-image-urls/upload",

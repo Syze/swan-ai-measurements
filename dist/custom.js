@@ -13,6 +13,13 @@ class Custom {
         this.#accessKey = accessKey;
         this.#stagingUrl = stagingUrl;
     }
+    createCustomer(payload) {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.CREATE_CUSTOMER}`, {
+            payload,
+            headers: { "X-Api-Key": this.#accessKey },
+        });
+    }
+    ;
     getCustomCustomerConfig = (store_url) => {
         if ((0, utils_js_1.checkParameters)(store_url) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);

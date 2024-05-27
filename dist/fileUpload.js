@@ -87,7 +87,7 @@ class FileUpload {
             });
         });
     }
-    async uploadFileBackend({ file, arrayMetaData, scanId }) {
+    async uploadFile({ file, arrayMetaData, scanId }) {
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
