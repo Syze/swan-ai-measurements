@@ -109,7 +109,7 @@ export default class FileUpload {
     });
   }
 
-  async uploadFileBackend({ file, arrayMetaData, scanId }: UploadOptions) {
+  async uploadFile({ file, arrayMetaData, scanId }: UploadOptions) {
     if (!checkParameters(file, arrayMetaData, scanId)) {
       throw new Error(REQUIRED_MESSAGE);
     }

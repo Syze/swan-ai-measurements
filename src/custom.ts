@@ -10,6 +10,13 @@ class Custom {
     this.#stagingUrl = stagingUrl;
   }
 
+  createCustomer(payload: {name: string, store_url: string, location: string, email: string, emailsTier_1: string, emailsTier_2: string}): Promise<AxiosResponse<any>>{
+    return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.CREATE_CUSTOMER}`, {
+      payload,
+      headers: { "X-Api-Key": this.#accessKey },
+    });
+  };
+
   getCustomCustomerConfig: (store_url: string) => Promise<AxiosResponse<any>> = (store_url: string) => {
     if (checkParameters(store_url) === false) {
       throw new Error(REQUIRED_MESSAGE);
