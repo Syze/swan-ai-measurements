@@ -29,7 +29,7 @@ interface GetTryOnResultParams {
 }
 declare class TryOn {
     #private;
-    constructor(accessKey: string);
+    constructor(accessKey: string, stagingUrl?: boolean);
     uploadFile({ files, userId }: UploadFileParams): Promise<string>;
     getUploadedFiles(userId: string): Promise<AxiosResponse<any>>;
     deleteImage({ userId, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;

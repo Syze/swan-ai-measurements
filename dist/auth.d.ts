@@ -24,7 +24,7 @@ interface AuthSocketParams {
 }
 export default class Auth {
     #private;
-    constructor(accessKey: string);
+    constructor(accessKey: string, stagingUrl?: boolean);
     registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse>;
     verifyToken(token: string): Promise<AxiosResponse>;
     addUser({ scanId, email, name, height, gender, offsetMarketingConsent }: AddUserParams): Promise<AxiosResponse>;

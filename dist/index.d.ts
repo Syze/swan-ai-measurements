@@ -12,6 +12,6 @@ declare class Swan {
     measurement: Measurement;
     poseDetection: PoseDetection;
     tryOn: TryOn;
-    constructor(accessKey: string);
+    constructor(accessKey: string, prod?: boolean);
 }
 export default Swan;

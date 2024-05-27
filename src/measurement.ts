@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_RECOMMENDATION_WEBSOCKET_URL, APP_TRY_ON_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { checkParameters } from "./utils.js";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters, getUrl } from "./utils.js";
 
 interface TryOnSocketOptions {
   shopDomain: string;
@@ -45,16 +45,18 @@ class Measurement {
   #timerWaitingRef: NodeJS.Timeout | null = null;
   #count: number = 1;
   #accessKey: string;
+  #stagingUrl: boolean;
 
-  constructor(accessKey: string) {
+  constructor(accessKey: string, stagingUrl = false) {
     this.#accessKey = accessKey;
+    this.#stagingUrl = stagingUrl;
   }
 
   getMeasurementResult(scanId: string): Promise<AxiosResponse<any>> {
     if (!checkParameters(scanId)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    const url = `${APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
+    const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}/measurements?scanId=${scanId}`;
     return axios.get(url, {
       headers: { "X-Api-Key": this.#accessKey },
     });
@@ -64,7 +66,9 @@ class Measurement {
     if (!checkParameters(scanId, shopDomain, productName)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    const tryOnUrl = `${APP_AUTH_BASE_URL}${API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
+    const tryOnUrl = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${
+      API_ENDPOINTS.TRY_ON_SCAN
+    }/${scanId}/shop/${shopDomain}/product/${productName}`;
     return axios.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
   }
 
@@ -76,7 +80,10 @@ class Measurement {
     }
 
     this.#tryOnSocketRef?.close();
-    const url = `${APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
+    const url = `${getUrl({
+      urlName: APP_BASE_WEBSOCKET_URL,
+      stagingUrl: this.#stagingUrl,
+    })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
     this.#tryOnSocketRef = new WebSocket(url);
 
     this.#tryOnSocketRef.onopen = () => {
@@ -169,7 +176,7 @@ class Measurement {
 
     setTimeout(() => {
       this.#disconnectSocket();
-      const url = `${APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
+      const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}/${API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
       this.#measurementSocketRef = new WebSocket(url);
       this.#measurementSocketRef.onopen = () => {
         onOpen?.();

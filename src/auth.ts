@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_AUTH_WEBSOCKET_URL, APP_BASE_URL, REQUIRED_MESSAGE } from "./constants.js";
-import { checkParameters } from "./utils.js";
+import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
+import { checkParameters, getUrl } from "./utils.js";
 
 interface RegisterUserParams {
   email: string;
@@ -36,9 +36,11 @@ interface AuthSocketDetail {
 export default class Auth {
   #socketRef?: WebSocket;
   #accessKey: string;
+  #stagingUrl: boolean;
 
-  constructor(accessKey: string) {
+  constructor(accessKey: string, stagingUrl = false) {
     this.#accessKey = accessKey;
+    this.#stagingUrl = stagingUrl;
   }
 
   registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse> {
@@ -49,7 +51,7 @@ export default class Auth {
     if (gender && height) {
       body = { ...body, attributes: { gender, height } };
     }
-    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.REGISTER_USER}`, body, {
+    return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.REGISTER_USER}`, body, {
       headers: { "X-Api-Key": this.#accessKey },
     });
   }
@@ -58,7 +60,7 @@ export default class Auth {
     if (!checkParameters(token)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    return axios.post(`${APP_AUTH_BASE_URL}${API_ENDPOINTS.VERIFY_USER}`, null, {
+    return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.VERIFY_USER}`, null, {
       params: { token },
       headers: { "X-Api-Key": this.#accessKey },
     });
@@ -69,7 +71,7 @@ export default class Auth {
       throw new Error(REQUIRED_MESSAGE);
     }
     return axios.post(
-      `${APP_AUTH_BASE_URL}${API_ENDPOINTS.ADD_USER}`,
+      `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.ADD_USER}`,
       { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) },
       { headers: { "X-Api-Key": this.#accessKey } }
     );
@@ -79,7 +81,7 @@ export default class Auth {
     if (!checkParameters(email)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    return axios.get(`${APP_BASE_URL}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+    return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
       headers: { "X-Api-Key": this.#accessKey },
     });
   }
@@ -90,7 +92,7 @@ export default class Auth {
     }
     if (this.#socketRef) this.#socketRef.close();
 
-    this.#socketRef = new WebSocket(`${APP_AUTH_WEBSOCKET_URL}${API_ENDPOINTS.AUTH}`);
+    this.#socketRef = new WebSocket(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.AUTH}`);
     const detailObj: AuthSocketDetail = { email, scanId };
 
     this.#socketRef.onopen = () => {

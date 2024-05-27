@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants.js";
+import { getUrl } from "./utils.js";
 
 interface VideoEmitOptions {
   image: string;
@@ -11,14 +12,15 @@ type PoseStatusCallback = (data: any) => void;
 class PoseDetection {
   #socketRef: Socket | null = null;
   #accessKey: string;
-
-  constructor(accessKey: string) {
+  #stagingUrl: boolean;
+  constructor(accessKey: string, stagingUrl = false) {
     this.#accessKey = accessKey;
+    this.#stagingUrl = stagingUrl;
   }
 
   connect(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.#socketRef = io(APP_POSE_DETECTION_WEBSOCKET_URL, {
+      this.#socketRef = io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, stagingUrl: this.#stagingUrl }), {
         auth: {
           token: this.#accessKey,
         },

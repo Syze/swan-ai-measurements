@@ -46,17 +46,19 @@ var __classPrivateFieldGet =
       throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
   };
-var _FileUpload_uppyIns, _FileUpload_accessKey;
+var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT } from "./constants.js";
 import { checkMetaDataValue, checkParameters, fetchData, getFileChunks } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
-  constructor(accessKey) {
+  constructor(accessKey, stagingUrl = false) {
     _FileUpload_uppyIns.set(this, void 0);
     _FileUpload_accessKey.set(this, void 0);
+    _FileUpload_stagingUrl.set(this, void 0);
     __classPrivateFieldSet(this, _FileUpload_accessKey, accessKey, "f");
+    __classPrivateFieldSet(this, _FileUpload_stagingUrl, stagingUrl, "f");
   }
   uploadFileFrontend(_a) {
     return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
@@ -80,6 +82,7 @@ class FileUpload {
             return fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
               body: {
                 objectKey,
                 contentType: file.type,
@@ -91,6 +94,7 @@ class FileUpload {
             fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
               body: {
                 uploadId,
                 objectKey: key,
@@ -101,6 +105,7 @@ class FileUpload {
           signPart: (file, partData) =>
             fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+              stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
               body: {
                 objectKey: partData.key,
@@ -144,6 +149,7 @@ class FileUpload {
             const res = yield fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
               body: {
                 objectKey: file.name,
                 contentType: file.type,
@@ -157,6 +163,7 @@ class FileUpload {
               const data = yield fetchData({
                 path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                 apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
                 body: {
                   objectKey: res === null || res === void 0 ? void 0 : res.key,
                   uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
@@ -175,6 +182,7 @@ class FileUpload {
             const completeValue = yield fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
               apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+              stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
               body: {
                 uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
                 objectKey: res === null || res === void 0 ? void 0 : res.key,
@@ -192,5 +200,5 @@ class FileUpload {
     });
   }
 }
-(_FileUpload_uppyIns = new WeakMap()), (_FileUpload_accessKey = new WeakMap());
+(_FileUpload_uppyIns = new WeakMap()), (_FileUpload_accessKey = new WeakMap()), (_FileUpload_stagingUrl = new WeakMap());
 export default FileUpload;

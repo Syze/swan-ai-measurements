@@ -7,8 +7,13 @@ export interface FetchDataOptions {
     apiKey?: string;
     headers?: Record<string, string>;
     throwError?: boolean;
+    stagingUrl: boolean;
 }
 export declare function fetchData(options: FetchDataOptions): Promise<any>;
 export declare function checkParameters(...args: any[]): boolean;
 export declare function checkMetaDataValue(arr: ObjMetaData[]): boolean;
 export declare function getFileChunks(file: File, chunkSize?: number): Blob[];
+export declare const getUrl: ({ urlName, stagingUrl }: {
+    urlName: string;
+    stagingUrl: boolean;
+}) => string;

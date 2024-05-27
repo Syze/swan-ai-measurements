@@ -24,9 +24,11 @@ interface UploadOptions {
 export default class FileUpload {
   #uppyIns: any;
   #accessKey: string;
+  #stagingUrl: boolean;
 
-  constructor(accessKey: string) {
+  constructor(accessKey: string, stagingUrl = false) {
     this.#accessKey = accessKey;
+    this.#stagingUrl = stagingUrl;
   }
 
   async uploadFileFrontend({ file, arrayMetaData, scanId }: UploadOptions) {
@@ -51,6 +53,7 @@ export default class FileUpload {
           return fetchData({
             path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
             apiKey: this.#accessKey,
+            stagingUrl: this.#stagingUrl,
             body: {
               objectKey,
               contentType: file.type,
@@ -62,6 +65,7 @@ export default class FileUpload {
           fetchData({
             path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
             apiKey: this.#accessKey,
+            stagingUrl: this.#stagingUrl,
             body: {
               uploadId,
               objectKey: key,
@@ -73,6 +77,7 @@ export default class FileUpload {
         signPart: (file: any, partData: any) =>
           fetchData({
             path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+            stagingUrl: this.#stagingUrl,
             apiKey: this.#accessKey,
             body: {
               objectKey: partData.key,
@@ -115,6 +120,7 @@ export default class FileUpload {
         const res: { key: string; uploadId: string } = await fetchData({
           path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
           apiKey: this.#accessKey,
+          stagingUrl: this.#stagingUrl,
           body: {
             objectKey: file.name,
             contentType: file.type,
@@ -128,6 +134,7 @@ export default class FileUpload {
           const data: { url: string } = await fetchData({
             path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
             apiKey: this.#accessKey,
+            stagingUrl: this.#stagingUrl,
             body: {
               objectKey: res?.key,
               uploadId: res?.uploadId,
@@ -141,6 +148,7 @@ export default class FileUpload {
         const completeValue = await fetchData({
           path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
           apiKey: this.#accessKey,
+          stagingUrl: this.#stagingUrl,
           body: {
             uploadId: res?.uploadId,
             objectKey: res?.key,

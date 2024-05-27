@@ -1,15 +1,14 @@
-export declare const APP_BASE_URL: string;
-export declare const APP_AUTH_BASE_URL: string;
-export declare const APP_AUTH_WEBSOCKET_URL: string;
-export declare const APP_TRY_ON_WEBSOCKET_URL: string;
-export declare const APP_RECOMMENDATION_WEBSOCKET_URL: string;
-export declare const APP_POSE_DETECTION_WEBSOCKET_URL: string;
+export declare const STAGING_URL: Record<string, string>;
+export declare const PROD_URL: Record<string, string>;
 export declare const FILE_UPLOAD_ENDPOINT: {
     UPLOAD_START: string;
     UPLOAD_COMPLETE: string;
     UPLOAD_SIGN_PART: string;
     UPLOAD_ABORT: string;
 };
+export declare const APP_AUTH_BASE_URL = "APP_AUTH_BASE_URL";
+export declare const APP_BASE_WEBSOCKET_URL = "APP_BASE_WEBSOCKET_URL";
+export declare const APP_POSE_DETECTION_WEBSOCKET_URL = "APP_POSE_DETECTION_WEBSOCKET_URL";
 export declare const API_ENDPOINTS: {
     [key: string]: string;
 };

@@ -9,18 +9,21 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _PoseDetection_socketRef, _PoseDetection_accessKey;
+var _PoseDetection_socketRef, _PoseDetection_accessKey, _PoseDetection_stagingUrl;
 import { io } from "socket.io-client";
 import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants.js";
+import { getUrl } from "./utils.js";
 class PoseDetection {
-    constructor(accessKey) {
+    constructor(accessKey, stagingUrl = false) {
         _PoseDetection_socketRef.set(this, null);
         _PoseDetection_accessKey.set(this, void 0);
+        _PoseDetection_stagingUrl.set(this, void 0);
         __classPrivateFieldSet(this, _PoseDetection_accessKey, accessKey, "f");
+        __classPrivateFieldSet(this, _PoseDetection_stagingUrl, stagingUrl, "f");
     }
     connect() {
         return new Promise((resolve, reject) => {
-            __classPrivateFieldSet(this, _PoseDetection_socketRef, io(APP_POSE_DETECTION_WEBSOCKET_URL, {
+            __classPrivateFieldSet(this, _PoseDetection_socketRef, io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _PoseDetection_stagingUrl, "f") }), {
                 auth: {
                     token: __classPrivateFieldGet(this, _PoseDetection_accessKey, "f"),
                 },
@@ -66,5 +69,5 @@ class PoseDetection {
         return !!((_a = __classPrivateFieldGet(this, _PoseDetection_socketRef, "f")) === null || _a === void 0 ? void 0 : _a.connected);
     }
 }
-_PoseDetection_socketRef = new WeakMap(), _PoseDetection_accessKey = new WeakMap();
+_PoseDetection_socketRef = new WeakMap(), _PoseDetection_accessKey = new WeakMap(), _PoseDetection_stagingUrl = new WeakMap();
 export default PoseDetection;

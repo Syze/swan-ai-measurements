@@ -7,6 +7,7 @@ import TryOn from "./tryOn.js";
 
 class Swan {
   #accessKey: string;
+  #stagingUrl: boolean;
   auth: Auth;
   custom: Custom;
   fileUpload: FileUpload;
@@ -14,15 +15,15 @@ class Swan {
   poseDetection: PoseDetection;
   tryOn: TryOn;
 
-  constructor(accessKey: string) {
+  constructor(accessKey: string, prod = false) {
     this.#accessKey = accessKey;
-
-    this.auth = new Auth(this.#accessKey);
-    this.custom = new Custom(this.#accessKey);
-    this.fileUpload = new FileUpload(this.#accessKey);
-    this.measurement = new Measurement(this.#accessKey);
-    this.poseDetection = new PoseDetection(this.#accessKey);
-    this.tryOn = new TryOn(this.#accessKey);
+    this.#stagingUrl = prod;
+    this.auth = new Auth(this.#accessKey, this.#stagingUrl);
+    this.custom = new Custom(this.#accessKey, this.#stagingUrl);
+    this.fileUpload = new FileUpload(this.#accessKey, this.#stagingUrl);
+    this.measurement = new Measurement(this.#accessKey, this.#stagingUrl);
+    this.poseDetection = new PoseDetection(this.#accessKey, this.#stagingUrl);
+    this.tryOn = new TryOn(this.#accessKey, this.#stagingUrl);
   }
 }
 

@@ -11,20 +11,22 @@ const poseDetection_js_1 = __importDefault(require("./poseDetection.js"));
 const tryOn_js_1 = __importDefault(require("./tryOn.js"));
 class Swan {
     #accessKey;
+    #stagingUrl;
     auth;
     custom;
     fileUpload;
     measurement;
     poseDetection;
     tryOn;
-    constructor(accessKey) {
+    constructor(accessKey, prod = false) {
         this.#accessKey = accessKey;
-        this.auth = new auth_js_1.default(this.#accessKey);
-        this.custom = new custom_js_1.default(this.#accessKey);
-        this.fileUpload = new fileUpload_js_1.default(this.#accessKey);
-        this.measurement = new measurement_js_1.default(this.#accessKey);
-        this.poseDetection = new poseDetection_js_1.default(this.#accessKey);
-        this.tryOn = new tryOn_js_1.default(this.#accessKey);
+        this.#stagingUrl = prod;
+        this.auth = new auth_js_1.default(this.#accessKey, this.#stagingUrl);
+        this.custom = new custom_js_1.default(this.#accessKey, this.#stagingUrl);
+        this.fileUpload = new fileUpload_js_1.default(this.#accessKey, this.#stagingUrl);
+        this.measurement = new measurement_js_1.default(this.#accessKey, this.#stagingUrl);
+        this.poseDetection = new poseDetection_js_1.default(this.#accessKey, this.#stagingUrl);
+        this.tryOn = new tryOn_js_1.default(this.#accessKey, this.#stagingUrl);
     }
 }
 exports.default = Swan;

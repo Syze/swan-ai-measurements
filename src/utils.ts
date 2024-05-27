@@ -1,5 +1,5 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { APP_AUTH_BASE_URL, ObjMetaData, requiredMetaData } from "./constants.js";
+import axios, { AxiosResponse } from "axios";
+import { APP_AUTH_BASE_URL, ObjMetaData, PROD_URL, STAGING_URL, requiredMetaData } from "./constants.js";
 
 export interface FetchDataOptions {
   path: string;
@@ -9,6 +9,7 @@ export interface FetchDataOptions {
   apiKey?: string;
   headers?: Record<string, string>;
   throwError?: boolean;
+  stagingUrl: boolean;
 }
 
 export async function fetchData(options: FetchDataOptions): Promise<any> {
@@ -20,9 +21,10 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     apiKey = "",
     throwError = false,
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
+    stagingUrl = false,
   } = options;
 
-  const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
+  const apiUrl = `${getUrl({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
     const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers });
     if (res.status >= 200 && res.status < 300) {
@@ -86,3 +88,10 @@ export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024): Blob[] {
   }
   return chunks;
 }
+
+export const getUrl = ({ urlName, stagingUrl = false }: { urlName: string; stagingUrl: boolean }) => {
+  if (stagingUrl) {
+    return STAGING_URL[urlName];
+  }
+  return PROD_URL[urlName];
+};

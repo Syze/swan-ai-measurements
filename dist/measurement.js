@@ -13,14 +13,16 @@ class Measurement {
     #timerWaitingRef = null;
     #count = 1;
     #accessKey;
-    constructor(accessKey) {
+    #stagingUrl;
+    constructor(accessKey, stagingUrl = false) {
         this.#accessKey = accessKey;
+        this.#stagingUrl = stagingUrl;
     }
     getMeasurementResult(scanId) {
         if (!(0, utils_js_1.checkParameters)(scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const url = `${constants_js_1.APP_AUTH_BASE_URL}/measurements?scanId=${scanId}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}/measurements?scanId=${scanId}`;
         return axios_1.default.get(url, {
             headers: { "X-Api-Key": this.#accessKey },
         });
@@ -29,7 +31,7 @@ class Measurement {
         if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const tryOnUrl = `${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
+        const tryOnUrl = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
         return axios_1.default.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
     }
     handleTryOnSocket(options) {
@@ -38,7 +40,10 @@ class Measurement {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         this.#tryOnSocketRef?.close();
-        const url = `${constants_js_1.APP_TRY_ON_WEBSOCKET_URL}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
+        const url = `${(0, utils_js_1.getUrl)({
+            urlName: constants_js_1.APP_BASE_WEBSOCKET_URL,
+            stagingUrl: this.#stagingUrl,
+        })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
         this.#tryOnSocketRef = new WebSocket(url);
         this.#tryOnSocketRef.onopen = () => {
             onOpen?.();
@@ -120,7 +125,7 @@ class Measurement {
         }
         setTimeout(() => {
             this.#disconnectSocket();
-            const url = `${constants_js_1.APP_RECOMMENDATION_WEBSOCKET_URL}?scanId=${scanId}`;
+            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}/${constants_js_1.API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
             this.#measurementSocketRef = new WebSocket(url);
             this.#measurementSocketRef.onopen = () => {
                 onOpen?.();

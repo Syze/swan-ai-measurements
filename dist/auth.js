@@ -9,8 +9,10 @@ const utils_js_1 = require("./utils.js");
 class Auth {
     #socketRef;
     #accessKey;
-    constructor(accessKey) {
+    #stagingUrl;
+    constructor(accessKey, stagingUrl = false) {
         this.#accessKey = accessKey;
+        this.#stagingUrl = stagingUrl;
     }
     registerUser({ email, appVerifyUrl, gender, height, username }) {
         if (!(0, utils_js_1.checkParameters)(email, appVerifyUrl)) {
@@ -20,7 +22,7 @@ class Auth {
         if (gender && height) {
             body = { ...body, attributes: { gender, height } };
         }
-        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.REGISTER_USER}`, body, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.REGISTER_USER}`, body, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -28,7 +30,7 @@ class Auth {
         if (!(0, utils_js_1.checkParameters)(token)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.VERIFY_USER}`, null, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.VERIFY_USER}`, null, {
             params: { token },
             headers: { "X-Api-Key": this.#accessKey },
         });
@@ -37,13 +39,13 @@ class Auth {
         if (!(0, utils_js_1.checkParameters)(scanId, email, height, gender)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${constants_js_1.APP_AUTH_BASE_URL}${constants_js_1.API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": this.#accessKey } });
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": this.#accessKey } });
     }
     getUserDetail(email) {
         if (!(0, utils_js_1.checkParameters)(email)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.get(`${constants_js_1.APP_BASE_URL}${constants_js_1.API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -53,7 +55,7 @@ class Auth {
         }
         if (this.#socketRef)
             this.#socketRef.close();
-        this.#socketRef = new WebSocket(`${constants_js_1.APP_AUTH_WEBSOCKET_URL}${constants_js_1.API_ENDPOINTS.AUTH}`);
+        this.#socketRef = new WebSocket(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.AUTH}`);
         const detailObj = { email, scanId };
         this.#socketRef.onopen = () => {
             this.#socketRef?.send(JSON.stringify(detailObj));

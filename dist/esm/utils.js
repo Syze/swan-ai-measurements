@@ -8,11 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import axios from "axios";
-import { APP_AUTH_BASE_URL, requiredMetaData } from "./constants.js";
+import { APP_AUTH_BASE_URL, PROD_URL, STAGING_URL, requiredMetaData } from "./constants.js";
 export function fetchData(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, } = options;
-        const apiUrl = `${baseUrl}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
+        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, stagingUrl = false, } = options;
+        const apiUrl = `${getUrl({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
             const res = yield axios.post(apiUrl, body, { headers });
             if (res.status >= 200 && res.status < 300) {
@@ -75,3 +75,9 @@ export function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {
     }
     return chunks;
 }
+export const getUrl = ({ urlName, stagingUrl = false }) => {
+    if (stagingUrl) {
+        return STAGING_URL[urlName];
+    }
+    return PROD_URL[urlName];
+};

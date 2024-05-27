@@ -5,7 +5,7 @@ interface VideoEmitOptions {
 type PoseStatusCallback = (data: any) => void;
 declare class PoseDetection {
     #private;
-    constructor(accessKey: string);
+    constructor(accessKey: string, stagingUrl?: boolean);
     connect(): Promise<string>;
     videoEmit({ image, scanId }: VideoEmitOptions): void;
     disconnect(): void;
