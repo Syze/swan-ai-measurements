@@ -139,7 +139,7 @@ class FileUpload {
       }
       return new Promise((resolve, reject) =>
         __awaiter(this, void 0, void 0, function* () {
-          var _b, _c;
+          var _b;
           try {
             const res = yield fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -171,10 +171,6 @@ class FileUpload {
                 PartNumber: i + 1,
                 ETag: (_b = val === null || val === void 0 ? void 0 : val.headers) === null || _b === void 0 ? void 0 : _b.etag,
               });
-              console.log(
-                (_c = val === null || val === void 0 ? void 0 : val.headers) === null || _c === void 0 ? void 0 : _c.etag,
-                "after uploading"
-              );
             }
             const completeValue = yield fetchData({
               path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,

@@ -137,7 +137,6 @@ export default class FileUpload {
           });
           const val = await axios.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
           parts.push({ PartNumber: i + 1, ETag: val?.headers?.etag });
-          console.log(val?.headers?.etag, "after uploading");
         }
         const completeValue = await fetchData({
           path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
