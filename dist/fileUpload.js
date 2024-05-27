@@ -27,8 +27,8 @@ class FileUpload {
             if (this.#uppyIns) {
                 this.#uppyIns.close();
             }
-            this.#uppyIns = new Uppy({ autoProceed: true });
-            this.#uppyIns.use(AwsS3Multipart, {
+            this.#uppyIns = new Uppy.default({ autoProceed: true });
+            this.#uppyIns.use(AwsS3Multipart.default, {
                 limit: 10,
                 retryDelays: [0, 1000, 3000, 5000],
                 companionUrl: (0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
