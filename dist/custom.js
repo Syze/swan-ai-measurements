@@ -15,7 +15,7 @@ class Custom {
     }
     createCustomer(payload) {
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.CREATE_CUSTOMER}`, {
-            payload,
+            ...payload,
             headers: { "X-Api-Key": this.#accessKey },
         });
     }

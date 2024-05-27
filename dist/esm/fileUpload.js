@@ -22,7 +22,7 @@ var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL } from "./constants.js";
 import { checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
-import  Uppy from "@uppy/core";  
+import  Uppy from "@uppy/core"; 
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
     constructor(accessKey, stagingUrl = false) {

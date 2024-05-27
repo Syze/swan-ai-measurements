@@ -27,7 +27,7 @@ class Custom {
         API_ENDPOINTS.CREATE_CUSTOMER
       }`,
       {
-        payload,
+        ...payload,
         headers: { "X-Api-Key": this.#accessKey },
       }
     );
