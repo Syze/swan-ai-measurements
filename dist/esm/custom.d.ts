@@ -4,7 +4,7 @@ declare class Custom {
     constructor(accessKey: string, stagingUrl?: boolean);
     createCustomer(payload: {
         name: string;
-        store_url: string;
+        storeUrl: string;
         location: string;
         email: string;
         emailsTier_1: string;
