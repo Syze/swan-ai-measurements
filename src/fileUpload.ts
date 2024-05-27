@@ -1,6 +1,6 @@
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData, getFileChunks } from "./utils.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
 const Uppy = require("fix-esm").require("@uppy/core");
 const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
 interface ObjMetaData {
@@ -47,6 +47,7 @@ export default class FileUpload {
       this.#uppyIns.use(AwsS3Multipart.default, {
         limit: 10,
         retryDelays: [0, 1000, 3000, 5000],
+        companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
         getChunkSize: () => 5 * 1024 * 1024,
         createMultipartUpload: (file: any) => {
           const objectKey = `${scanId}.${file.extension}`;

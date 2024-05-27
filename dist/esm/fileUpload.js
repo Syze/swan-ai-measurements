@@ -48,8 +48,8 @@ var __classPrivateFieldGet =
   };
 var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData, getFileChunks } from "./utils.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL } from "./constants.js";
+import { checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
@@ -76,6 +76,7 @@ class FileUpload {
         __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart, {
           limit: 10,
           retryDelays: [0, 1000, 3000, 5000],
+          companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f") }),
           getChunkSize: () => 5 * 1024 * 1024,
           createMultipartUpload: (file) => {
             const objectKey = `${scanId}.${file.extension}`;
