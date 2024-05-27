@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
-import  Uppy from "@uppy/core";  
-import AwsS3Multipart from "@uppy/aws-s3-multipart";
+const Uppy = require("fix-esm").require("@uppy/core");
+const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
 class FileUpload {
     #uppyIns;
     #accessKey;
