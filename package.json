@@ -39,7 +39,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/paras-swan/swan-ai-measurements.git"
+    "url": "https://github.com/Syze/swan-ai-measurements.git"
   },
   "keywords": [
     "swan",
@@ -49,7 +49,7 @@
   "author": "paras",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/paras-swan/swan-ai-measurements/issues"
+    "url": "https://github.com/Syze/swan-ai-measurements.git/issues"
   },
   "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme",
   "devDependencies": {
