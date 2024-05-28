@@ -51,7 +51,7 @@
   "bugs": {
     "url": "https://github.com/Syze/swan-ai-measurements.git/issues"
   },
-  "homepage": "https://github.com/paras-swan/swan-ai-measurements#readme",
+  "homepage": "https://github.com/Syze/swan-ai-measurements.git#readme",
   "devDependencies": {
     "nodemon": "^3.1.0"
   }

@@ -10,7 +10,6 @@ async function fetchData(options) {
     const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, stagingUrl = false, } = options;
     const apiUrl = `${(0, exports.getUrl)({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
     try {
-        console.log(body);
         const res = await axios_1.default.post(apiUrl, body, { headers });
         if (res.status >= 200 && res.status < 300) {
             return res.data;

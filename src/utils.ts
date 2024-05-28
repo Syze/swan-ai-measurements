@@ -26,7 +26,6 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
 
   const apiUrl = `${getUrl({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
-    console.log(body);
     const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers });
     if (res.status >= 200 && res.status < 300) {
       return res.data;

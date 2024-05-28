@@ -14,7 +14,6 @@ export function fetchData(options) {
         const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, stagingUrl = false, } = options;
         const apiUrl = `${getUrl({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
-            console.log(body);
             const res = yield axios.post(apiUrl, body, { headers });
             if (res.status >= 200 && res.status < 300) {
                 return res.data;
