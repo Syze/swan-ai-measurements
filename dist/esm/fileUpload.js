@@ -144,6 +144,7 @@ class FileUpload {
       if (!checkMetaDataValue(arrayMetaData)) {
         throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
       }
+      arrayMetaData = addScanType(arrayMetaData, scanId);
       return new Promise((resolve, reject) =>
         __awaiter(this, void 0, void 0, function* () {
           var _b;
