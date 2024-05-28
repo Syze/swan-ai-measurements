@@ -4,8 +4,8 @@ interface CreateCustomer {
     storeUrl: string;
     location: string;
     email: string;
-    emailsTier_1: string;
-    emailsTier_2: string;
+    emailsTier_1?: string;
+    emailsTier_2?: string;
 }
 declare class Custom {
     #private;

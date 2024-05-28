@@ -41,6 +41,9 @@ class Custom {
         __classPrivateFieldSet(this, _Custom_stagingUrl, stagingUrl, "f");
     }
     createCustomer(payload) {
+        if (checkParameters(payload.name, payload.storeUrl, payload.email, payload.location)) {
+            throw new Error(REQUIRED_MESSAGE);
+        }
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Custom_stagingUrl, "f") })}${API_ENDPOINTS.CREATE_CUSTOMER}`, Object.assign(Object.assign({}, payload), { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Custom_accessKey, "f") } }));
     }
 }

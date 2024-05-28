@@ -7,8 +7,8 @@ interface CreateCustomer {
   storeUrl: string;
   location: string;
   email: string;
-  emailsTier_1: string;
-  emailsTier_2: string;
+  emailsTier_1?: string;
+  emailsTier_2?: string;
 }
 class Custom {
   #accessKey: string;
@@ -19,6 +19,9 @@ class Custom {
   }
 
   createCustomer(payload: CreateCustomer): Promise<AxiosResponse<any>> {
+    if (checkParameters(payload.name, payload.storeUrl, payload.email, payload.location)) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.CREATE_CUSTOMER}`, {
       ...payload,
       headers: { "X-Api-Key": this.#accessKey },
