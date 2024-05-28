@@ -22,7 +22,7 @@ Node 20 or higher.
 
 ##### Upload file
 
-    swan.fileUpload.uploadFile({ file, objMetaData, scanId })
+    swan.fileUpload.uploadFile({ file, arrayMetaData, scanId })
 
 ##### Get measurements
 
