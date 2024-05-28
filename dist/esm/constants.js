@@ -34,14 +34,6 @@ export const API_ENDPOINTS = {
     AUTH: "/auth",
     SCANNING: "/scanning",
 };
-export const requiredMetaData = [
-    "gender",
-    "email",
-    "focal_length",
-    "height",
-    "customer_store_url",
-    "callback_url",
-    "clothes_fit",
-];
+export const requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
 export const REQUIRED_MESSAGE = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";

@@ -57,15 +57,7 @@ export interface ObjMetaData {
 }
 type RequiredMetaDataKeys = keyof ObjMetaData;
 
-export const requiredMetaData: RequiredMetaDataKeys[] = [
-  "gender",
-  "email",
-  "focal_length",
-  "height",
-  "customer_store_url",
-  "callback_url",
-  "clothes_fit",
-];
+export const requiredMetaData: RequiredMetaDataKeys[] = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
 
 export const REQUIRED_MESSAGE: string = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA: string = "Please verify required parameters in meta data";
