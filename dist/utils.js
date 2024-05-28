@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUrl = exports.getFileChunks = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
+exports.getUrl = exports.getFileChunks = exports.addScanType = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 async function fetchData(options) {
@@ -63,6 +63,16 @@ function checkMetaDataValue(arr) {
     return true;
 }
 exports.checkMetaDataValue = checkMetaDataValue;
+const addScanType = (arr, scan_id) => {
+    for (const obj of arr) {
+        if (!obj.scan_type) {
+            arr.push({ scan_type: "clothing_custom_scan" });
+        }
+    }
+    arr.push({ scan_id });
+    return arr;
+};
+exports.addScanType = addScanType;
 function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {
     const totalSize = file.size;
     const chunks = [];

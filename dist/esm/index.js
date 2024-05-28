@@ -17,11 +17,11 @@ import Measurement from "./measurement.js";
 import PoseDetection from "./poseDetection.js";
 import TryOn from "./tryOn.js";
 class Swan {
-    constructor(accessKey, prod = false) {
+    constructor(accessKey, stagingUrl = false) {
         _Swan_accessKey.set(this, void 0);
         _Swan_stagingUrl.set(this, void 0);
         __classPrivateFieldSet(this, _Swan_accessKey, accessKey, "f");
-        __classPrivateFieldSet(this, _Swan_stagingUrl, prod, "f");
+        __classPrivateFieldSet(this, _Swan_stagingUrl, stagingUrl, "f");
         this.auth = new Auth(__classPrivateFieldGet(this, _Swan_accessKey, "f"), __classPrivateFieldGet(this, _Swan_stagingUrl, "f"));
         this.custom = new Custom(__classPrivateFieldGet(this, _Swan_accessKey, "f"), __classPrivateFieldGet(this, _Swan_stagingUrl, "f"));
         this.fileUpload = new FileUpload(__classPrivateFieldGet(this, _Swan_accessKey, "f"), __classPrivateFieldGet(this, _Swan_stagingUrl, "f"));

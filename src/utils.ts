@@ -53,7 +53,7 @@ export function checkParameters(...args: any[]): boolean {
   return true;
 }
 
-export function checkMetaDataValue(arr: ObjMetaData[]): boolean {
+export function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean {
   for (const key of requiredMetaData) {
     let hasRequiredKey = false;
     for (const obj of arr) {
@@ -77,6 +77,16 @@ export function checkMetaDataValue(arr: ObjMetaData[]): boolean {
   }
   return true;
 }
+
+export const addScanType = (arr: Partial<ObjMetaData>[], scan_id: string): Partial<ObjMetaData>[] => {
+  for (const obj of arr) {
+    if (!obj.scan_type) {
+      arr.push({ scan_type: "clothing_custom_scan" });
+    }
+  }
+  arr.push({ scan_id });
+  return arr;
+};
 
 export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024): Blob[] {
   const totalSize = file.size;

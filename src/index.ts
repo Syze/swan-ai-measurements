@@ -15,9 +15,9 @@ class Swan {
   poseDetection: PoseDetection;
   tryOn: TryOn;
 
-  constructor(accessKey: string, prod = false) {
+  constructor(accessKey: string, stagingUrl = false) {
     this.#accessKey = accessKey;
-    this.#stagingUrl = prod;
+    this.#stagingUrl = stagingUrl;
     this.auth = new Auth(this.#accessKey, this.#stagingUrl);
     this.custom = new Custom(this.#accessKey, this.#stagingUrl);
     this.fileUpload = new FileUpload(this.#accessKey, this.#stagingUrl);

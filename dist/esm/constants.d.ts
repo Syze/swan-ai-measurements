@@ -14,13 +14,13 @@ export declare const API_ENDPOINTS: {
 };
 export interface ObjMetaData {
     gender: string;
-    scan_id: string;
+    scan_id?: string;
     email: string;
     focal_length: string;
     height: string;
     customer_store_url: string;
     clothes_fit: string;
-    scan_type: string;
+    scan_type?: string;
     callback_url: string;
 }
 type RequiredMetaDataKeys = keyof ObjMetaData;

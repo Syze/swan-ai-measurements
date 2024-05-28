@@ -23,6 +23,7 @@ class FileUpload {
         if (!(0, utils_js_1.checkMetaDataValue)(arrayMetaData)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE_FOR_META_DATA);
         }
+        arrayMetaData = (0, utils_js_1.addScanType)(arrayMetaData, scanId);
         return new Promise((resolve, reject) => {
             if (this.#uppyIns) {
                 this.#uppyIns.close();

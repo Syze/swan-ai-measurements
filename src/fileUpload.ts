@@ -1,23 +1,23 @@
 import axios from "axios";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL } from "./constants.js";
-import { checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
+import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
 const Uppy = require("fix-esm").require("@uppy/core");
 const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
 interface ObjMetaData {
   gender: string;
-  scan_id: string;
+  scan_id?: string;
   email: string;
   focal_length: string;
   height: string;
   customer_store_url: string;
   clothes_fit: string;
-  scan_type: string;
+  scan_type?: string;
   callback_url: string;
 }
 
 interface UploadOptions {
   file: File;
-  arrayMetaData: ObjMetaData[];
+  arrayMetaData: Partial<ObjMetaData>[];
   scanId: string;
 }
 
@@ -38,7 +38,7 @@ export default class FileUpload {
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
-
+    arrayMetaData = addScanType(arrayMetaData, scanId);
     return new Promise((resolve, reject) => {
       if (this.#uppyIns) {
         this.#uppyIns.close();
@@ -116,6 +116,7 @@ export default class FileUpload {
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
     }
+
     return new Promise(async (resolve, reject) => {
       try {
         const res: { key: string; uploadId: string } = await fetchData({

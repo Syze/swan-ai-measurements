@@ -11,7 +11,8 @@ export interface FetchDataOptions {
 }
 export declare function fetchData(options: FetchDataOptions): Promise<any>;
 export declare function checkParameters(...args: any[]): boolean;
-export declare function checkMetaDataValue(arr: ObjMetaData[]): boolean;
+export declare function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean;
+export declare const addScanType: (arr: Partial<ObjMetaData>[], scan_id: string) => Partial<ObjMetaData>[];
 export declare function getFileChunks(file: File, chunkSize?: number): Blob[];
 export declare const getUrl: ({ urlName, stagingUrl }: {
     urlName: string;

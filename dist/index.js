@@ -18,9 +18,9 @@ class Swan {
     measurement;
     poseDetection;
     tryOn;
-    constructor(accessKey, prod = false) {
+    constructor(accessKey, stagingUrl = false) {
         this.#accessKey = accessKey;
-        this.#stagingUrl = prod;
+        this.#stagingUrl = stagingUrl;
         this.auth = new auth_js_1.default(this.#accessKey, this.#stagingUrl);
         this.custom = new custom_js_1.default(this.#accessKey, this.#stagingUrl);
         this.fileUpload = new fileUpload_js_1.default(this.#accessKey, this.#stagingUrl);
