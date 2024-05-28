@@ -19,7 +19,7 @@ class Custom {
   }
 
   createCustomer(payload: CreateCustomer): Promise<AxiosResponse<any>> {
-    if (checkParameters(payload.name, payload.storeUrl, payload.email, payload.location)) {
+    if (checkParameters(payload.name, payload.storeUrl, payload.email, payload.location) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
     return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.CREATE_CUSTOMER}`, {

@@ -14,7 +14,7 @@ class Custom {
         this.#stagingUrl = stagingUrl;
     }
     createCustomer(payload) {
-        if ((0, utils_js_1.checkParameters)(payload.name, payload.storeUrl, payload.email, payload.location)) {
+        if ((0, utils_js_1.checkParameters)(payload.name, payload.storeUrl, payload.email, payload.location) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.CREATE_CUSTOMER}`, {
