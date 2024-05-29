@@ -176,7 +176,7 @@ class Measurement {
 
     setTimeout(() => {
       this.#disconnectSocket();
-      const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}/${API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
+      const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
       this.#measurementSocketRef = new WebSocket(url);
       this.#measurementSocketRef.onopen = () => {
         onOpen?.();

@@ -89,7 +89,7 @@ class Measurement {
         }
         setTimeout(() => {
             __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this);
-            const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}/${API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
+            const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
             __classPrivateFieldSet(this, _Measurement_measurementSocketRef, new WebSocket(url), "f");
             __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onopen = () => {
                 onOpen === null || onOpen === void 0 ? void 0 : onOpen();
