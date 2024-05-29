@@ -23,11 +23,7 @@ class PoseDetection {
     }
     connect() {
         return new Promise((resolve, reject) => {
-            __classPrivateFieldSet(this, _PoseDetection_socketRef, io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _PoseDetection_stagingUrl, "f") }), {
-                auth: {
-                    token: __classPrivateFieldGet(this, _PoseDetection_accessKey, "f"),
-                },
-            }), "f");
+            __classPrivateFieldSet(this, _PoseDetection_socketRef, io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _PoseDetection_stagingUrl, "f") })), "f");
             __classPrivateFieldGet(this, _PoseDetection_socketRef, "f").on("connect", () => {
                 var _a;
                 const socketId = (_a = __classPrivateFieldGet(this, _PoseDetection_socketRef, "f")) === null || _a === void 0 ? void 0 : _a.id;
@@ -35,7 +31,7 @@ class PoseDetection {
                     resolve(socketId);
                 }
                 else {
-                    reject(new Error("Failed to obtain socket ID."));
+                    reject("Failed to obtain socket ID.");
                 }
             });
             __classPrivateFieldGet(this, _PoseDetection_socketRef, "f").on("connect_error", (err) => {

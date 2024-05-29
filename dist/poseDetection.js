@@ -13,18 +13,14 @@ class PoseDetection {
     }
     connect() {
         return new Promise((resolve, reject) => {
-            this.#socketRef = (0, socket_io_client_1.io)((0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_POSE_DETECTION_WEBSOCKET_URL, stagingUrl: this.#stagingUrl }), {
-                auth: {
-                    token: this.#accessKey,
-                },
-            });
+            this.#socketRef = (0, socket_io_client_1.io)((0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_POSE_DETECTION_WEBSOCKET_URL, stagingUrl: this.#stagingUrl }));
             this.#socketRef.on("connect", () => {
                 const socketId = this.#socketRef?.id;
                 if (socketId) {
                     resolve(socketId);
                 }
                 else {
-                    reject(new Error("Failed to obtain socket ID."));
+                    reject("Failed to obtain socket ID.");
                 }
             });
             this.#socketRef.on("connect_error", (err) => {
