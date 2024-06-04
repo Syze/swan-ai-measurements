@@ -40,7 +40,7 @@ class TryOn {
             __classPrivateFieldSet(this, _TryOn_timerWaitingRef, setTimeout(() => {
                 __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { shopDomain, userId, productName, onSuccess, onError });
                 __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-            }, 120000), "f");
+            }, 138000), "f");
         });
         this.handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen }) => {
             if (checkParameters(shopDomain, userId, productName) === false) {
@@ -62,7 +62,7 @@ class TryOn {
             __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
-                    __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { shopDomain, userId, productName, onError, onSuccess });
+                    onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
                 }
                 else {
                     onError === null || onError === void 0 ? void 0 : onError(data);

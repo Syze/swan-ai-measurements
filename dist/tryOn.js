@@ -75,7 +75,7 @@ class TryOn {
         this.#timerWaitingRef = setTimeout(() => {
             this.#handleGetTryOnResult({ shopDomain, userId, productName, onSuccess, onError });
             this.#disconnectSocket();
-        }, 120000);
+        }, 138000);
     };
     handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen }) => {
         if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
@@ -97,7 +97,7 @@ class TryOn {
         this.#tryOnSocketRef.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data?.status === "success") {
-                this.#handleGetTryOnResult({ shopDomain, userId, productName, onError, onSuccess });
+                onSuccess?.(data);
             }
             else {
                 onError?.(data);
