@@ -54,6 +54,12 @@ class TryOn {
   }
 
   async uploadFile({ files, userId }: UploadFileParams): Promise<string> {
+    if (checkParameters(files, userId) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    if (files?.length > 2) {
+      throw new Error("Cannot allow more than 2 files.");
+    }
     try {
       const payload = {
         userId,
@@ -73,6 +79,9 @@ class TryOn {
   }
 
   #getSignedUrl(payload: { userId: string; userImages: string[] }): Promise<AxiosResponse<any>> {
+    if (checkParameters(payload) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
       headers: {
         "Content-Type": "application/json",
@@ -82,6 +91,9 @@ class TryOn {
   }
 
   #s3Upload(url: string, file: File): Promise<AxiosResponse<any>> {
+    if (checkParameters(url, file) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
     return axios.put(url, file, {
       headers: {
         "Content-Type": file.type,

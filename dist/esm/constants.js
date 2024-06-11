@@ -18,7 +18,7 @@ export const APP_AUTH_BASE_URL = "APP_AUTH_BASE_URL";
 export const APP_BASE_WEBSOCKET_URL = "APP_BASE_WEBSOCKET_URL";
 export const APP_POSE_DETECTION_WEBSOCKET_URL = "APP_POSE_DETECTION_WEBSOCKET_URL";
 export const API_ENDPOINTS = {
-    GET_USER_DETAIL: "/api/user",
+    GET_USER_DETAIL: "/user",
     REGISTER_USER: "/auth/register",
     VERIFY_USER: "/auth/verify",
     ADD_USER: "/user",

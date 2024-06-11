@@ -28,7 +28,7 @@ export const APP_POSE_DETECTION_WEBSOCKET_URL = "APP_POSE_DETECTION_WEBSOCKET_UR
 export const API_ENDPOINTS: {
   [key: string]: string;
 } = {
-  GET_USER_DETAIL: "/api/user",
+  GET_USER_DETAIL: "/user",
   REGISTER_USER: "/auth/register",
   VERIFY_USER: "/auth/verify",
   ADD_USER: "/user",

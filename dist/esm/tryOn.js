@@ -129,6 +129,12 @@ class TryOn {
     uploadFile(_a) {
         return __awaiter(this, arguments, void 0, function* ({ files, userId }) {
             var _b;
+            if (checkParameters(files, userId) === false) {
+                throw new Error(REQUIRED_MESSAGE);
+            }
+            if ((files === null || files === void 0 ? void 0 : files.length) > 2) {
+                throw new Error("Cannot allow more than 2 files.");
+            }
             try {
                 const payload = {
                     userId,
@@ -166,6 +172,9 @@ class TryOn {
     }
 }
 _TryOn_tryOnSocketRef = new WeakMap(), _TryOn_timerWaitingRef = new WeakMap(), _TryOn_accessKey = new WeakMap(), _TryOn_stagingUrl = new WeakMap(), _TryOn_disconnectSocket = new WeakMap(), _TryOn_handleTimeOut = new WeakMap(), _TryOn_handleGetTryOnResult = new WeakMap(), _TryOn_instances = new WeakSet(), _TryOn_getSignedUrl = function _TryOn_getSignedUrl(payload) {
+    if (checkParameters(payload) === false) {
+        throw new Error(REQUIRED_MESSAGE);
+    }
     return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
         headers: {
             "Content-Type": "application/json",
@@ -173,6 +182,9 @@ _TryOn_tryOnSocketRef = new WeakMap(), _TryOn_timerWaitingRef = new WeakMap(), _
         },
     });
 }, _TryOn_s3Upload = function _TryOn_s3Upload(url, file) {
+    if (checkParameters(url, file) === false) {
+        throw new Error(REQUIRED_MESSAGE);
+    }
     return axios.put(url, file, {
         headers: {
             "Content-Type": file.type,

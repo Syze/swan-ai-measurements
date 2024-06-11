@@ -16,6 +16,12 @@ class TryOn {
         this.#stagingUrl = stagingUrl;
     }
     async uploadFile({ files, userId }) {
+        if ((0, utils_js_1.checkParameters)(files, userId) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        if (files?.length > 2) {
+            throw new Error("Cannot allow more than 2 files.");
+        }
         try {
             const payload = {
                 userId,
@@ -35,6 +41,9 @@ class TryOn {
         }
     }
     #getSignedUrl(payload) {
+        if ((0, utils_js_1.checkParameters)(payload) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
             headers: {
                 "Content-Type": "application/json",
@@ -43,6 +52,9 @@ class TryOn {
         });
     }
     #s3Upload(url, file) {
+        if ((0, utils_js_1.checkParameters)(url, file) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
         return axios_1.default.put(url, file, {
             headers: {
                 "Content-Type": file.type,
