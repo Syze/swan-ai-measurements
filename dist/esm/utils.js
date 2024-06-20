@@ -65,13 +65,14 @@ export function checkMetaDataValue(arr) {
     }
     return true;
 }
-export const addScanType = (arr, scan_id) => {
+export const addScanType = (arr, scan_id, email) => {
     for (const obj of arr) {
         if (!obj.scan_type) {
             arr.push({ scan_type: "clothing_custom_scan" });
         }
     }
     arr.push({ scan_id });
+    arr.push({ email });
     return arr;
 };
 export function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {

@@ -16,14 +16,17 @@ class FileUpload {
         this.#accessKey = accessKey;
         this.#stagingUrl = stagingUrl;
     }
-    async uploadFileFrontend({ file, arrayMetaData, scanId }) {
+    async uploadFileFrontend({ file, arrayMetaData, scanId, email }) {
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         if (!(0, utils_js_1.checkMetaDataValue)(arrayMetaData)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE_FOR_META_DATA);
         }
-        arrayMetaData = (0, utils_js_1.addScanType)(arrayMetaData, scanId);
+        if (!email.trim()) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
+        arrayMetaData = (0, utils_js_1.addScanType)(arrayMetaData, scanId, email);
         return new Promise((resolve, reject) => {
             if (this.#uppyIns) {
                 this.#uppyIns.close();
@@ -88,14 +91,17 @@ class FileUpload {
             });
         });
     }
-    async uploadFile({ file, arrayMetaData, scanId }) {
+    async uploadFile({ file, arrayMetaData, scanId, email }) {
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         if (!(0, utils_js_1.checkMetaDataValue)(arrayMetaData)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE_FOR_META_DATA);
         }
-        arrayMetaData = (0, utils_js_1.addScanType)(arrayMetaData, scanId);
+        if (!email.trim()) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
+        arrayMetaData = (0, utils_js_1.addScanType)(arrayMetaData, scanId, email);
         return new Promise(async (resolve, reject) => {
             try {
                 const res = await (0, utils_js_1.fetchData)({

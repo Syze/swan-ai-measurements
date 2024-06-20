@@ -20,7 +20,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL } from "./constants.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
 import  Uppy from "@uppy/core";  
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
@@ -33,14 +33,17 @@ class FileUpload {
         __classPrivateFieldSet(this, _FileUpload_stagingUrl, stagingUrl, "f");
     }
     uploadFileFrontend(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
+        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId, email }) {
             if (!checkParameters(file, arrayMetaData, scanId)) {
                 throw new Error(REQUIRED_MESSAGE);
             }
             if (!checkMetaDataValue(arrayMetaData)) {
                 throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
             }
-            arrayMetaData = addScanType(arrayMetaData, scanId);
+            if (!email.trim()) {
+                throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+            }
+            arrayMetaData = addScanType(arrayMetaData, scanId, email);
             return new Promise((resolve, reject) => {
                 if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
                     __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
@@ -107,14 +110,17 @@ class FileUpload {
         });
     }
     uploadFile(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId }) {
+        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId, email }) {
             if (!checkParameters(file, arrayMetaData, scanId)) {
                 throw new Error(REQUIRED_MESSAGE);
             }
             if (!checkMetaDataValue(arrayMetaData)) {
                 throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
             }
-            arrayMetaData = addScanType(arrayMetaData, scanId);
+            if (!email.trim()) {
+                throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+            }
+            arrayMetaData = addScanType(arrayMetaData, scanId, email);
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 var _b;
                 try {

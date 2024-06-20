@@ -13,11 +13,12 @@ interface UploadOptions {
     file: File;
     arrayMetaData: Partial<ObjMetaData>[];
     scanId: string;
+    email: string;
 }
 export default class FileUpload {
     #private;
     constructor(accessKey: string, stagingUrl?: boolean);
-    uploadFileFrontend({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
-    uploadFile({ file, arrayMetaData, scanId }: UploadOptions): Promise<unknown>;
+    uploadFileFrontend({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
+    uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
 }
 export {};
