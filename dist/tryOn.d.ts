@@ -1,15 +1,16 @@
 import { AxiosResponse } from "axios";
 interface UploadFileParams {
     files: File[];
-    userId: string;
+    userEmail: string;
 }
 interface DeleteImageParams {
-    userId: string;
+    userEmail: string;
     fileName: string;
 }
 interface HandleTryOnWebSocketParams {
+    userEmail: string;
     shopDomain: string;
-    userId: string;
+    tryonId: string;
     productName: string;
     onError?: (error: any) => void;
     onSuccess?: (data: any) => void;
@@ -18,23 +19,25 @@ interface HandleTryOnWebSocketParams {
 }
 interface HandleForLatestImageParams {
     shopDomain: string;
-    userId: string;
+    userEmail: string;
     productName: string;
+    firstImageName: string;
+    secondImageName: string;
     onError?: (error: any) => void;
 }
 interface GetTryOnResultParams {
     shopDomain: string;
-    userId: string;
+    userEmail: string;
     productName: string;
 }
 declare class TryOn {
     #private;
     constructor(accessKey: string, stagingUrl?: boolean);
-    uploadFile({ files, userId }: UploadFileParams): Promise<string>;
-    getUploadedFiles(userId: string): Promise<AxiosResponse<any>>;
-    deleteImage({ userId, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
-    handleTryOnWebSocket: ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
-    handleForLatestImage: ({ userId, shopDomain, productName, onError }: HandleForLatestImageParams) => Promise<any>;
-    getTryOnResult: ({ userId, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
+    uploadFile({ files, userEmail }: UploadFileParams): Promise<string>;
+    getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>>;
+    deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
+    handleTryOnWebSocket: ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
+    handleSumbmitTryOn: ({ userEmail, shopDomain, productName, firstImageName, secondImageName, onError }: HandleForLatestImageParams) => Promise<any>;
+    getTryOnResult: ({ userEmail, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
 }
 export default TryOn;

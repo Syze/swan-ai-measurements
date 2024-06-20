@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUrl = exports.getFileChunks = exports.addScanType = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
+exports.isValidEmail = exports.getUrl = exports.getFileChunks = exports.addScanType = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 async function fetchData(options) {
@@ -91,3 +91,8 @@ const getUrl = ({ urlName, stagingUrl = false }) => {
     return constants_js_1.PROD_URL[urlName];
 };
 exports.getUrl = getUrl;
+const isValidEmail = (email) => {
+    const checkEmailValidation = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return checkEmailValidation.test(email);
+};
+exports.isValidEmail = isValidEmail;

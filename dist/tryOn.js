@@ -15,16 +15,20 @@ class TryOn {
         this.#accessKey = accessKey;
         this.#stagingUrl = stagingUrl;
     }
-    async uploadFile({ files, userId }) {
-        if ((0, utils_js_1.checkParameters)(files, userId) === false) {
+    async uploadFile({ files, userEmail }) {
+        userEmail = userEmail.trim();
+        if ((0, utils_js_1.checkParameters)(files, userEmail) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         if (files?.length > 2) {
             throw new Error("Cannot allow more than 2 files.");
         }
         try {
             const payload = {
-                userId,
+                userEmail,
                 userImages: [files[0]?.name],
             };
             if (files[1]) {
@@ -61,20 +65,36 @@ class TryOn {
             },
         });
     }
-    getUploadedFiles(userId) {
-        if ((0, utils_js_1.checkParameters)(userId) === false) {
+    getUploadedFiles(userEmail) {
+        userEmail = userEmail.trim();
+        if ((0, utils_js_1.checkParameters)(userEmail) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}?userId=${userId}`, null, {
+        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
+        const payload = {
+            userEmail
+        };
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
-    deleteImage({ userId, fileName }) {
-        if ((0, utils_js_1.checkParameters)(userId, fileName) === false) {
+    deleteImage({ userEmail, fileName }) {
+        userEmail = userEmail.trim();
+        if ((0, utils_js_1.checkParameters)(userEmail, fileName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.delete(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_URLS}?userId=${userId}&file=${fileName}`, {
+        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
+        const payload = {
+            userEmail,
+            file: fileName
+        };
+        return axios_1.default.delete(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
             headers: { "X-Api-Key": this.#accessKey },
+            data: payload
         });
     }
     #disconnectSocket = () => {
@@ -83,28 +103,22 @@ class TryOn {
             clearTimeout(this.#timerWaitingRef);
         }
     };
-    #handleTimeOut = ({ onSuccess, onError, shopDomain, userId, productName }) => {
+    #handleTimeOut = ({ onSuccess, onError, shopDomain, userEmail, productName }) => {
         this.#timerWaitingRef = setTimeout(() => {
-            this.#handleGetTryOnResult({ shopDomain, userId, productName, onSuccess, onError });
+            this.#handleGetTryOnResult({ shopDomain, userEmail, productName, onSuccess, onError });
             this.#disconnectSocket();
         }, 138000);
     };
-    handleTryOnWebSocket = ({ shopDomain, userId, productName, onError, onSuccess, onClose, onOpen }) => {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
+    handleTryOnWebSocket = ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }) => {
+        if ((0, utils_js_1.checkParameters)(shopDomain, tryonId, productName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         this.#disconnectSocket();
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}/?store_url=${shopDomain}&product_name=${productName}&scan_id=${userId}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}?tryonId=${tryonId}`;
         this.#tryOnSocketRef = new WebSocket(url);
         this.#tryOnSocketRef.onopen = async () => {
             onOpen?.();
-            this.#handleTimeOut({ onSuccess, onError, shopDomain, userId, productName });
-            try {
-                await this.handleForLatestImage({ shopDomain, userId, productName, onError });
-            }
-            catch (error) {
-                onError?.(error);
-            }
+            this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
         };
         this.#tryOnSocketRef.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -128,13 +142,26 @@ class TryOn {
             }
         };
     };
-    handleForLatestImage = async ({ userId, shopDomain, productName, onError }) => {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
+    handleSumbmitTryOn = async ({ userEmail, shopDomain, productName, firstImageName, secondImageName, onError }) => {
+        userEmail = userEmail.trim();
+        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
+        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
         try {
-            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}/?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-            const res = await axios_1.default.post(url, null, {
+            const payload = {
+                productName,
+                userEmail,
+                customerStoreUrl: shopDomain,
+                selectedUserImages: [
+                    firstImageName,
+                    secondImageName
+                ]
+            };
+            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
+            const res = await axios_1.default.post(url, payload, {
                 headers: { "X-Api-Key": this.#accessKey },
             });
             if (res?.data?.tryOnProcessStatus === "failed") {
@@ -151,21 +178,30 @@ class TryOn {
             throw error;
         }
     };
-    #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userId, productName }) => {
+    #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userEmail, productName }) => {
         try {
-            const data = await this.getTryOnResult({ shopDomain, userId, productName });
+            const data = await this.getTryOnResult({ shopDomain, userEmail, productName });
             onSuccess?.(data.data);
         }
         catch (error) {
             onError?.(error);
         }
     };
-    getTryOnResult = ({ userId, shopDomain, productName }) => {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userId, productName) === false) {
+    getTryOnResult = ({ userEmail, shopDomain, productName }) => {
+        userEmail = userEmail.trim();
+        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}?scan_id=${userId}&store_url=${shopDomain}&product_name=${productName}`;
-        return axios_1.default.post(url, null, {
+        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
+        const payload = {
+            productName,
+            userEmail,
+            customerStoreUrl: shopDomain,
+        };
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}`;
+        return axios_1.default.post(url, payload, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     };

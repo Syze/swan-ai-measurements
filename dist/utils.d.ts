@@ -18,3 +18,4 @@ export declare const getUrl: ({ urlName, stagingUrl }: {
     urlName: string;
     stagingUrl: boolean;
 }) => string;
+export declare const isValidEmail: (email: string) => boolean;

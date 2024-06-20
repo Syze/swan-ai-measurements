@@ -105,3 +105,9 @@ export const getUrl = ({ urlName, stagingUrl = false }: { urlName: string; stagi
   }
   return PROD_URL[urlName];
 };
+
+export const isValidEmail = (email:string) => {
+  const checkEmailValidation =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return checkEmailValidation.test(email);
+};

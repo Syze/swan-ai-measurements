@@ -90,3 +90,7 @@ export const getUrl = ({ urlName, stagingUrl = false }) => {
     }
     return PROD_URL[urlName];
 };
+export const isValidEmail = (email) => {
+    const checkEmailValidation = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return checkEmailValidation.test(email);
+};

@@ -1,11 +1,11 @@
 export const STAGING_URL: Record<string, string> = {
-  APP_AUTH_BASE_URL: "https://staging.api.swanvision.ai",
+  APP_AUTH_BASE_URL: "https://staging.api.getswan.co",
   APP_BASE_WEBSOCKET_URL: "wss://staging.wsnotify.api.getswan.co",
   APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com",
 };
 
 export const PROD_URL: Record<string, string> = {
-  APP_AUTH_BASE_URL: "https://api.swanvision.ai",
+  APP_AUTH_BASE_URL: "https://api.getswan.co",
   APP_BASE_WEBSOCKET_URL: "wss://wsnotify.api.getswan.co",
   APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service.uvcn97hn133d6.eu-west-1.cs.amazonlightsail.com",
 };
@@ -61,3 +61,4 @@ export const requiredMetaData: RequiredMetaDataKeys[] = ["gender", "focal_length
 
 export const REQUIRED_MESSAGE: string = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA: string = "Please verify required parameters in meta data";
+export const REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";
