@@ -127,11 +127,10 @@ class TryOn {
                     payload.userImages.push(files[1].name);
                 }
                 const signedUrlRes = yield __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getSignedUrl).call(this, payload);
-                let s3UploadResult;
                 for (const file of files) {
-                    s3UploadResult = yield __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_s3Upload).call(this, signedUrlRes.data.uploadUrls[file.name].url, file);
+                    yield __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_s3Upload).call(this, signedUrlRes.data.uploadUrls[file.name].url, file);
                 }
-                return `uploaded successfully! and ${JSON.stringify(s3UploadResult)}`;
+                return `uploaded successfully!`;
             }
             catch (error) {
                 throw error;
@@ -204,7 +203,6 @@ _TryOn_tryOnSocketRef = new WeakMap(), _TryOn_timerWaitingRef = new WeakMap(), _
     if (checkParameters(url, file) === false) {
         throw new Error(REQUIRED_MESSAGE);
     }
-    console.log("s3 being called========", url, file);
     return axios.put(url, file, {
         headers: {
             "Content-Type": file.type,

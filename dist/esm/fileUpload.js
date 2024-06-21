@@ -22,6 +22,7 @@ var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
+const Uppy = require("fix-esm").require("@uppy/core");
 import  Uppy from "@uppy/core";  
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
