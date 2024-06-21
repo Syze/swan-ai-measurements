@@ -82,7 +82,7 @@ class TryOn {
       for (const file of files) {
         s3UploadResult = await this.#s3Upload(signedUrlRes.data.uploadUrls[file.name].url, file);
       }
-      return `uploaded successfully! and ${s3UploadResult}`;
+      return `uploaded successfully! and ${JSON.stringify(s3UploadResult)}`;
     } catch (error) {
       throw error;
     }

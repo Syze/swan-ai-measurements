@@ -131,7 +131,7 @@ class TryOn {
                 for (const file of files) {
                     s3UploadResult = yield __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_s3Upload).call(this, signedUrlRes.data.uploadUrls[file.name].url, file);
                 }
-                return `uploaded successfully! and ${s3UploadResult}`;
+                return `uploaded successfully! and ${JSON.stringify(s3UploadResult)}`;
             }
             catch (error) {
                 throw error;
