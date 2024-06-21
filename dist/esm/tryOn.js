@@ -75,44 +75,7 @@ class TryOn {
                 }
             };
         };
-        this.handleSumbmitTryOn = (_a) => __awaiter(this, [_a], void 0, function* ({ userEmail, shopDomain, productName, firstImageName, secondImageName, onError }) {
-            var _b;
-            userEmail = userEmail.trim();
-            if (checkParameters(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
-                throw new Error(REQUIRED_MESSAGE);
-            }
-            if (!isValidEmail(userEmail)) {
-                throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-            }
-            try {
-                const payload = {
-                    productName,
-                    userEmail,
-                    customerStoreUrl: shopDomain,
-                    selectedUserImages: [
-                        firstImageName,
-                        secondImageName
-                    ]
-                };
-                const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
-                const res = yield axios.post(url, payload, {
-                    headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
-                });
-                if (((_b = res === null || res === void 0 ? void 0 : res.data) === null || _b === void 0 ? void 0 : _b.tryOnProcessStatus) === "failed") {
-                    __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-                    throw res.data;
-                }
-                else {
-                    return res.data;
-                }
-            }
-            catch (error) {
-                onError === null || onError === void 0 ? void 0 : onError(error);
-                __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-                throw error;
-            }
-        });
-        _TryOn_handleGetTryOnResult.set(this, (_c) => __awaiter(this, [_c], void 0, function* ({ onSuccess, onError, shopDomain, userEmail, productName }) {
+        _TryOn_handleGetTryOnResult.set(this, (_a) => __awaiter(this, [_a], void 0, function* ({ onSuccess, onError, shopDomain, userEmail, productName }) {
             try {
                 const data = yield this.getTryOnResult({ shopDomain, userEmail, productName });
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data.data);
@@ -183,7 +146,7 @@ class TryOn {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
-            userEmail
+            userEmail,
         };
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
@@ -199,11 +162,30 @@ class TryOn {
         }
         const payload = {
             userEmail,
-            file: fileName
+            file: fileName,
         };
         return axios.delete(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
-            data: payload
+            data: payload,
+        });
+    }
+    handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }) {
+        userEmail = userEmail.trim();
+        if (checkParameters(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
+            throw new Error(REQUIRED_MESSAGE);
+        }
+        if (!isValidEmail(userEmail)) {
+            throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        }
+        const payload = {
+            productName,
+            userEmail,
+            customerStoreUrl: shopDomain,
+            selectedUserImages: [firstImageName, secondImageName],
+        };
+        const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
+        return axios.post(url, payload, {
+            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
         });
     }
 }

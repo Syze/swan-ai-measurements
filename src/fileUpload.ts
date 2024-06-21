@@ -1,6 +1,12 @@
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL } from "./constants.js";
-import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl } from "./utils.js";
+import {
+  REQUIRED_MESSAGE,
+  REQUIRED_MESSAGE_FOR_META_DATA,
+  FILE_UPLOAD_ENDPOINT,
+  APP_AUTH_BASE_URL,
+  REQUIRED_ERROR_MESSAGE_INVALID_EMAIL,
+} from "./constants.js";
+import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
 const Uppy = require("fix-esm").require("@uppy/core");
 const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
 interface ObjMetaData {
@@ -33,14 +39,15 @@ export default class FileUpload {
   }
 
   async uploadFileFrontend({ file, arrayMetaData, scanId, email }: UploadOptions) {
-    if (!checkParameters(file, arrayMetaData, scanId)) {
+    email = email.trim();
+    if (!checkParameters(file, arrayMetaData, scanId, email)) {
       throw new Error(REQUIRED_MESSAGE);
+    }
+    if (!isValidEmail(email)) {
+      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
-    }
-    if(!email.trim()){
-      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     arrayMetaData = addScanType(arrayMetaData, scanId, email);
     return new Promise((resolve, reject) => {
@@ -114,14 +121,15 @@ export default class FileUpload {
   }
 
   async uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions) {
-    if (!checkParameters(file, arrayMetaData, scanId)) {
+    email = email.trim();
+    if (!checkParameters(file, arrayMetaData, scanId, email)) {
       throw new Error(REQUIRED_MESSAGE);
+    }
+    if (!isValidEmail(email)) {
+      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     if (!checkMetaDataValue(arrayMetaData)) {
       throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
-    }
-    if(!email.trim()){
-      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     arrayMetaData = addScanType(arrayMetaData, scanId, email);
     return new Promise(async (resolve, reject) => {

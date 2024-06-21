@@ -37,7 +37,7 @@ declare class TryOn {
     getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>>;
     deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
     handleTryOnWebSocket: ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
-    handleSumbmitTryOn: ({ userEmail, shopDomain, productName, firstImageName, secondImageName, onError }: HandleForLatestImageParams) => Promise<any>;
+    handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
     getTryOnResult: ({ userEmail, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
 }
 export default TryOn;
