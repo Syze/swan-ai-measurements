@@ -78,10 +78,11 @@ class TryOn {
         payload.userImages.push(files[1].name);
       }
       const signedUrlRes = await this.#getSignedUrl(payload);
+      let s3UploadResult;
       for (const file of files) {
-        await this.#s3Upload(signedUrlRes.data.uploadUrls[file.name].url, file);
+        s3UploadResult = await this.#s3Upload(signedUrlRes.data.uploadUrls[file.name].url, file);
       }
-      return "uploaded successfully!";
+      return `uploaded successfully! and ${s3UploadResult}`;
     } catch (error) {
       throw error;
     }
@@ -103,6 +104,7 @@ class TryOn {
     if (checkParameters(url, file) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
+    console.log("s3 being called========",url,file)
     return axios.put(url, file, {
       headers: {
         "Content-Type": file.type,
