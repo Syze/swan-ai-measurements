@@ -111,7 +111,7 @@ class TryOn {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         this.#disconnectSocket();
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}?tryonId=${tryonId}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
         this.#tryOnSocketRef = new WebSocket(url);
         this.#tryOnSocketRef.onopen = async () => {
             onOpen?.();

@@ -47,7 +47,7 @@ class TryOn {
                 throw new Error(REQUIRED_MESSAGE);
             }
             __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-            const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}?tryonId=${tryonId}`;
+            const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
             __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocket(url), "f");
             __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onopen = () => __awaiter(this, void 0, void 0, function* () {
                 onOpen === null || onOpen === void 0 ? void 0 : onOpen();
