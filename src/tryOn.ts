@@ -57,12 +57,11 @@ class TryOn {
   }
 
   async uploadFile({ files, userEmail }: UploadFileParams): Promise<string> {
-    userEmail = userEmail.trim();
     if (checkParameters(files, userEmail) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
 
-    if (!isValidEmail(userEmail)) {
+    if (!isValidEmail(userEmail.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
 
@@ -111,11 +110,10 @@ class TryOn {
   }
 
   getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>> {
-    userEmail = userEmail.trim();
     if (checkParameters(userEmail) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (!isValidEmail(userEmail)) {
+    if (!isValidEmail(userEmail.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
 
@@ -129,11 +127,10 @@ class TryOn {
   }
 
   deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>> {
-    userEmail = userEmail.trim();
     if (checkParameters(userEmail, fileName) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (!isValidEmail(userEmail)) {
+    if (!isValidEmail(userEmail.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     const payload = {
@@ -200,7 +197,6 @@ class TryOn {
     firstImageName,
     secondImageName,
   }: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-    userEmail = userEmail.trim();
     if (checkParameters(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
@@ -231,12 +227,11 @@ class TryOn {
   };
 
   getTryOnResult = ({ userEmail, shopDomain, productName }: GetTryOnResultParams): Promise<AxiosResponse<any>> => {
-    userEmail = userEmail.trim();
     if (checkParameters(shopDomain, userEmail, productName) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
 
-    if (!isValidEmail(userEmail)) {
+    if (!isValidEmail(userEmail.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
 

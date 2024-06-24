@@ -85,11 +85,10 @@ class TryOn {
             }
         }));
         this.getTryOnResult = ({ userEmail, shopDomain, productName }) => {
-            userEmail = userEmail.trim();
             if (checkParameters(shopDomain, userEmail, productName) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            if (!isValidEmail(userEmail)) {
+            if (!isValidEmail(userEmail.trim())) {
                 throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
             }
             const payload = {
@@ -108,11 +107,10 @@ class TryOn {
     uploadFile(_a) {
         return __awaiter(this, arguments, void 0, function* ({ files, userEmail }) {
             var _b;
-            userEmail = userEmail.trim();
             if (checkParameters(files, userEmail) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            if (!isValidEmail(userEmail)) {
+            if (!isValidEmail(userEmail.trim())) {
                 throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
             }
             if ((files === null || files === void 0 ? void 0 : files.length) > 2) {
@@ -138,11 +136,10 @@ class TryOn {
         });
     }
     getUploadedFiles(userEmail) {
-        userEmail = userEmail.trim();
         if (checkParameters(userEmail) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        if (!isValidEmail(userEmail)) {
+        if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
@@ -153,11 +150,10 @@ class TryOn {
         });
     }
     deleteImage({ userEmail, fileName }) {
-        userEmail = userEmail.trim();
         if (checkParameters(userEmail, fileName) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        if (!isValidEmail(userEmail)) {
+        if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
@@ -170,7 +166,6 @@ class TryOn {
         });
     }
     handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }) {
-        userEmail = userEmail.trim();
         if (checkParameters(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }

@@ -16,11 +16,10 @@ class TryOn {
         this.#stagingUrl = stagingUrl;
     }
     async uploadFile({ files, userEmail }) {
-        userEmail = userEmail.trim();
         if ((0, utils_js_1.checkParameters)(files, userEmail) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         if (files?.length > 2) {
@@ -66,11 +65,10 @@ class TryOn {
         });
     }
     getUploadedFiles(userEmail) {
-        userEmail = userEmail.trim();
         if ((0, utils_js_1.checkParameters)(userEmail) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
@@ -81,11 +79,10 @@ class TryOn {
         });
     }
     deleteImage({ userEmail, fileName }) {
-        userEmail = userEmail.trim();
         if ((0, utils_js_1.checkParameters)(userEmail, fileName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
@@ -143,7 +140,6 @@ class TryOn {
         };
     };
     handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }) {
-        userEmail = userEmail.trim();
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
@@ -171,11 +167,10 @@ class TryOn {
         }
     };
     getTryOnResult = ({ userEmail, shopDomain, productName }) => {
-        userEmail = userEmail.trim();
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
