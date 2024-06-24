@@ -27,6 +27,12 @@ class Measurement {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
+    getMeasurementRecommendation({ scanId, shopDomain, productName }) {
+        if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, { headers: { "X-Api-Key": this.#accessKey } });
+    }
     getTryOnMeasurements({ scanId, shopDomain, productName }) {
         if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);

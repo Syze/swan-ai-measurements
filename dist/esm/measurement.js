@@ -44,6 +44,12 @@ class Measurement {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") },
         });
     }
+    getMeasurementRecommendation({ scanId, shopDomain, productName }) {
+        if (!checkParameters(scanId, shopDomain, productName)) {
+            throw new Error(REQUIRED_MESSAGE);
+        }
+        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") } });
+    }
     getTryOnMeasurements({ scanId, shopDomain, productName }) {
         if (!checkParameters(scanId, shopDomain, productName)) {
             throw new Error(REQUIRED_MESSAGE);

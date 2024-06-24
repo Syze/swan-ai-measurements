@@ -12,6 +12,11 @@ interface TryOnSocketOptions {
   onOpen?: () => void;
 }
 
+interface MeasurementRecommendation {
+  shopDomain: string;
+  scanId: string;
+  productName: string;
+}
 interface MeasurementSocketOptions {
   scanId: string;
   onError?: (error: any) => void;
@@ -60,6 +65,18 @@ class Measurement {
     return axios.get(url, {
       headers: { "X-Api-Key": this.#accessKey },
     });
+  }
+
+  getMeasurementRecommendation({ scanId, shopDomain, productName }: MeasurementRecommendation): Promise<AxiosResponse<any>> {
+    if (!checkParameters(scanId, shopDomain, productName)) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    return axios.get(
+      `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${
+        API_ENDPOINTS.RECOMMENDATION
+      }/scan/${scanId}/shop/${shopDomain}/product/${productName}`,
+      { headers: { "X-Api-Key": this.#accessKey } }
+    );
   }
 
   getTryOnMeasurements({ scanId, shopDomain, productName }: TryOnSocketOptions): Promise<AxiosResponse<any>> {

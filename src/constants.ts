@@ -43,6 +43,7 @@ export const API_ENDPOINTS: {
   TRY_ON: "/tryon",
   AUTH: "/auth",
   SCANNING: "/scanning",
+  RECOMMENDATION: "/recommendation",
 };
 export interface ObjMetaData {
   gender: string;
