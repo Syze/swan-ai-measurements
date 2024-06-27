@@ -1,6 +1,6 @@
 export const STAGING_URL: Record<string, string> = {
-  APP_AUTH_BASE_URL: "https://develop.api.getswan.co",
-  APP_BASE_WEBSOCKET_URL: "wss://develop.wsnotify.api.getswan.co",
+  APP_AUTH_BASE_URL: "https://staging.api.getswan.co",
+  APP_BASE_WEBSOCKET_URL: "wss://staging.wsnotify.api.getswan.co",
   APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com",
 };
 
