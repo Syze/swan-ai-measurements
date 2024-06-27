@@ -81,7 +81,7 @@ export function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean {
 export const addScanType = (arr: Partial<ObjMetaData>[], scan_id: string, email: string): Partial<ObjMetaData>[] => {
   for (const obj of arr) {
     if (!obj.scan_type) {
-      arr.push({ scan_type: "clothing_custom_scan" });
+      arr.push({ scan_type: "clothing_scan" });
     }
   }
   arr.push({ scan_id });
