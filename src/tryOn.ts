@@ -158,8 +158,11 @@ class TryOn {
   };
 
   handleTryOnWebSocket = ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams): void => {
-    if (checkParameters(shopDomain, tryonId, productName) === false) {
+    if (checkParameters(shopDomain, tryonId, productName, userEmail) === false) {
       throw new Error(REQUIRED_MESSAGE);
+    }
+    if (!isValidEmail(userEmail.trim())) {
+      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     this.#disconnectSocket();
     const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
@@ -201,7 +204,7 @@ class TryOn {
       throw new Error(REQUIRED_MESSAGE);
     }
 
-    if (!isValidEmail(userEmail)) {
+    if (!isValidEmail(userEmail.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     const payload = {

@@ -107,8 +107,11 @@ class TryOn {
         }, 138000);
     };
     handleTryOnWebSocket = ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }) => {
-        if ((0, utils_js_1.checkParameters)(shopDomain, tryonId, productName) === false) {
+        if ((0, utils_js_1.checkParameters)(shopDomain, tryonId, productName, userEmail) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
+            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         this.#disconnectSocket();
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
@@ -143,7 +146,7 @@ class TryOn {
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail)) {
+        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {

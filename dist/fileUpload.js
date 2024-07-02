@@ -17,11 +17,10 @@ class FileUpload {
         this.#stagingUrl = stagingUrl;
     }
     async uploadFileFrontend({ file, arrayMetaData, scanId, email }) {
-        email = email.trim();
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId, email)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(email)) {
+        if (!(0, utils_js_1.isValidEmail)(email.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         if (!(0, utils_js_1.checkMetaDataValue)(arrayMetaData)) {
@@ -93,11 +92,10 @@ class FileUpload {
         });
     }
     async uploadFile({ file, arrayMetaData, scanId, email }) {
-        email = email.trim();
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId, email)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(email)) {
+        if (!(0, utils_js_1.isValidEmail)(email.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         if (!(0, utils_js_1.checkMetaDataValue)(arrayMetaData)) {

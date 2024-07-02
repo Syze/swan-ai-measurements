@@ -66,10 +66,9 @@ export function checkMetaDataValue(arr) {
     return true;
 }
 export const addScanType = (arr, scan_id, email) => {
-    for (const obj of arr) {
-        if (!obj.scan_type) {
-            arr.push({ scan_type: "clothing_scan" });
-        }
+    const scanType = arr.find((el) => el.scan_type);
+    if (!scanType) {
+        arr.push({ scan_type: "clothing_scan" });
     }
     arr.push({ scan_id });
     arr.push({ email });

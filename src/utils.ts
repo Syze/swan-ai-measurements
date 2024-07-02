@@ -79,10 +79,9 @@ export function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean {
 }
 
 export const addScanType = (arr: Partial<ObjMetaData>[], scan_id: string, email: string): Partial<ObjMetaData>[] => {
-  for (const obj of arr) {
-    if (!obj.scan_type) {
-      arr.push({ scan_type: "clothing_scan" });
-    }
+  const scanType = arr.find((el) => el.scan_type);
+  if (!scanType) {
+    arr.push({ scan_type: "clothing_scan" });
   }
   arr.push({ scan_id });
   arr.push({ email });
@@ -107,7 +106,7 @@ export const getUrl = ({ urlName, stagingUrl = false }: { urlName: string; stagi
   return PROD_URL[urlName];
 };
 
-export const isValidEmail = (email:string) => {
+export const isValidEmail = (email: string) => {
   const checkEmailValidation =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return checkEmailValidation.test(email);

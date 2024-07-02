@@ -39,11 +39,10 @@ export default class FileUpload {
   }
 
   async uploadFileFrontend({ file, arrayMetaData, scanId, email }: UploadOptions) {
-    email = email.trim();
     if (!checkParameters(file, arrayMetaData, scanId, email)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(email.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     if (!checkMetaDataValue(arrayMetaData)) {
@@ -121,11 +120,10 @@ export default class FileUpload {
   }
 
   async uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions) {
-    email = email.trim();
     if (!checkParameters(file, arrayMetaData, scanId, email)) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(email.trim())) {
       throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
     }
     if (!checkMetaDataValue(arrayMetaData)) {
