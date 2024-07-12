@@ -38,6 +38,7 @@ declare class TryOn {
     deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
     handleTryOnWebSocket: ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
     handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
+    getShareLink(tryonId: string): Promise<AxiosResponse<any, any>>;
     getTryOnResult: ({ userEmail, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
 }
 export default TryOn;

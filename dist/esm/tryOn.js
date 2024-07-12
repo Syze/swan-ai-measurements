@@ -186,6 +186,11 @@ class TryOn {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
         });
     }
+    getShareLink(tryonId) {
+        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
+            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+        });
+    }
 }
 _TryOn_tryOnSocketRef = new WeakMap(), _TryOn_timerWaitingRef = new WeakMap(), _TryOn_accessKey = new WeakMap(), _TryOn_stagingUrl = new WeakMap(), _TryOn_disconnectSocket = new WeakMap(), _TryOn_handleTimeOut = new WeakMap(), _TryOn_handleGetTryOnResult = new WeakMap(), _TryOn_instances = new WeakSet(), _TryOn_getSignedUrl = function _TryOn_getSignedUrl(payload) {
     if (checkParameters(payload) === false) {

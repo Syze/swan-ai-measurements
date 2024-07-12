@@ -169,6 +169,11 @@ class TryOn {
             onError?.(error);
         }
     };
+    getShareLink(tryonId) {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
+            headers: { "X-Api-Key": this.#accessKey },
+        });
+    }
     getTryOnResult = ({ userEmail, shopDomain, productName }) => {
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);

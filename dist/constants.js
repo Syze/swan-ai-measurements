@@ -37,6 +37,7 @@ exports.API_ENDPOINTS = {
     AUTH: "/auth",
     SCANNING: "/scanning",
     RECOMMENDATION: "/recommendation",
+    TRY_ON_SHARE: "/tryon/share",
 };
 exports.requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
 exports.REQUIRED_MESSAGE = "Please verify required parameters";
