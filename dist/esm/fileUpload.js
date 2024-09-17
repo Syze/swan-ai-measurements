@@ -22,8 +22,8 @@ var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
-const Uppy = require("fix-esm").require("@uppy/core");
-const AwsS3Multipart = require("fix-esm").require("@uppy/aws-s3-multipart");
+import Uppy from "@uppy/core";
+import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
     constructor(accessKey, stagingUrl = false) {
         _FileUpload_uppyIns.set(this, void 0);
@@ -48,8 +48,8 @@ class FileUpload {
                 if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
                     __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
                 }
-                __classPrivateFieldSet(this, _FileUpload_uppyIns, new Uppy.default({ autoProceed: true }), "f");
-                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart.default, {
+                __classPrivateFieldSet(this, _FileUpload_uppyIns, new Uppy({ autoProceed: true }), "f");
+                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart, {
                     limit: 10,
                     retryDelays: [0, 1000, 3000, 5000],
                     companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f") }),
