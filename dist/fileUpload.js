@@ -151,5 +151,14 @@ class FileUpload {
             }
         });
     }
+    async setDeviceInfo(data) {
+        const { scanId, ...rest } = data;
+        if ((0, utils_js_1.checkParameters)(scanId) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.DEVICE_INFO}/${scanId}`, { device_info: { ...rest } }, {
+            headers: { "X-Api-Key": this.#accessKey },
+        });
+    }
 }
 exports.default = FileUpload;

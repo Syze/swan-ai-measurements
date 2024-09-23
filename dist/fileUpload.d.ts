@@ -8,16 +8,17 @@ interface ObjMetaData {
     clothes_fit: string;
     scan_type?: string;
     callback_url: string;
-    device_info?: {
-        detection?: string;
-        model?: string;
-        gyro?: {
-            alpha?: string;
-            gamma?: string;
-            beta?: string;
-            timestamp?: string;
-        }[];
-    };
+}
+interface SetDeviceInfo {
+    detection?: string;
+    model?: string;
+    gyro: {
+        alpha?: string;
+        gamma?: string;
+        beta?: string;
+        timestamp?: string;
+    }[];
+    scanId: string;
 }
 interface UploadOptions {
     file: File;
@@ -30,5 +31,6 @@ export default class FileUpload {
     constructor(accessKey: string, stagingUrl?: boolean);
     uploadFileFrontend({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
     uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
+    setDeviceInfo(data: SetDeviceInfo): Promise<import("axios").AxiosResponse<any, any>>;
 }
 export {};

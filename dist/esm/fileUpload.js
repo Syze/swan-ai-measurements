@@ -18,9 +18,20 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, } from "./constants.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
@@ -170,6 +181,17 @@ class FileUpload {
                     reject(error);
                 }
             }));
+        });
+    }
+    setDeviceInfo(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { scanId } = data, rest = __rest(data, ["scanId"]);
+            if (checkParameters(scanId) === false) {
+                throw new Error(REQUIRED_MESSAGE);
+            }
+            return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f") })}${API_ENDPOINTS.DEVICE_INFO}/${scanId}`, { device_info: Object.assign({}, rest) }, {
+                headers: { "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") },
+            });
         });
     }
 }

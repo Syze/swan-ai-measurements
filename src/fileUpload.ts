@@ -5,6 +5,7 @@ import {
 	FILE_UPLOAD_ENDPOINT,
 	APP_AUTH_BASE_URL,
 	REQUIRED_ERROR_MESSAGE_INVALID_EMAIL,
+	API_ENDPOINTS,
 } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
 import Uppy from "@uppy/core";
@@ -19,7 +20,13 @@ interface ObjMetaData {
 	clothes_fit: string;
 	scan_type?: string;
 	callback_url: string;
-	device_info?:{ detection?: string, model?: string, gyro?: {alpha?:string,gamma?:string,beta?:string,timestamp?:string}[] };
+}
+
+interface SetDeviceInfo {
+	detection?: string;
+	model?: string;
+	gyro: { alpha?: string; gamma?: string; beta?: string; timestamp?: string }[];
+	scanId:string
 }
 
 interface UploadOptions {
@@ -119,7 +126,6 @@ export default class FileUpload {
 			});
 		});
 	}
-
 	async uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions) {
 		if (!checkParameters(file, arrayMetaData, scanId, email)) {
 			throw new Error(REQUIRED_MESSAGE);
@@ -178,5 +184,14 @@ export default class FileUpload {
 				reject(error);
 			}
 		});
+	}
+	async setDeviceInfo(data:SetDeviceInfo) {
+		const {scanId,...rest} = data;
+		if (checkParameters(scanId) === false) {
+			throw new Error(REQUIRED_MESSAGE);
+		  }
+		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.DEVICE_INFO}/${scanId}`,{device_info:{...rest}} , {
+			headers: { "X-Api-Key": this.#accessKey },
+		  });
 	}
 }
