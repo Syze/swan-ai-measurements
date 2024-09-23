@@ -8,7 +8,16 @@ interface ObjMetaData {
     clothes_fit: string;
     scan_type?: string;
     callback_url: string;
-    gyro?: string;
+    device_info?: {
+        detection?: string;
+        model?: string;
+        gyro?: {
+            alpha?: string;
+            gamma?: string;
+            beta?: string;
+            timestamp?: string;
+        }[];
+    };
 }
 interface UploadOptions {
     file: File;
