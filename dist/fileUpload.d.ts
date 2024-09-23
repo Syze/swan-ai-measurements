@@ -8,9 +8,7 @@ interface ObjMetaData {
     clothes_fit: string;
     scan_type?: string;
     callback_url: string;
-    alpha?: string;
-    beta?: string;
-    gamma?: string;
+    gyro?: string;
 }
 interface UploadOptions {
     file: File;
