@@ -13,13 +13,13 @@ var _Auth_socketRef, _Auth_accessKey, _Auth_stagingUrl;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
+import WS from "ws";
 // Conditionally import ws for Node.js
 let WebSocketClient;
 if (typeof window !== "undefined" && window.WebSocket) {
     WebSocketClient = window.WebSocket;
 }
 else {
-    const WS = require("ws");
     WebSocketClient = WS;
 }
 class Auth {

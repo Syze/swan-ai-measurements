@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+const ws_1 = __importDefault(require("ws"));
 // Conditionally import ws for Node.js
 let WebSocketClient;
 if (typeof window !== "undefined" && window.WebSocket) {
     WebSocketClient = window.WebSocket;
 }
 else {
-    const WS = require("ws");
-    WebSocketClient = WS;
+    WebSocketClient = ws_1.default;
 }
 class Auth {
     #socketRef;

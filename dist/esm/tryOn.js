@@ -22,14 +22,12 @@ var _TryOn_instances, _TryOn_tryOnSocketRef, _TryOn_timerWaitingRef, _TryOn_acce
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
-// Conditionally import ws for Node.js
+import WS from "ws";
 let WebSocketClient;
 if (typeof window !== 'undefined' && window.WebSocket) {
     WebSocketClient = window.WebSocket;
 }
 else {
-    const WS = require('ws');
-    console.log(WS);
     WebSocketClient = WS;
 }
 class TryOn {
