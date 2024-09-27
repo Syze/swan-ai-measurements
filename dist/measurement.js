@@ -6,6 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+let WebSocketClient;
+if (typeof window !== 'undefined' && window.WebSocket) {
+    WebSocketClient = window.WebSocket;
+}
+else {
+    const WS = require('ws');
+    console.log(WS);
+    WebSocketClient = WS;
+}
 class Measurement {
     #tryOnSocketRef = null;
     #measurementSocketRef = null;
@@ -50,25 +59,34 @@ class Measurement {
             urlName: constants_js_1.APP_BASE_WEBSOCKET_URL,
             stagingUrl: this.#stagingUrl,
         })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-        this.#tryOnSocketRef = new WebSocket(url);
-        this.#tryOnSocketRef.onopen = () => {
-            onOpen?.();
-        };
-        this.#tryOnSocketRef.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data?.tryOnProcessStatus === "available") {
-                onSuccess?.(data);
-            }
-            else {
-                onError?.({ message: "failed to get image urls" });
-            }
-        };
-        this.#tryOnSocketRef.onclose = () => {
-            onClose?.();
-        };
-        this.#tryOnSocketRef.onerror = (event) => {
-            onError?.(event);
-        };
+        this.#tryOnSocketRef = new WebSocketClient(url);
+        if (this.#tryOnSocketRef) {
+            this.#tryOnSocketRef.onopen = () => {
+                onOpen?.();
+            };
+            this.#tryOnSocketRef.onmessage = (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                }
+                catch (error) {
+                    console.log(data, error, "noy correct format for data");
+                    return;
+                }
+                if (data?.tryOnProcessStatus === "available") {
+                    onSuccess?.(data);
+                }
+                else {
+                    onError?.({ message: "failed to get image urls" });
+                }
+            };
+            this.#tryOnSocketRef.onclose = () => {
+                onClose?.();
+            };
+            this.#tryOnSocketRef.onerror = (event) => {
+                onError?.(event);
+            };
+        }
     }
     async #getMeasurementsCheck(options) {
         const { scanId, onSuccess, onError } = options;

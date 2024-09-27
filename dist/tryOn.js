@@ -6,6 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+// Conditionally import ws for Node.js
+let WebSocketClient;
+if (typeof window !== 'undefined' && window.WebSocket) {
+    WebSocketClient = window.WebSocket;
+}
+else {
+    const WS = require('ws');
+    console.log(WS);
+    WebSocketClient = WS;
+}
 class TryOn {
     #tryOnSocketRef = null;
     #timerWaitingRef = null;
@@ -115,32 +125,44 @@ class TryOn {
         }
         this.#disconnectSocket();
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-        this.#tryOnSocketRef = new WebSocket(url);
-        this.#tryOnSocketRef.onopen = async () => {
-            onOpen?.();
-            this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
-        };
-        this.#tryOnSocketRef.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data?.status === "success") {
-                onSuccess?.(data);
-            }
-            else {
-                onError?.(data);
-            }
-            if (this.#timerWaitingRef) {
-                clearTimeout(this.#timerWaitingRef);
-            }
-        };
-        this.#tryOnSocketRef.onclose = () => {
-            onClose?.();
-        };
-        this.#tryOnSocketRef.onerror = (event) => {
-            onError?.(event);
-            if (this.#timerWaitingRef) {
-                clearTimeout(this.#timerWaitingRef);
-            }
-        };
+        this.#tryOnSocketRef = new WebSocketClient(url);
+        if (this.#tryOnSocketRef) {
+            this.#tryOnSocketRef.onopen = async () => {
+                onOpen?.();
+                this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
+            };
+            this.#tryOnSocketRef.onmessage = (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                }
+                catch (error) {
+                    console.log(data, error, "noy correct format for data");
+                    return;
+                }
+                if (data?.status === "success") {
+                    onSuccess?.(data);
+                }
+                else {
+                    onError?.(data);
+                }
+                if (this.#timerWaitingRef) {
+                    clearTimeout(this.#timerWaitingRef);
+                }
+            };
+            this.#tryOnSocketRef.onclose = () => {
+                onClose?.();
+            };
+            this.#tryOnSocketRef.onerror = (event) => {
+                onError?.(event);
+                if (this.#timerWaitingRef) {
+                    clearTimeout(this.#timerWaitingRef);
+                }
+            };
+        }
+        else {
+            console.log("no connection made for websocket");
+        }
     };
     handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }) {
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {

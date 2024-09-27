@@ -22,6 +22,15 @@ var _Measurement_instances, _Measurement_tryOnSocketRef, _Measurement_measuremen
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
+let WebSocketClient;
+if (typeof window !== 'undefined' && window.WebSocket) {
+    WebSocketClient = window.WebSocket;
+}
+else {
+    const WS = require('ws');
+    console.log(WS);
+    WebSocketClient = WS;
+}
 class Measurement {
     constructor(accessKey, stagingUrl = false) {
         _Measurement_instances.add(this);
@@ -68,25 +77,34 @@ class Measurement {
             urlName: APP_BASE_WEBSOCKET_URL,
             stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f"),
         })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-        __classPrivateFieldSet(this, _Measurement_tryOnSocketRef, new WebSocket(url), "f");
-        __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onopen = () => {
-            onOpen === null || onOpen === void 0 ? void 0 : onOpen();
-        };
-        __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if ((data === null || data === void 0 ? void 0 : data.tryOnProcessStatus) === "available") {
-                onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
-            }
-            else {
-                onError === null || onError === void 0 ? void 0 : onError({ message: "failed to get image urls" });
-            }
-        };
-        __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onclose = () => {
-            onClose === null || onClose === void 0 ? void 0 : onClose();
-        };
-        __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onerror = (event) => {
-            onError === null || onError === void 0 ? void 0 : onError(event);
-        };
+        __classPrivateFieldSet(this, _Measurement_tryOnSocketRef, new WebSocketClient(url), "f");
+        if (__classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f")) {
+            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onopen = () => {
+                onOpen === null || onOpen === void 0 ? void 0 : onOpen();
+            };
+            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onmessage = (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                }
+                catch (error) {
+                    console.log(data, error, "noy correct format for data");
+                    return;
+                }
+                if ((data === null || data === void 0 ? void 0 : data.tryOnProcessStatus) === "available") {
+                    onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
+                }
+                else {
+                    onError === null || onError === void 0 ? void 0 : onError({ message: "failed to get image urls" });
+                }
+            };
+            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onclose = () => {
+                onClose === null || onClose === void 0 ? void 0 : onClose();
+            };
+            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onerror = (event) => {
+                onError === null || onError === void 0 ? void 0 : onError(event);
+            };
+        }
     }
     handleMeasurementSocket(options) {
         const { scanId, onError, onSuccess, onClose, onOpen } = options;

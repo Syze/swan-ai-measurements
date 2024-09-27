@@ -2,6 +2,14 @@ import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
 
+let WebSocketClient: any;
+if (typeof window !== 'undefined' && window.WebSocket) {
+  WebSocketClient = window.WebSocket;
+} else {
+  const WS = require('ws');
+  console.log(WS);
+  WebSocketClient = WS;
+}
 interface TryOnSocketOptions {
   shopDomain: string;
   scanId: string;
@@ -101,28 +109,37 @@ class Measurement {
       urlName: APP_BASE_WEBSOCKET_URL,
       stagingUrl: this.#stagingUrl,
     })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-    this.#tryOnSocketRef = new WebSocket(url);
+    this.#tryOnSocketRef = new WebSocketClient(url);
+    if (this.#tryOnSocketRef) {
+      this.#tryOnSocketRef.onopen = () => {
+        onOpen?.();
+      };
+  
+      this.#tryOnSocketRef.onmessage = (event) => {
+        let data;
+				try {
+					data = JSON.parse(event.data);
+				} catch (error) {
+					console.log(data, error, "noy correct format for data");
 
-    this.#tryOnSocketRef.onopen = () => {
-      onOpen?.();
-    };
-
-    this.#tryOnSocketRef.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data?.tryOnProcessStatus === "available") {
-        onSuccess?.(data);
-      } else {
-        onError?.({ message: "failed to get image urls" });
-      }
-    };
-
-    this.#tryOnSocketRef.onclose = () => {
-      onClose?.();
-    };
-
-    this.#tryOnSocketRef.onerror = (event) => {
-      onError?.(event);
-    };
+					return;
+				}
+        if (data?.tryOnProcessStatus === "available") {
+          onSuccess?.(data);
+        } else {
+          onError?.({ message: "failed to get image urls" });
+        }
+      };
+  
+      this.#tryOnSocketRef.onclose = () => {
+        onClose?.();
+      };
+  
+      this.#tryOnSocketRef.onerror = (event) => {
+        onError?.(event);
+      };
+    }
+   
   }
 
   async #getMeasurementsCheck(options: GetMeasurementsCheckOptions): Promise<void> {

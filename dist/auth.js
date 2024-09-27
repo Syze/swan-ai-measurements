@@ -6,6 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+// Conditionally import ws for Node.js
+let WebSocketClient;
+if (typeof window !== "undefined" && window.WebSocket) {
+    WebSocketClient = window.WebSocket;
+}
+else {
+    const WS = require("ws");
+    WebSocketClient = WS;
+}
 class Auth {
     #socketRef;
     #accessKey;
@@ -55,22 +64,32 @@ class Auth {
         }
         if (this.#socketRef)
             this.#socketRef.close();
-        this.#socketRef = new WebSocket(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.AUTH}`);
+        this.#socketRef = new WebSocketClient(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.AUTH}`);
         const detailObj = { email, scanId };
-        this.#socketRef.onopen = () => {
-            this.#socketRef?.send(JSON.stringify(detailObj));
-            onOpen?.();
-        };
-        this.#socketRef.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            onSuccess?.(data);
-        };
-        this.#socketRef.onclose = () => {
-            onClose?.();
-        };
-        this.#socketRef.onerror = (event) => {
-            onError?.(event);
-        };
+        if (this.#socketRef) {
+            this.#socketRef.onopen = () => {
+                this.#socketRef?.send(JSON.stringify(detailObj));
+                onOpen?.();
+            };
+            this.#socketRef.onmessage = (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                }
+                catch (error) {
+                    console.log(data, error, "noy correct format for data");
+                    return;
+                }
+                data = JSON.parse(event.data);
+                onSuccess?.(data);
+            };
+            this.#socketRef.onclose = () => {
+                onClose?.();
+            };
+            this.#socketRef.onerror = (event) => {
+                onError?.(event);
+            };
+        }
     }
 }
 exports.default = Auth;

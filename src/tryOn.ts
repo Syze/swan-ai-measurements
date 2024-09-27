@@ -2,6 +2,16 @@ import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
 
+// Conditionally import ws for Node.js
+let WebSocketClient: any;
+if (typeof window !== 'undefined' && window.WebSocket) {
+  WebSocketClient = window.WebSocket;
+} else {
+  const WS = require('ws');
+  console.log(WS);
+  WebSocketClient = WS;
+}
+
 interface UploadFileParams {
   files: File[];
   userEmail: string;
@@ -166,31 +176,43 @@ class TryOn {
     }
     this.#disconnectSocket();
     const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-    this.#tryOnSocketRef = new WebSocket(url);
-    this.#tryOnSocketRef.onopen = async () => {
-      onOpen?.();
-      this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
-    };
-    this.#tryOnSocketRef.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data?.status === "success") {
-        onSuccess?.(data);
-      } else {
-        onError?.(data);
-      }
-      if (this.#timerWaitingRef) {
-        clearTimeout(this.#timerWaitingRef);
-      }
-    };
-    this.#tryOnSocketRef.onclose = () => {
-      onClose?.();
-    };
-    this.#tryOnSocketRef.onerror = (event) => {
-      onError?.(event);
-      if (this.#timerWaitingRef) {
-        clearTimeout(this.#timerWaitingRef);
-      }
-    };
+    this.#tryOnSocketRef = new WebSocketClient(url);
+    if(this.#tryOnSocketRef){
+      this.#tryOnSocketRef.onopen = async () => {
+        onOpen?.();
+        this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
+      };
+      this.#tryOnSocketRef.onmessage = (event) => {
+        let data;
+				try {
+					data = JSON.parse(event.data);
+				} catch (error) {
+					console.log(data, error, "noy correct format for data");
+					return;
+				}
+        if (data?.status === "success") {
+          onSuccess?.(data);
+        } else {
+          onError?.(data);
+        }
+        if (this.#timerWaitingRef) {
+          clearTimeout(this.#timerWaitingRef);
+        }
+      };
+      this.#tryOnSocketRef.onclose = () => {
+        onClose?.();
+      };
+      this.#tryOnSocketRef.onerror = (event) => {
+        onError?.(event);
+        if (this.#timerWaitingRef) {
+          clearTimeout(this.#timerWaitingRef);
+        }
+      };
+    }else{
+      console.log("no connection made for websocket");
+      
+    }
+ 
   };
 
   handleTryOnSubmit({

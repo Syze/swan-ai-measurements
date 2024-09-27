@@ -2,115 +2,133 @@ import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
 
+// Conditionally import ws for Node.js
+let WebSocketClient: any;
+if (typeof window !== "undefined" && window.WebSocket) {
+	WebSocketClient = window.WebSocket;
+} else {
+	const WS = require("ws");
+	WebSocketClient = WS;
+}
+
 interface RegisterUserParams {
-  email: string;
-  appVerifyUrl: string;
-  gender?: string;
-  height?: number;
-  username?: string;
+	email: string;
+	appVerifyUrl: string;
+	gender?: string;
+	height?: number;
+	username?: string;
 }
 
 interface AddUserParams {
-  scanId: string;
-  email: string;
-  name?: string;
-  height: number;
-  gender: string;
-  offsetMarketingConsent?: boolean;
+	scanId: string;
+	email: string;
+	name?: string;
+	height: number;
+	gender: string;
+	offsetMarketingConsent?: boolean;
 }
 
 interface AuthSocketParams {
-  email: string;
-  scanId: string;
-  onError?: (event: Event) => void;
-  onSuccess?: (data: any) => void;
-  onClose?: () => void;
-  onOpen?: () => void;
+	email: string;
+	scanId: string;
+	onError?: (event: Event) => void;
+	onSuccess?: (data: any) => void;
+	onClose?: () => void;
+	onOpen?: () => void;
 }
 
 interface AuthSocketDetail {
-  email: string;
-  scanId: string;
+	email: string;
+	scanId: string;
 }
 
 export default class Auth {
-  #socketRef?: WebSocket;
-  #accessKey: string;
-  #stagingUrl: boolean;
+	#socketRef?: WebSocket;
+	#accessKey: string;
+	#stagingUrl: boolean;
 
-  constructor(accessKey: string, stagingUrl = false) {
-    this.#accessKey = accessKey;
-    this.#stagingUrl = stagingUrl;
-  }
+	constructor(accessKey: string, stagingUrl = false) {
+		this.#accessKey = accessKey;
+		this.#stagingUrl = stagingUrl;
+	}
 
-  registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse> {
-    if (!checkParameters(email, appVerifyUrl)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    let body: Record<string, any> = { username, email, appVerifyUrl };
-    if (gender && height) {
-      body = { ...body, attributes: { gender, height } };
-    }
-    return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.REGISTER_USER}`, body, {
-      headers: { "X-Api-Key": this.#accessKey },
-    });
-  }
+	registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse> {
+		if (!checkParameters(email, appVerifyUrl)) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
+		let body: Record<string, any> = { username, email, appVerifyUrl };
+		if (gender && height) {
+			body = { ...body, attributes: { gender, height } };
+		}
+		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.REGISTER_USER}`, body, {
+			headers: { "X-Api-Key": this.#accessKey },
+		});
+	}
 
-  verifyToken(token: string): Promise<AxiosResponse> {
-    if (!checkParameters(token)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.VERIFY_USER}`, null, {
-      params: { token },
-      headers: { "X-Api-Key": this.#accessKey },
-    });
-  }
+	verifyToken(token: string): Promise<AxiosResponse> {
+		if (!checkParameters(token)) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
+		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.VERIFY_USER}`, null, {
+			params: { token },
+			headers: { "X-Api-Key": this.#accessKey },
+		});
+	}
 
-  addUser({ scanId, email, name, height, gender, offsetMarketingConsent }: AddUserParams): Promise<AxiosResponse> {
-    if (!checkParameters(scanId, email, height, gender)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    return axios.post(
-      `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.ADD_USER}`,
-      { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) },
-      { headers: { "X-Api-Key": this.#accessKey } }
-    );
-  }
+	addUser({ scanId, email, name, height, gender, offsetMarketingConsent }: AddUserParams): Promise<AxiosResponse> {
+		if (!checkParameters(scanId, email, height, gender)) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
+		return axios.post(
+			`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.ADD_USER}`,
+			{ scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) },
+			{ headers: { "X-Api-Key": this.#accessKey } },
+		);
+	}
 
-  getUserDetail(email: string): Promise<AxiosResponse> {
-    if (!checkParameters(email)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
-      headers: { "X-Api-Key": this.#accessKey },
-    });
-  }
+	getUserDetail(email: string): Promise<AxiosResponse> {
+		if (!checkParameters(email)) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
+		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+			headers: { "X-Api-Key": this.#accessKey },
+		});
+	}
 
-  handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }: AuthSocketParams): void {
-    if (!checkParameters(email, scanId)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    if (this.#socketRef) this.#socketRef.close();
+	handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }: AuthSocketParams): void {
+		if (!checkParameters(email, scanId)) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
+		if (this.#socketRef) this.#socketRef.close();
 
-    this.#socketRef = new WebSocket(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.AUTH}`);
-    const detailObj: AuthSocketDetail = { email, scanId };
+		this.#socketRef = new WebSocketClient(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.AUTH}`);
+		const detailObj: AuthSocketDetail = { email, scanId };
+		if (this.#socketRef) {
+			this.#socketRef.onopen = () => {
+				this.#socketRef?.send(JSON.stringify(detailObj));
+				onOpen?.();
+			};
 
-    this.#socketRef.onopen = () => {
-      this.#socketRef?.send(JSON.stringify(detailObj));
-      onOpen?.();
-    };
+			this.#socketRef.onmessage = (event: MessageEvent) => {
+				let data;
+				try {
+					data = JSON.parse(event.data);
+				} catch (error) {
+					console.log(data, error, "noy correct format for data");
 
-    this.#socketRef.onmessage = (event: MessageEvent) => {
-      const data = JSON.parse(event.data);
-      onSuccess?.(data);
-    };
+					return;
+				}
+				data = JSON.parse(event.data);
+				onSuccess?.(data);
+			};
 
-    this.#socketRef.onclose = () => {
-      onClose?.();
-    };
+			this.#socketRef.onclose = () => {
+				onClose?.();
+			};
 
-    this.#socketRef.onerror = (event: Event) => {
-      onError?.(event);
-    };
-  }
+			this.#socketRef.onerror = (event: Event) => {
+				onError?.(event);
+			};
+		}
+	}
 }

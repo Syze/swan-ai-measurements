@@ -17,11 +17,12 @@
     "@uppy/aws-s3-multipart": "^3.11.1",
     "@uppy/core": "^3.11.3",
     "axios": "^1.6.7",
+    "fix-esm": "^1.0.1",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "tslib": "^2.6.2",
     "typescript": "^5.4.5",
-    "fix-esm": "^1.0.1"
+    "ws": "^8.18.0"
   },
   "scripts": {
     "start": "nodemon dist/index.js",
@@ -53,6 +54,7 @@
   },
   "homepage": "https://github.com/Syze/swan-ai-measurements.git#readme",
   "devDependencies": {
+    "@types/ws": "^8.5.12",
     "nodemon": "^3.1.0"
   }
 }

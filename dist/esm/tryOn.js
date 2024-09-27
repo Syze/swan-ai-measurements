@@ -22,6 +22,16 @@ var _TryOn_instances, _TryOn_tryOnSocketRef, _TryOn_timerWaitingRef, _TryOn_acce
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
+// Conditionally import ws for Node.js
+let WebSocketClient;
+if (typeof window !== 'undefined' && window.WebSocket) {
+    WebSocketClient = window.WebSocket;
+}
+else {
+    const WS = require('ws');
+    console.log(WS);
+    WebSocketClient = WS;
+}
 class TryOn {
     constructor(accessKey, stagingUrl = false) {
         _TryOn_instances.add(this);
@@ -51,32 +61,44 @@ class TryOn {
             }
             __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
             const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-            __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocket(url), "f");
-            __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onopen = () => __awaiter(this, void 0, void 0, function* () {
-                onOpen === null || onOpen === void 0 ? void 0 : onOpen();
-                __classPrivateFieldGet(this, _TryOn_handleTimeOut, "f").call(this, { onSuccess, onError, shopDomain, userEmail, productName });
-            });
-            __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
-                    onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
-                }
-                else {
-                    onError === null || onError === void 0 ? void 0 : onError(data);
-                }
-                if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
-                    clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
-                }
-            };
-            __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onclose = () => {
-                onClose === null || onClose === void 0 ? void 0 : onClose();
-            };
-            __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onerror = (event) => {
-                onError === null || onError === void 0 ? void 0 : onError(event);
-                if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
-                    clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
-                }
-            };
+            __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocketClient(url), "f");
+            if (__classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f")) {
+                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onopen = () => __awaiter(this, void 0, void 0, function* () {
+                    onOpen === null || onOpen === void 0 ? void 0 : onOpen();
+                    __classPrivateFieldGet(this, _TryOn_handleTimeOut, "f").call(this, { onSuccess, onError, shopDomain, userEmail, productName });
+                });
+                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onmessage = (event) => {
+                    let data;
+                    try {
+                        data = JSON.parse(event.data);
+                    }
+                    catch (error) {
+                        console.log(data, error, "noy correct format for data");
+                        return;
+                    }
+                    if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
+                        onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
+                    }
+                    else {
+                        onError === null || onError === void 0 ? void 0 : onError(data);
+                    }
+                    if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
+                        clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
+                    }
+                };
+                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onclose = () => {
+                    onClose === null || onClose === void 0 ? void 0 : onClose();
+                };
+                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onerror = (event) => {
+                    onError === null || onError === void 0 ? void 0 : onError(event);
+                    if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
+                        clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
+                    }
+                };
+            }
+            else {
+                console.log("no connection made for websocket");
+            }
         };
         _TryOn_handleGetTryOnResult.set(this, (_a) => __awaiter(this, [_a], void 0, function* ({ onSuccess, onError, shopDomain, userEmail, productName }) {
             try {
