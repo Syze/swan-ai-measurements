@@ -2,6 +2,7 @@ import { AxiosResponse } from "axios";
 interface UploadFileParams {
     files: File[];
     userEmail: string;
+    fileNoLimit?: number;
 }
 interface DeleteImageParams {
     userEmail: string;
@@ -33,7 +34,7 @@ interface GetTryOnResultParams {
 declare class TryOn {
     #private;
     constructor(accessKey: string, stagingUrl?: boolean);
-    uploadFile({ files, userEmail }: UploadFileParams): Promise<string>;
+    uploadFile({ files, userEmail, fileNoLimit }: UploadFileParams): Promise<string>;
     getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>>;
     deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
     handleTryOnWebSocket: ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;

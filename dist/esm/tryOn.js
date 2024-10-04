@@ -128,25 +128,27 @@ class TryOn {
         __classPrivateFieldSet(this, _TryOn_stagingUrl, stagingUrl, "f");
     }
     uploadFile(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ files, userEmail }) {
-            var _b;
+        return __awaiter(this, arguments, void 0, function* ({ files, userEmail, fileNoLimit = 2 }) {
             if (checkParameters(files, userEmail) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
             if (!isValidEmail(userEmail.trim())) {
                 throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
             }
-            if ((files === null || files === void 0 ? void 0 : files.length) > 2) {
-                throw new Error("Cannot allow more than 2 files.");
+            if (fileNoLimit <= 0) {
+                throw new Error(`Provide valid file number limit ${fileNoLimit}.`);
+            }
+            if ((files === null || files === void 0 ? void 0 : files.length) > fileNoLimit) {
+                throw new Error(`Cannot allow more than ${fileNoLimit} files.`);
             }
             try {
                 const payload = {
                     userEmail,
-                    userImages: [(_b = files[0]) === null || _b === void 0 ? void 0 : _b.name],
+                    userImages: [],
                 };
-                if (files[1]) {
-                    payload.userImages.push(files[1].name);
-                }
+                files === null || files === void 0 ? void 0 : files.forEach((file) => {
+                    payload.userImages.push(file.name);
+                });
                 const signedUrlRes = yield __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getSignedUrl).call(this, payload);
                 for (const file of files) {
                     yield __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_s3Upload).call(this, signedUrlRes.data.uploadUrls[file.name].url, file);

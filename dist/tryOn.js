@@ -23,24 +23,27 @@ class TryOn {
         this.#accessKey = accessKey;
         this.#stagingUrl = stagingUrl;
     }
-    async uploadFile({ files, userEmail }) {
+    async uploadFile({ files, userEmail, fileNoLimit = 2 }) {
         if ((0, utils_js_1.checkParameters)(files, userEmail) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
-        if (files?.length > 2) {
-            throw new Error("Cannot allow more than 2 files.");
+        if (fileNoLimit <= 0) {
+            throw new Error(`Provide valid file number limit ${fileNoLimit}.`);
+        }
+        if (files?.length > fileNoLimit) {
+            throw new Error(`Cannot allow more than ${fileNoLimit} files.`);
         }
         try {
             const payload = {
                 userEmail,
-                userImages: [files[0]?.name],
+                userImages: [],
             };
-            if (files[1]) {
-                payload.userImages.push(files[1].name);
-            }
+            files?.forEach((file) => {
+                payload.userImages.push(file.name);
+            });
             const signedUrlRes = await this.#getSignedUrl(payload);
             for (const file of files) {
                 await this.#s3Upload(signedUrlRes.data.uploadUrls[file.name].url, file);

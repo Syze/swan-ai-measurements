@@ -13,11 +13,13 @@ if (typeof window !== 'undefined' && window.WebSocket) {
 interface UploadFileParams {
   files: File[];
   userEmail: string;
+  fileNoLimit?:number
 }
 
 interface DeleteImageParams {
   userEmail: string;
   fileName: string;
+  
 }
 
 interface HandleTryOnWebSocketParams {
@@ -64,35 +66,37 @@ class TryOn {
     this.#stagingUrl = stagingUrl;
   }
 
-  async uploadFile({ files, userEmail }: UploadFileParams): Promise<string> {
-    if (checkParameters(files, userEmail) === false) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
+  async uploadFile({ files, userEmail,fileNoLimit=2 }: UploadFileParams): Promise<string> {
+		if (checkParameters(files, userEmail) === false) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
 
-    if (!isValidEmail(userEmail.trim())) {
-      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-    }
-
-    if (files?.length > 2) {
-      throw new Error("Cannot allow more than 2 files.");
-    }
-    try {
-      const payload = {
-        userEmail,
-        userImages: [files[0]?.name],
-      };
-      if (files[1]) {
-        payload.userImages.push(files[1].name);
-      }
-      const signedUrlRes = await this.#getSignedUrl(payload);
-      for (const file of files) {
-        await this.#s3Upload(signedUrlRes.data.uploadUrls[file.name].url, file);
-      }
-      return `uploaded successfully!`;
-    } catch (error) {
-      throw error;
-    }
-  }
+		if (!isValidEmail(userEmail.trim())) {
+			throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+		}
+        if (fileNoLimit<=0) {
+			throw new Error(`Provide valid file number limit ${fileNoLimit}.`);
+		}
+		if (files?.length > fileNoLimit) {
+			throw new Error(`Cannot allow more than ${fileNoLimit} files.`);
+		}
+		try {
+			const payload :{ userEmail: string; userImages: string[] } = {
+				userEmail,
+				userImages: [],
+			};
+			files?.forEach((file:File)=>{
+             payload.userImages.push(file.name)
+			})
+			const signedUrlRes = await this.#getSignedUrl(payload);
+			for (const file of files) {
+				await this.#s3Upload(signedUrlRes.data.uploadUrls[file.name].url, file);
+			}
+			return `uploaded successfully!`;
+		} catch (error) {
+			throw error;
+		}
+	}
 
   #getSignedUrl(payload: { userEmail: string; userImages: string[] }): Promise<AxiosResponse<any>> {
     if (checkParameters(payload) === false) {
