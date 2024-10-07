@@ -6,14 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
-const ws_1 = __importDefault(require("ws"));
-let WebSocketClient;
-if (typeof window !== 'undefined' && window.WebSocket) {
-    WebSocketClient = window.WebSocket;
-}
-else {
-    WebSocketClient = ws_1.default;
-}
 class TryOn {
     #tryOnSocketRef = null;
     #timerWaitingRef = null;
@@ -126,7 +118,7 @@ class TryOn {
         }
         this.#disconnectSocket();
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-        this.#tryOnSocketRef = new WebSocketClient(url);
+        this.#tryOnSocketRef = new WebSocket(url);
         if (this.#tryOnSocketRef) {
             this.#tryOnSocketRef.onopen = async () => {
                 onOpen?.();

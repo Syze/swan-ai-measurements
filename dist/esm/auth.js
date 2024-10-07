@@ -13,15 +13,6 @@ var _Auth_socketRef, _Auth_accessKey, _Auth_stagingUrl;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
-import WS from "ws";
-// Conditionally import ws for Node.js
-let WebSocketClient;
-if (typeof window !== "undefined" && window.WebSocket) {
-    WebSocketClient = window.WebSocket;
-}
-else {
-    WebSocketClient = WS;
-}
 class Auth {
     constructor(accessKey, stagingUrl = false) {
         _Auth_socketRef.set(this, void 0);
@@ -71,7 +62,7 @@ class Auth {
         }
         if (__classPrivateFieldGet(this, _Auth_socketRef, "f"))
             __classPrivateFieldGet(this, _Auth_socketRef, "f").close();
-        __classPrivateFieldSet(this, _Auth_socketRef, new WebSocketClient(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.AUTH}`), "f");
+        __classPrivateFieldSet(this, _Auth_socketRef, new WebSocket(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.AUTH}`), "f");
         const detailObj = { email, scanId };
         if (__classPrivateFieldGet(this, _Auth_socketRef, "f")) {
             __classPrivateFieldGet(this, _Auth_socketRef, "f").onopen = () => {

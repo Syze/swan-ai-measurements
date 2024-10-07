@@ -6,15 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
-const ws_1 = __importDefault(require("ws"));
-// Conditionally import ws for Node.js
-let WebSocketClient;
-if (typeof window !== "undefined" && window.WebSocket) {
-    WebSocketClient = window.WebSocket;
-}
-else {
-    WebSocketClient = ws_1.default;
-}
 class Auth {
     #socketRef;
     #accessKey;
@@ -64,7 +55,7 @@ class Auth {
         }
         if (this.#socketRef)
             this.#socketRef.close();
-        this.#socketRef = new WebSocketClient(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.AUTH}`);
+        this.#socketRef = new WebSocket(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.AUTH}`);
         const detailObj = { email, scanId };
         if (this.#socketRef) {
             this.#socketRef.onopen = () => {

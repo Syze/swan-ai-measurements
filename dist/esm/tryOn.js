@@ -22,14 +22,6 @@ var _TryOn_instances, _TryOn_tryOnSocketRef, _TryOn_timerWaitingRef, _TryOn_acce
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
-import WS from "ws";
-let WebSocketClient;
-if (typeof window !== 'undefined' && window.WebSocket) {
-    WebSocketClient = window.WebSocket;
-}
-else {
-    WebSocketClient = WS;
-}
 class TryOn {
     constructor(accessKey, stagingUrl = false) {
         _TryOn_instances.add(this);
@@ -59,7 +51,7 @@ class TryOn {
             }
             __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
             const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-            __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocketClient(url), "f");
+            __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocket(url), "f");
             if (__classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f")) {
                 __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onopen = () => __awaiter(this, void 0, void 0, function* () {
                     onOpen === null || onOpen === void 0 ? void 0 : onOpen();

@@ -6,14 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
-const ws_1 = __importDefault(require("ws"));
-let WebSocketClient;
-if (typeof window !== 'undefined' && window.WebSocket) {
-    WebSocketClient = window.WebSocket;
-}
-else {
-    WebSocketClient = ws_1.default;
-}
 class Measurement {
     #tryOnSocketRef = null;
     #measurementSocketRef = null;
@@ -58,7 +50,7 @@ class Measurement {
             urlName: constants_js_1.APP_BASE_WEBSOCKET_URL,
             stagingUrl: this.#stagingUrl,
         })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-        this.#tryOnSocketRef = new WebSocketClient(url);
+        this.#tryOnSocketRef = new WebSocket(url);
         if (this.#tryOnSocketRef) {
             this.#tryOnSocketRef.onopen = () => {
                 onOpen?.();

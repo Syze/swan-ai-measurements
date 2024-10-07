@@ -22,14 +22,6 @@ var _Measurement_instances, _Measurement_tryOnSocketRef, _Measurement_measuremen
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
-import WS from "ws";
-let WebSocketClient;
-if (typeof window !== 'undefined' && window.WebSocket) {
-    WebSocketClient = window.WebSocket;
-}
-else {
-    WebSocketClient = WS;
-}
 class Measurement {
     constructor(accessKey, stagingUrl = false) {
         _Measurement_instances.add(this);
@@ -76,7 +68,7 @@ class Measurement {
             urlName: APP_BASE_WEBSOCKET_URL,
             stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f"),
         })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-        __classPrivateFieldSet(this, _Measurement_tryOnSocketRef, new WebSocketClient(url), "f");
+        __classPrivateFieldSet(this, _Measurement_tryOnSocketRef, new WebSocket(url), "f");
         if (__classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f")) {
             __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onopen = () => {
                 onOpen === null || onOpen === void 0 ? void 0 : onOpen();
