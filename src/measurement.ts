@@ -1,14 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
-import  WS from "ws";
 
-let WebSocketClient: any;
-if (typeof window !== 'undefined' && window.WebSocket) {
-  WebSocketClient = window.WebSocket;
-} else {
-  WebSocketClient = WS;
-}
+
 interface TryOnSocketOptions {
   shopDomain: string;
   scanId: string;
@@ -108,7 +102,7 @@ class Measurement {
       urlName: APP_BASE_WEBSOCKET_URL,
       stagingUrl: this.#stagingUrl,
     })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-    this.#tryOnSocketRef = new WebSocketClient(url);
+    this.#tryOnSocketRef = new WebSocket(url);
     if (this.#tryOnSocketRef) {
       this.#tryOnSocketRef.onopen = () => {
         onOpen?.();

@@ -1,15 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
-import  WS from "ws";
-// Conditionally import ws for Node.js
-let WebSocketClient: any;
-if (typeof window !== "undefined" && window.WebSocket) {
-	WebSocketClient = window.WebSocket;
-} else {
-	
-	WebSocketClient = WS;
-}
+
 
 interface RegisterUserParams {
 	email: string;
@@ -101,7 +93,7 @@ export default class Auth {
 		}
 		if (this.#socketRef) this.#socketRef.close();
 
-		this.#socketRef = new WebSocketClient(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.AUTH}`);
+		this.#socketRef = new WebSocket(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.AUTH}`);
 		const detailObj: AuthSocketDetail = { email, scanId };
 		if (this.#socketRef) {
 			this.#socketRef.onopen = () => {
