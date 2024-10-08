@@ -28,6 +28,8 @@ interface UploadOptions {
     callBack?: (a: {
         eventName: string;
         message: string;
+        scanId: string;
+        email?: string;
     }) => void;
 }
 export default class FileUpload {

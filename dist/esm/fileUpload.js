@@ -67,7 +67,7 @@ class FileUpload {
                     getChunkSize: () => CHUNK_SIZE,
                     createMultipartUpload: (file) => {
                         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks` });
+                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks`, scanId, email });
                         const objectKey = `${scanId}.${file.extension}`;
                         return fetchData({
                             path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -81,7 +81,7 @@ class FileUpload {
                         });
                     },
                     completeMultipartUpload: (file, { uploadId, key, parts }) => {
-                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded` });
+                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded`, scanId, email });
                         return fetchData({
                             path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                             apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
@@ -93,7 +93,7 @@ class FileUpload {
                                 originalFileName: file.name,
                             },
                         }).then((response) => {
-                            callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully` });
+                            callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully`, scanId, email });
                             return response;
                         });
                     },

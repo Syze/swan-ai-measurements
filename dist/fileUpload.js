@@ -39,7 +39,7 @@ class FileUpload {
                 getChunkSize: () => constants_js_1.CHUNK_SIZE,
                 createMultipartUpload: (file) => {
                     const totalChunks = Math.ceil(file.size / constants_js_1.CHUNK_SIZE);
-                    callBack?.({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks` });
+                    callBack?.({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks`, scanId, email });
                     const objectKey = `${scanId}.${file.extension}`;
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -53,7 +53,7 @@ class FileUpload {
                     });
                 },
                 completeMultipartUpload: (file, { uploadId, key, parts }) => {
-                    callBack?.({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded` });
+                    callBack?.({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded`, scanId, email });
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                         apiKey: this.#accessKey,
@@ -65,7 +65,7 @@ class FileUpload {
                             originalFileName: file.name,
                         },
                     }).then((response) => {
-                        callBack?.({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully` });
+                        callBack?.({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully`, scanId, email });
                         return response;
                     });
                 },

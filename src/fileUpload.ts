@@ -27,7 +27,7 @@ interface UploadOptions {
 	arrayMetaData: Partial<ObjMetaData>[];
 	scanId: string;
 	email: string;
-	callBack?: (a: { eventName: string; message: string }) => void;
+	callBack?: (a: { eventName: string; message: string,scanId:string,email?:string }) => void;
 }
 
 export default class FileUpload {
@@ -63,7 +63,7 @@ export default class FileUpload {
 				getChunkSize: () => CHUNK_SIZE,
 				createMultipartUpload: (file: any) => {
 					const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-					callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`})
+					callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`,scanId,email})
 					const objectKey = `${scanId}.${file.extension}`;
 					return fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -77,7 +77,7 @@ export default class FileUpload {
 					});
 				},
 				completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) => {
-				   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`})	
+				   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`,scanId,email})	
 					return fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
 						apiKey: this.#accessKey,
@@ -89,7 +89,7 @@ export default class FileUpload {
 							originalFileName: file.name,
 						},
 					}).then((response) => {
-						callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`})
+						callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`,scanId,email})
 						return response;  
 					});
 				},
