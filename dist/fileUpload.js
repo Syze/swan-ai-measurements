@@ -16,7 +16,7 @@ class FileUpload {
         this.#accessKey = accessKey;
         this.#stagingUrl = stagingUrl;
     }
-    async uploadFileFrontend({ file, arrayMetaData, scanId, email }) {
+    async uploadFileFrontend({ file, arrayMetaData, scanId, email, callBack }) {
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId, email)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
@@ -36,8 +36,10 @@ class FileUpload {
                 limit: 10,
                 retryDelays: [0, 1000, 3000, 5000],
                 companionUrl: (0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
-                getChunkSize: () => 5 * 1024 * 1024,
+                getChunkSize: () => constants_js_1.CHUNK_SIZE,
                 createMultipartUpload: (file) => {
+                    const totalChunks = Math.ceil(file.size / constants_js_1.CHUNK_SIZE);
+                    callBack?.({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks` });
                     const objectKey = `${scanId}.${file.extension}`;
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -50,17 +52,23 @@ class FileUpload {
                         },
                     });
                 },
-                completeMultipartUpload: (file, { uploadId, key, parts }) => (0, utils_js_1.fetchData)({
-                    path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-                    apiKey: this.#accessKey,
-                    stagingUrl: this.#stagingUrl,
-                    body: {
-                        uploadId,
-                        objectKey: key,
-                        parts,
-                        originalFileName: file.name,
-                    },
-                }),
+                completeMultipartUpload: (file, { uploadId, key, parts }) => {
+                    callBack?.({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded` });
+                    return (0, utils_js_1.fetchData)({
+                        path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+                        apiKey: this.#accessKey,
+                        stagingUrl: this.#stagingUrl,
+                        body: {
+                            uploadId,
+                            objectKey: key,
+                            parts,
+                            originalFileName: file.name,
+                        },
+                    }).then((response) => {
+                        callBack?.({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully` });
+                        return response;
+                    });
+                },
                 signPart: (file, partData) => (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                     stagingUrl: this.#stagingUrl,
@@ -79,7 +87,12 @@ class FileUpload {
                 data: file,
             });
             this.#uppyIns.on("upload-error", (file, error, response) => {
-                reject(error);
+                if (error.isNetworkError) {
+                    this.#uppyIns.retryUpload(file.id);
+                }
+                else {
+                    reject(error);
+                }
             });
             this.#uppyIns.on("upload-success", () => {
                 resolve({ message: "file uploaded successfully" });

@@ -28,4 +28,5 @@ export declare const requiredMetaData: RequiredMetaDataKeys[];
 export declare const REQUIRED_MESSAGE: string;
 export declare const REQUIRED_MESSAGE_FOR_META_DATA: string;
 export declare const REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";
+export declare const CHUNK_SIZE: number;
 export {};

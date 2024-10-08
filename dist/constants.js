@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = exports.REQUIRED_MESSAGE_FOR_META_DATA = exports.REQUIRED_MESSAGE = exports.requiredMetaData = exports.API_ENDPOINTS = exports.APP_POSE_DETECTION_WEBSOCKET_URL = exports.APP_BASE_WEBSOCKET_URL = exports.APP_AUTH_BASE_URL = exports.FILE_UPLOAD_ENDPOINT = exports.PROD_URL = exports.STAGING_URL = void 0;
+exports.CHUNK_SIZE = exports.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = exports.REQUIRED_MESSAGE_FOR_META_DATA = exports.REQUIRED_MESSAGE = exports.requiredMetaData = exports.API_ENDPOINTS = exports.APP_POSE_DETECTION_WEBSOCKET_URL = exports.APP_BASE_WEBSOCKET_URL = exports.APP_AUTH_BASE_URL = exports.FILE_UPLOAD_ENDPOINT = exports.PROD_URL = exports.STAGING_URL = void 0;
 exports.STAGING_URL = {
     APP_AUTH_BASE_URL: "https://staging.api.getswan.co",
     APP_BASE_WEBSOCKET_URL: "wss://staging.wsnotify.api.getswan.co",
@@ -44,3 +44,4 @@ exports.requiredMetaData = ["gender", "focal_length", "height", "customer_store_
 exports.REQUIRED_MESSAGE = "Please verify required parameters";
 exports.REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
 exports.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";
+exports.CHUNK_SIZE = 5 * 1024 * 1024;

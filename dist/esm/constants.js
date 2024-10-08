@@ -41,3 +41,4 @@ export const requiredMetaData = ["gender", "focal_length", "height", "customer_s
 export const REQUIRED_MESSAGE = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
 export const REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";
+export const CHUNK_SIZE = 5 * 1024 * 1024;

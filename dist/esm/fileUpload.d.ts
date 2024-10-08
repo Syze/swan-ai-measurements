@@ -25,11 +25,15 @@ interface UploadOptions {
     arrayMetaData: Partial<ObjMetaData>[];
     scanId: string;
     email: string;
+    callBack?: (a: {
+        eventName: string;
+        message: string;
+    }) => void;
 }
 export default class FileUpload {
     #private;
     constructor(accessKey: string, stagingUrl?: boolean);
-    uploadFileFrontend({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
+    uploadFileFrontend({ file, arrayMetaData, scanId, email, callBack }: UploadOptions): Promise<unknown>;
     uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
     setDeviceInfo(data: SetDeviceInfo): Promise<import("axios").AxiosResponse<any, any>>;
 }

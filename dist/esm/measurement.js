@@ -18,14 +18,13 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Measurement_instances, _Measurement_tryOnSocketRef, _Measurement_measurementSocketRef, _Measurement_timerPollingRef, _Measurement_timerWaitingRef, _Measurement_count, _Measurement_accessKey, _Measurement_stagingUrl, _Measurement_getMeasurementsCheck, _Measurement_handlePolling, _Measurement_disconnectSocket, _Measurement_handleTimeOut;
+var _Measurement_instances, _Measurement_measurementSocketRef, _Measurement_timerPollingRef, _Measurement_timerWaitingRef, _Measurement_count, _Measurement_accessKey, _Measurement_stagingUrl, _Measurement_getMeasurementsCheck, _Measurement_handlePolling, _Measurement_disconnectSocket, _Measurement_handleTimeOut;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
 class Measurement {
     constructor(accessKey, stagingUrl = false) {
         _Measurement_instances.add(this);
-        _Measurement_tryOnSocketRef.set(this, null);
         _Measurement_measurementSocketRef.set(this, null);
         _Measurement_timerPollingRef.set(this, null);
         _Measurement_timerWaitingRef.set(this, null);
@@ -49,53 +48,6 @@ class Measurement {
             throw new Error(REQUIRED_MESSAGE);
         }
         return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") } });
-    }
-    getTryOnMeasurements({ scanId, shopDomain, productName }) {
-        if (!checkParameters(scanId, shopDomain, productName)) {
-            throw new Error(REQUIRED_MESSAGE);
-        }
-        const tryOnUrl = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
-        return axios.get(tryOnUrl, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") } });
-    }
-    handleTryOnSocket(options) {
-        var _a;
-        const { shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen } = options;
-        if (!checkParameters(shopDomain, scanId, productName)) {
-            throw new Error(REQUIRED_MESSAGE);
-        }
-        (_a = __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f")) === null || _a === void 0 ? void 0 : _a.close();
-        const url = `${getUrl({
-            urlName: APP_BASE_WEBSOCKET_URL,
-            stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f"),
-        })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-        __classPrivateFieldSet(this, _Measurement_tryOnSocketRef, new WebSocket(url), "f");
-        if (__classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f")) {
-            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onopen = () => {
-                onOpen === null || onOpen === void 0 ? void 0 : onOpen();
-            };
-            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onmessage = (event) => {
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                }
-                catch (error) {
-                    console.log(data, error, "noy correct format for data");
-                    return;
-                }
-                if ((data === null || data === void 0 ? void 0 : data.tryOnProcessStatus) === "available") {
-                    onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
-                }
-                else {
-                    onError === null || onError === void 0 ? void 0 : onError({ message: "failed to get image urls" });
-                }
-            };
-            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onclose = () => {
-                onClose === null || onClose === void 0 ? void 0 : onClose();
-            };
-            __classPrivateFieldGet(this, _Measurement_tryOnSocketRef, "f").onerror = (event) => {
-                onError === null || onError === void 0 ? void 0 : onError(event);
-            };
-        }
     }
     handleMeasurementSocket(options) {
         const { scanId, onError, onSuccess, onClose, onOpen } = options;
@@ -131,7 +83,7 @@ class Measurement {
         }, 5000);
     }
 }
-_Measurement_tryOnSocketRef = new WeakMap(), _Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef = new WeakMap(), _Measurement_timerWaitingRef = new WeakMap(), _Measurement_count = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options) {
+_Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef = new WeakMap(), _Measurement_timerWaitingRef = new WeakMap(), _Measurement_count = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         var _b;

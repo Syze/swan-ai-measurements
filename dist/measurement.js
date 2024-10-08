@@ -7,7 +7,6 @@ const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
 class Measurement {
-    #tryOnSocketRef = null;
     #measurementSocketRef = null;
     #timerPollingRef = null;
     #timerWaitingRef = null;
@@ -32,52 +31,6 @@ class Measurement {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, { headers: { "X-Api-Key": this.#accessKey } });
-    }
-    getTryOnMeasurements({ scanId, shopDomain, productName }) {
-        if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
-            throw new Error(constants_js_1.REQUIRED_MESSAGE);
-        }
-        const tryOnUrl = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_SCAN}/${scanId}/shop/${shopDomain}/product/${productName}`;
-        return axios_1.default.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
-    }
-    handleTryOnSocket(options) {
-        const { shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen } = options;
-        if (!(0, utils_js_1.checkParameters)(shopDomain, scanId, productName)) {
-            throw new Error(constants_js_1.REQUIRED_MESSAGE);
-        }
-        this.#tryOnSocketRef?.close();
-        const url = `${(0, utils_js_1.getUrl)({
-            urlName: constants_js_1.APP_BASE_WEBSOCKET_URL,
-            stagingUrl: this.#stagingUrl,
-        })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-        this.#tryOnSocketRef = new WebSocket(url);
-        if (this.#tryOnSocketRef) {
-            this.#tryOnSocketRef.onopen = () => {
-                onOpen?.();
-            };
-            this.#tryOnSocketRef.onmessage = (event) => {
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                }
-                catch (error) {
-                    console.log(data, error, "noy correct format for data");
-                    return;
-                }
-                if (data?.tryOnProcessStatus === "available") {
-                    onSuccess?.(data);
-                }
-                else {
-                    onError?.({ message: "failed to get image urls" });
-                }
-            };
-            this.#tryOnSocketRef.onclose = () => {
-                onClose?.();
-            };
-            this.#tryOnSocketRef.onerror = (event) => {
-                onError?.(event);
-            };
-        }
     }
     async #getMeasurementsCheck(options) {
         const { scanId, onSuccess, onError } = options;

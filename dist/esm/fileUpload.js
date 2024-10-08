@@ -31,7 +31,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, } from "./constants.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, CHUNK_SIZE } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
@@ -44,7 +44,7 @@ class FileUpload {
         __classPrivateFieldSet(this, _FileUpload_stagingUrl, stagingUrl, "f");
     }
     uploadFileFrontend(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId, email }) {
+        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId, email, callBack }) {
             if (!checkParameters(file, arrayMetaData, scanId, email)) {
                 throw new Error(REQUIRED_MESSAGE);
             }
@@ -64,8 +64,10 @@ class FileUpload {
                     limit: 10,
                     retryDelays: [0, 1000, 3000, 5000],
                     companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f") }),
-                    getChunkSize: () => 5 * 1024 * 1024,
+                    getChunkSize: () => CHUNK_SIZE,
                     createMultipartUpload: (file) => {
+                        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks` });
                         const objectKey = `${scanId}.${file.extension}`;
                         return fetchData({
                             path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -78,17 +80,23 @@ class FileUpload {
                             },
                         });
                     },
-                    completeMultipartUpload: (file, { uploadId, key, parts }) => fetchData({
-                        path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-                        apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-                        stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
-                        body: {
-                            uploadId,
-                            objectKey: key,
-                            parts,
-                            originalFileName: file.name,
-                        },
-                    }),
+                    completeMultipartUpload: (file, { uploadId, key, parts }) => {
+                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded` });
+                        return fetchData({
+                            path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+                            apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                            stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
+                            body: {
+                                uploadId,
+                                objectKey: key,
+                                parts,
+                                originalFileName: file.name,
+                            },
+                        }).then((response) => {
+                            callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully` });
+                            return response;
+                        });
+                    },
                     signPart: (file, partData) => fetchData({
                         path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                         stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
@@ -107,7 +115,12 @@ class FileUpload {
                     data: file,
                 });
                 __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("upload-error", (file, error, response) => {
-                    reject(error);
+                    if (error.isNetworkError) {
+                        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").retryUpload(file.id);
+                    }
+                    else {
+                        reject(error);
+                    }
                 });
                 __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("upload-success", () => {
                     resolve({ message: "file uploaded successfully" });
