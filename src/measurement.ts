@@ -3,15 +3,7 @@ import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESS
 import { checkParameters, getUrl } from "./utils.js";
 
 
-interface TryOnSocketOptions {
-  shopDomain: string;
-  scanId: string;
-  productName: string;
-  onError?: (error: any) => void;
-  onSuccess?: (data: any) => void;
-  onClose?: () => void;
-  onOpen?: () => void;
-}
+
 
 interface MeasurementRecommendation {
   shopDomain: string;
@@ -45,7 +37,6 @@ interface HandleTimeOutOptions {
 }
 
 class Measurement {
-  #tryOnSocketRef: WebSocket | null = null;
   #measurementSocketRef: WebSocket | null = null;
   #timerPollingRef: NodeJS.Timeout | null = null;
   #timerWaitingRef: NodeJS.Timeout | null = null;
@@ -80,61 +71,7 @@ class Measurement {
     );
   }
 
-  getTryOnMeasurements({ scanId, shopDomain, productName }: TryOnSocketOptions): Promise<AxiosResponse<any>> {
-    if (!checkParameters(scanId, shopDomain, productName)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-    const tryOnUrl = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${
-      API_ENDPOINTS.TRY_ON_SCAN
-    }/${scanId}/shop/${shopDomain}/product/${productName}`;
-    return axios.get(tryOnUrl, { headers: { "X-Api-Key": this.#accessKey } });
-  }
-
-  handleTryOnSocket(options: TryOnSocketOptions): void {
-    const { shopDomain, scanId, productName, onError, onSuccess, onClose, onOpen } = options;
-
-    if (!checkParameters(shopDomain, scanId, productName)) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-
-    this.#tryOnSocketRef?.close();
-    const url = `${getUrl({
-      urlName: APP_BASE_WEBSOCKET_URL,
-      stagingUrl: this.#stagingUrl,
-    })}/develop?store_url=${shopDomain}&product_name=${productName}&scan_id=${scanId}`;
-    this.#tryOnSocketRef = new WebSocket(url);
-    if (this.#tryOnSocketRef) {
-      this.#tryOnSocketRef.onopen = () => {
-        onOpen?.();
-      };
   
-      this.#tryOnSocketRef.onmessage = (event) => {
-        let data;
-				try {
-					data = JSON.parse(event.data);
-				} catch (error) {
-					console.log(data, error, "noy correct format for data");
-
-					return;
-				}
-        if (data?.tryOnProcessStatus === "available") {
-          onSuccess?.(data);
-        } else {
-          onError?.({ message: "failed to get image urls" });
-        }
-      };
-  
-      this.#tryOnSocketRef.onclose = () => {
-        onClose?.();
-      };
-  
-      this.#tryOnSocketRef.onerror = (event) => {
-        onError?.(event);
-      };
-    }
-   
-  }
-
   async #getMeasurementsCheck(options: GetMeasurementsCheckOptions): Promise<void> {
     const { scanId, onSuccess, onError } = options;
 

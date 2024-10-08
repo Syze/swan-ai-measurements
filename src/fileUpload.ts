@@ -1,12 +1,5 @@
 import axios from "axios";
-import {
-	REQUIRED_MESSAGE,
-	REQUIRED_MESSAGE_FOR_META_DATA,
-	FILE_UPLOAD_ENDPOINT,
-	APP_AUTH_BASE_URL,
-	REQUIRED_ERROR_MESSAGE_INVALID_EMAIL,
-	API_ENDPOINTS,
-} from "./constants.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, CHUNK_SIZE } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
@@ -26,7 +19,7 @@ interface SetDeviceInfo {
 	detection?: string;
 	model?: string;
 	gyro: { alpha?: string; gamma?: string; beta?: string; timestamp?: string }[];
-	scanId:string
+	scanId: string;
 }
 
 interface UploadOptions {
@@ -34,6 +27,7 @@ interface UploadOptions {
 	arrayMetaData: Partial<ObjMetaData>[];
 	scanId: string;
 	email: string;
+	callBack?: (a: { eventName: string; message: string }) => void;
 }
 
 export default class FileUpload {
@@ -46,7 +40,7 @@ export default class FileUpload {
 		this.#stagingUrl = stagingUrl;
 	}
 
-	async uploadFileFrontend({ file, arrayMetaData, scanId, email }: UploadOptions) {
+	async uploadFileFrontend({ file, arrayMetaData, scanId, email, callBack }: UploadOptions) {
 		if (!checkParameters(file, arrayMetaData, scanId, email)) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
@@ -66,8 +60,10 @@ export default class FileUpload {
 				limit: 10,
 				retryDelays: [0, 1000, 3000, 5000],
 				companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
-				getChunkSize: () => 5 * 1024 * 1024,
+				getChunkSize: () => CHUNK_SIZE,
 				createMultipartUpload: (file: any) => {
+					const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+					callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`})
 					const objectKey = `${scanId}.${file.extension}`;
 					return fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
@@ -80,8 +76,9 @@ export default class FileUpload {
 						},
 					});
 				},
-				completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) =>
-					fetchData({
+				completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) => {
+				   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`})	
+					return fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
 						apiKey: this.#accessKey,
 						stagingUrl: this.#stagingUrl,
@@ -91,7 +88,11 @@ export default class FileUpload {
 							parts,
 							originalFileName: file.name,
 						},
-					}),
+					}).then((response) => {
+						callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`})
+						return response;  
+					});
+				},
 
 				signPart: (file: any, partData: any) =>
 					fetchData({
@@ -114,7 +115,11 @@ export default class FileUpload {
 			});
 
 			this.#uppyIns.on("upload-error", (file: any, error: any, response: any) => {
-				reject(error);
+				if (error.isNetworkError) {
+					this.#uppyIns.retryUpload(file.id);
+				  }else{
+					  reject(error);
+				  }
 			});
 			this.#uppyIns.on("upload-success", () => {
 				resolve({ message: "file uploaded successfully" });
@@ -185,13 +190,17 @@ export default class FileUpload {
 			}
 		});
 	}
-	async setDeviceInfo(data:SetDeviceInfo) {
-		const {scanId,...rest} = data;
+	async setDeviceInfo(data: SetDeviceInfo) {
+		const { scanId, ...rest } = data;
 		if (checkParameters(scanId) === false) {
 			throw new Error(REQUIRED_MESSAGE);
-		  }
-		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.DEVICE_INFO}/${scanId}`,{device_info:{...rest}} , {
-			headers: { "X-Api-Key": this.#accessKey },
-		  });
+		}
+		return axios.post(
+			`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.DEVICE_INFO}/${scanId}`,
+			{ device_info: { ...rest } },
+			{
+				headers: { "X-Api-Key": this.#accessKey },
+			},
+		);
 	}
 }
