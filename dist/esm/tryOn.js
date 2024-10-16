@@ -182,19 +182,18 @@ class TryOn {
             data: payload,
         });
     }
-    handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }) {
-        if (checkParameters(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
+    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, }) {
+        if (checkParameters(shopDomain, userEmail, productName, selectedUserImages) === false) {
             throw new Error(REQUIRED_MESSAGE);
+        }
+        if (!selectedUserImages.length) {
+            throw new Error("No user images found!");
         }
         if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
-        const payload = {
-            productName,
-            userEmail,
-            customerStoreUrl: shopDomain,
-            selectedUserImages: [firstImageName, secondImageName],
-        };
+        const payload = Object.assign(Object.assign({ productName,
+            userEmail, customerStoreUrl: shopDomain, selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
         return axios.post(url, payload, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },

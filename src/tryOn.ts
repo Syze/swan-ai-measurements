@@ -29,12 +29,13 @@ interface HandleTryOnWebSocketParams {
 }
 
 interface HandleForLatestImageParams {
-  shopDomain: string;
-  userEmail: string;
-  productName: string;
-  firstImageName: string;
-  secondImageName: string;
-  onError?: (error: any) => void;
+	shopDomain: string;
+	userEmail: string;
+	productName: string;
+	selectedUserImages:string[];
+	onError?: (error: any) => void;
+	requestSource?: string;
+	callbackUrl?: string;
 }
 
 interface HandleTimeOutParams {
@@ -213,31 +214,35 @@ class TryOn {
   };
 
   handleTryOnSubmit({
-    userEmail,
-    shopDomain,
-    productName,
-    firstImageName,
-    secondImageName,
-  }: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-    if (checkParameters(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
-      throw new Error(REQUIRED_MESSAGE);
-    }
-
-    if (!isValidEmail(userEmail.trim())) {
-      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-    }
-    const payload = {
-      productName,
-      userEmail,
-      customerStoreUrl: shopDomain,
-      selectedUserImages: [firstImageName, secondImageName],
-    };
-
-    const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}`;
-    return axios.post(url, payload, {
+		userEmail,
+		shopDomain,
+		productName,
+		selectedUserImages,
+		requestSource,
+		callbackUrl,
+	}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
+		if (checkParameters(shopDomain, userEmail, productName,selectedUserImages) === false) {
+			throw new Error(REQUIRED_MESSAGE);
+		}
+        if (!selectedUserImages.length) {
+			throw new Error("No user images found!");
+		}
+		if (!isValidEmail(userEmail.trim())) {
+			throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+		}
+		const payload = {
+			productName,
+			userEmail,
+			customerStoreUrl: shopDomain,
+			selectedUserImages,
+      ...(requestSource!==undefined && requestSource!==null &&{requestSource}),
+      ...(callbackUrl!==undefined && callbackUrl!==null &&{callbackUrl})
+		};
+		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}`;
+		return axios.post(url, payload, {
       headers: { "X-Api-Key": this.#accessKey },
-    });
-  }
+		});
+	}
 
   #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userEmail, productName }: HandleTimeOutParams): Promise<void> => {
     try {

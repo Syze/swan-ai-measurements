@@ -157,9 +157,12 @@ class TryOn {
             console.log("no connection made for websocket");
         }
     };
-    handleTryOnSubmit({ userEmail, shopDomain, productName, firstImageName, secondImageName, }) {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, firstImageName, secondImageName) === false) {
+    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, }) {
+        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, selectedUserImages) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        if (!selectedUserImages.length) {
+            throw new Error("No user images found!");
         }
         if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
@@ -168,7 +171,9 @@ class TryOn {
             productName,
             userEmail,
             customerStoreUrl: shopDomain,
-            selectedUserImages: [firstImageName, secondImageName],
+            selectedUserImages,
+            ...(requestSource !== undefined && requestSource !== null && { requestSource }),
+            ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })
         };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
         return axios_1.default.post(url, payload, {
