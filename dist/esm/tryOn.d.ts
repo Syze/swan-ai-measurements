@@ -8,6 +8,12 @@ interface DeleteImageParams {
     userEmail: string;
     fileName: string;
 }
+interface EligibiltyImageParams {
+    storeUrl: string;
+    productHandle: string;
+    imageURL: string;
+    productDescription: string;
+}
 interface HandleTryOnWebSocketParams {
     userEmail: string;
     shopDomain: string;
@@ -23,7 +29,6 @@ interface HandleForLatestImageParams {
     userEmail: string;
     productName: string;
     selectedUserImages: string[];
-    onError?: (error: any) => void;
     requestSource?: string;
     callbackUrl?: string;
 }
@@ -42,5 +47,6 @@ declare class TryOn {
     handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
     getShareLink(tryonId: string): Promise<AxiosResponse<any, any>>;
     getTryOnResult: ({ userEmail, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
+    getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }: EligibiltyImageParams): Promise<AxiosResponse<any, any>>;
 }
 export default TryOn;

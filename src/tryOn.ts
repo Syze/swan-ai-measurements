@@ -16,7 +16,7 @@ interface DeleteImageParams {
   fileName: string;
   
 }
-
+interface EligibiltyImageParams {storeUrl:string,productHandle:string,imageURL:string,productDescription:string}
 interface HandleTryOnWebSocketParams {
   userEmail: string;
   shopDomain: string;
@@ -33,7 +33,6 @@ interface HandleForLatestImageParams {
 	userEmail: string;
 	productName: string;
 	selectedUserImages:string[];
-	onError?: (error: any) => void;
 	requestSource?: string;
 	callbackUrl?: string;
 }
@@ -283,6 +282,17 @@ class TryOn {
       headers: { "X-Api-Key": this.#accessKey },
     });
   };
+
+  getProductImageEligibility({storeUrl,productHandle,imageURL,productDescription}:EligibiltyImageParams){
+    if (checkParameters(storeUrl, productHandle, imageURL) === false) {
+      throw new Error(REQUIRED_MESSAGE);
+    }
+    const payload = {storeUrl,productHandle,imageURL,productDescription:productDescription??null};
+    const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
+    return axios.post(url, payload, {
+      headers: { "X-Api-Key": this.#accessKey },
+    });
+  }
 }
 
 export default TryOn;

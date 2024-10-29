@@ -211,5 +211,15 @@ class TryOn {
             headers: { "X-Api-Key": this.#accessKey },
         });
     };
+    getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }) {
+        if ((0, utils_js_1.checkParameters)(storeUrl, productHandle, imageURL) === false) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        const payload = { storeUrl, productHandle, imageURL, productDescription: productDescription ?? null };
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
+        return axios_1.default.post(url, payload, {
+            headers: { "X-Api-Key": this.#accessKey },
+        });
+    }
 }
 exports.default = TryOn;

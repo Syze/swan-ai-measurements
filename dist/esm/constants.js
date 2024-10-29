@@ -35,7 +35,8 @@ export const API_ENDPOINTS = {
     SCANNING: "/scanning",
     RECOMMENDATION: "/recommendation",
     TRY_ON_SHARE: "/tryon/share",
-    DEVICE_INFO: "/deviceinfo"
+    DEVICE_INFO: "/deviceinfo",
+    TRY_ON_PRODUCT_IMAGE_ELIGIBILTY: "/tryon/product-image-eligibility"
 };
 export const requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
 export const REQUIRED_MESSAGE = "Please verify required parameters";
