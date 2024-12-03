@@ -31,6 +31,8 @@ interface HandleForLatestImageParams {
     selectedUserImages: string[];
     requestSource?: string;
     callbackUrl?: string;
+    openTryonId?: string;
+    selectedProductImageUrl?: string;
 }
 interface GetTryOnResultParams {
     shopDomain: string;
@@ -44,7 +46,7 @@ declare class TryOn {
     getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>>;
     deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
     handleTryOnWebSocket: ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
-    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
+    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
     getShareLink(tryonId: string): Promise<AxiosResponse<any, any>>;
     getTryOnResult: ({ userEmail, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
     getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }: EligibiltyImageParams): Promise<AxiosResponse<any, any>>;

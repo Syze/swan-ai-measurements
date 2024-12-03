@@ -63,7 +63,7 @@ class TryOn {
                         data = JSON.parse(event.data);
                     }
                     catch (error) {
-                        console.log(data, error, "noy correct format for data");
+                        console.log(data, error, "not correct format for data");
                         return;
                     }
                     if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
@@ -182,7 +182,7 @@ class TryOn {
             data: payload,
         });
     }
-    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, }) {
+    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
         if (checkParameters(shopDomain, userEmail, productName, selectedUserImages) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
@@ -192,8 +192,8 @@ class TryOn {
         if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
-        const payload = Object.assign(Object.assign({ productName,
-            userEmail, customerStoreUrl: shopDomain, selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }));
+        const payload = Object.assign(Object.assign(Object.assign(Object.assign({ productName,
+            userEmail, customerStoreUrl: shopDomain, selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
         return axios.post(url, payload, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },

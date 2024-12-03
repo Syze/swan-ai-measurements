@@ -35,6 +35,8 @@ interface HandleForLatestImageParams {
 	selectedUserImages:string[];
 	requestSource?: string;
 	callbackUrl?: string;
+  openTryonId?:string;
+  selectedProductImageUrl?:string
 }
 
 interface HandleTimeOutParams {
@@ -184,7 +186,7 @@ class TryOn {
 				try {
 					data = JSON.parse(event.data);
 				} catch (error) {
-					console.log(data, error, "noy correct format for data");
+					console.log(data, error, "not correct format for data");
 					return;
 				}
         if (data?.status === "success") {
@@ -219,6 +221,8 @@ class TryOn {
 		selectedUserImages,
 		requestSource,
 		callbackUrl,
+    openTryonId,
+    selectedProductImageUrl
 	}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
 		if (checkParameters(shopDomain, userEmail, productName,selectedUserImages) === false) {
 			throw new Error(REQUIRED_MESSAGE);
@@ -235,7 +239,9 @@ class TryOn {
 			customerStoreUrl: shopDomain,
 			selectedUserImages,
       ...(requestSource!==undefined && requestSource!==null &&{requestSource}),
-      ...(callbackUrl!==undefined && callbackUrl!==null &&{callbackUrl})
+      ...(callbackUrl!==undefined && callbackUrl!==null &&{callbackUrl}),
+      ...(openTryonId!==undefined && openTryonId!==null &&{openTryonId}),
+      ...(selectedProductImageUrl!==undefined && selectedProductImageUrl!==null &&{selectedProductImageUrl})
 		};
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}`;
 		return axios.post(url, payload, {

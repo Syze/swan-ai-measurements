@@ -130,7 +130,7 @@ class TryOn {
                     data = JSON.parse(event.data);
                 }
                 catch (error) {
-                    console.log(data, error, "noy correct format for data");
+                    console.log(data, error, "not correct format for data");
                     return;
                 }
                 if (data?.status === "success") {
@@ -157,7 +157,7 @@ class TryOn {
             console.log("no connection made for websocket");
         }
     };
-    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, }) {
+    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, selectedUserImages) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
@@ -173,7 +173,9 @@ class TryOn {
             customerStoreUrl: shopDomain,
             selectedUserImages,
             ...(requestSource !== undefined && requestSource !== null && { requestSource }),
-            ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })
+            ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),
+            ...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),
+            ...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl })
         };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
         return axios_1.default.post(url, payload, {
