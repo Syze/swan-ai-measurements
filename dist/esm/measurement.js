@@ -78,7 +78,7 @@ class Measurement {
                 onClose === null || onClose === void 0 ? void 0 : onClose();
             };
             __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onerror = (event) => {
-                onError === null || onError === void 0 ? void 0 : onError(event);
+                // onError?.(event);
             };
         }, 5000);
     }

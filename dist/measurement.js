@@ -115,7 +115,7 @@ class Measurement {
                 onClose?.();
             };
             this.#measurementSocketRef.onerror = (event) => {
-                onError?.(event);
+                // onError?.(event);
             };
         }, 5000);
     }

@@ -164,7 +164,7 @@ class Measurement {
       };
 
       this.#measurementSocketRef.onerror = (event: Event) => {
-        onError?.(event);
+        // onError?.(event);
       };
     }, 5000);
   }
