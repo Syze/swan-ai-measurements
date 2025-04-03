@@ -182,8 +182,8 @@ class TryOn {
             data: payload,
         });
     }
-    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if (checkParameters(shopDomain, userEmail, productName, selectedUserImages) === false) {
+    handleTryOnSubmit({ userEmail, customerStoreUrl, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
+        if (checkParameters(customerStoreUrl, userEmail, products, selectedUserImages) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
         if (!selectedUserImages.length) {
@@ -192,8 +192,10 @@ class TryOn {
         if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
-        const payload = Object.assign(Object.assign(Object.assign(Object.assign({ productName,
-            userEmail, customerStoreUrl: shopDomain, selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
+        const payload = Object.assign(Object.assign(Object.assign(Object.assign({ products,
+            userEmail,
+            customerStoreUrl,
+            selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
         return axios.post(url, payload, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },

@@ -157,8 +157,8 @@ class TryOn {
             console.log("no connection made for websocket");
         }
     };
-    handleTryOnSubmit({ userEmail, shopDomain, productName, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName, selectedUserImages) === false) {
+    handleTryOnSubmit({ userEmail, customerStoreUrl, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
+        if ((0, utils_js_1.checkParameters)(customerStoreUrl, userEmail, products, selectedUserImages) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         if (!selectedUserImages.length) {
@@ -168,9 +168,9 @@ class TryOn {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
-            productName,
+            products,
             userEmail,
-            customerStoreUrl: shopDomain,
+            customerStoreUrl,
             selectedUserImages,
             ...(requestSource !== undefined && requestSource !== null && { requestSource }),
             ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),

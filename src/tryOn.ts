@@ -27,11 +27,18 @@ interface HandleTryOnWebSocketParams {
   onClose?: () => void;
   onOpen?: () => void;
 }
+interface Products
+  {
+    productUrl:string,
+    productHandle: string,
+    openTryonId: string,
+    selectedProductImageUrl:string
+  }
 
 interface HandleForLatestImageParams {
-	shopDomain: string;
+	customerStoreUrl: string;
 	userEmail: string;
-	productName: string;
+	products:Products[];
 	selectedUserImages:string[];
 	requestSource?: string;
 	callbackUrl?: string;
@@ -216,15 +223,15 @@ class TryOn {
 
   handleTryOnSubmit({
 		userEmail,
-		shopDomain,
-		productName,
+		customerStoreUrl,
+		products,
 		selectedUserImages,
 		requestSource,
 		callbackUrl,
     openTryonId,
     selectedProductImageUrl
 	}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-		if (checkParameters(shopDomain, userEmail, productName,selectedUserImages) === false) {
+		if (checkParameters(customerStoreUrl, userEmail, products,selectedUserImages) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
         if (!selectedUserImages.length) {
@@ -234,9 +241,9 @@ class TryOn {
 			throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
 		}
 		const payload = {
-			productName,
+			products,
 			userEmail,
-			customerStoreUrl: shopDomain,
+			customerStoreUrl,
 			selectedUserImages,
       ...(requestSource!==undefined && requestSource!==null &&{requestSource}),
       ...(callbackUrl!==undefined && callbackUrl!==null &&{callbackUrl}),
