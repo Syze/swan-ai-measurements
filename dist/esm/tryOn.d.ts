@@ -15,10 +15,7 @@ interface EligibiltyImageParams {
     productDescription: string;
 }
 interface HandleTryOnWebSocketParams {
-    userEmail: string;
-    shopDomain: string;
     tryonId: string;
-    productName: string;
     onError?: (error: any) => void;
     onSuccess?: (data: any) => void;
     onClose?: () => void;
@@ -31,7 +28,7 @@ interface Products {
     selectedProductImageUrl: string;
 }
 interface HandleForLatestImageParams {
-    customerStoreUrl: string;
+    shopDomain: string;
     userEmail: string;
     products: Products[];
     selectedUserImages: string[];
@@ -41,9 +38,7 @@ interface HandleForLatestImageParams {
     selectedProductImageUrl?: string;
 }
 interface GetTryOnResultParams {
-    shopDomain: string;
-    userEmail: string;
-    productName: string;
+    tryonId: string;
 }
 declare class TryOn {
     #private;
@@ -51,10 +46,10 @@ declare class TryOn {
     uploadFile({ files, userEmail, fileNoLimit }: UploadFileParams): Promise<string>;
     getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>>;
     deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;
-    handleTryOnWebSocket: ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
-    handleTryOnSubmit({ userEmail, customerStoreUrl, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
+    handleTryOnWebSocket: ({ tryonId, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams) => void;
+    handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }: HandleForLatestImageParams): Promise<AxiosResponse<any>>;
     getShareLink(tryonId: string): Promise<AxiosResponse<any, any>>;
-    getTryOnResult: ({ userEmail, shopDomain, productName }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
+    getTryOnResult: ({ tryonId }: GetTryOnResultParams) => Promise<AxiosResponse<any>>;
     getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }: EligibiltyImageParams): Promise<AxiosResponse<any, any>>;
 }
 export default TryOn;

@@ -18,10 +18,11 @@ interface DeleteImageParams {
 }
 interface EligibiltyImageParams {storeUrl:string,productHandle:string,imageURL:string,productDescription:string}
 interface HandleTryOnWebSocketParams {
-  userEmail: string;
-  shopDomain: string;
-  tryonId: string;
-  productName: string;
+  tryonId:string
+  // userEmail: string;
+  // shopDomain: string;
+  // tryonId: string;
+  // products: Products[];
   onError?: (error: any) => void;
   onSuccess?: (data: any) => void;
   onClose?: () => void;
@@ -36,7 +37,7 @@ interface Products
   }
 
 interface HandleForLatestImageParams {
-	customerStoreUrl: string;
+	shopDomain: string;
 	userEmail: string;
 	products:Products[];
 	selectedUserImages:string[];
@@ -49,15 +50,17 @@ interface HandleForLatestImageParams {
 interface HandleTimeOutParams {
   onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
-  shopDomain: string;
-  userEmail: string;
-  productName: string;
+  tryonId:string
+  // shopDomain: string;
+  // userEmail: string;
+  // products: Products[];
 }
 
 interface GetTryOnResultParams {
-  shopDomain: string;
-  userEmail: string;
-  productName: string;
+  // shopDomain: string;
+  // userEmail: string;
+  // products: Products[];
+  tryonId :string
 }
 
 class TryOn {
@@ -166,27 +169,27 @@ class TryOn {
     }
   };
 
-  #handleTimeOut = ({ onSuccess, onError, shopDomain, userEmail, productName }: HandleTimeOutParams): void => {
+  #handleTimeOut = ({ onSuccess, onError,tryonId }: HandleTimeOutParams): void => {
     this.#timerWaitingRef = setTimeout(() => {
-      this.#handleGetTryOnResult({ shopDomain, userEmail, productName, onSuccess, onError });
+      this.#handleGetTryOnResult({  onSuccess, onError,tryonId });
       this.#disconnectSocket();
     }, 138000);
   };
 
-  handleTryOnWebSocket = ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams): void => {
-    if (checkParameters(shopDomain, tryonId, productName, userEmail) === false) {
+  handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams): void => {
+    if (checkParameters(tryonId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    if (!isValidEmail(userEmail.trim())) {
-      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-    }
+    // if (!isValidEmail(userEmail.trim())) {
+    //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+    // }
     this.#disconnectSocket();
     const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
     this.#tryOnSocketRef = new WebSocket(url);
     if(this.#tryOnSocketRef){
       this.#tryOnSocketRef.onopen = async () => {
         onOpen?.();
-        this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
+        this.#handleTimeOut({ onSuccess, onError, tryonId });
       };
       this.#tryOnSocketRef.onmessage = (event) => {
         let data;
@@ -223,7 +226,7 @@ class TryOn {
 
   handleTryOnSubmit({
 		userEmail,
-		customerStoreUrl,
+		shopDomain,
 		products,
 		selectedUserImages,
 		requestSource,
@@ -231,7 +234,7 @@ class TryOn {
     openTryonId,
     selectedProductImageUrl
 	}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-		if (checkParameters(customerStoreUrl, userEmail, products,selectedUserImages) === false) {
+		if (checkParameters(shopDomain, userEmail, products,selectedUserImages) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
         if (!selectedUserImages.length) {
@@ -243,7 +246,7 @@ class TryOn {
 		const payload = {
 			products,
 			userEmail,
-			customerStoreUrl,
+			customerStoreUrl:shopDomain,
 			selectedUserImages,
       ...(requestSource!==undefined && requestSource!==null &&{requestSource}),
       ...(callbackUrl!==undefined && callbackUrl!==null &&{callbackUrl}),
@@ -256,9 +259,9 @@ class TryOn {
 		});
 	}
 
-  #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userEmail, productName }: HandleTimeOutParams): Promise<void> => {
+  #handleGetTryOnResult = async ({ onSuccess, onError, tryonId }: HandleTimeOutParams): Promise<void> => {
     try {
-      const data = await this.getTryOnResult({ shopDomain, userEmail, productName });
+      const data = await this.getTryOnResult({ tryonId });
       onSuccess?.(data.data);
     } catch (error) {
       onError?.(error);
@@ -275,23 +278,23 @@ class TryOn {
     );
   }
 
-  getTryOnResult = ({ userEmail, shopDomain, productName }: GetTryOnResultParams): Promise<AxiosResponse<any>> => {
-    if (checkParameters(shopDomain, userEmail, productName) === false) {
+  getTryOnResult = ({tryonId }: GetTryOnResultParams): Promise<AxiosResponse<any>> => {
+    if (checkParameters(tryonId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
 
-    if (!isValidEmail(userEmail.trim())) {
-      throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-    }
+    // if (!isValidEmail(userEmail.trim())) {
+    //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+    // }
 
-    const payload = {
-      productName,
-      userEmail,
-      customerStoreUrl: shopDomain,
-    };
+    // const payload = {
+    //   products,
+    //   userEmail,
+    //   customerStoreUrl: shopDomain,
+    // };
 
-    const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}`;
-    return axios.post(url, payload, {
+    const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
+    return axios.post(url, null,{
       headers: { "X-Api-Key": this.#accessKey },
     });
   };

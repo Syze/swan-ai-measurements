@@ -103,26 +103,26 @@ class TryOn {
             clearTimeout(this.#timerWaitingRef);
         }
     };
-    #handleTimeOut = ({ onSuccess, onError, shopDomain, userEmail, productName }) => {
+    #handleTimeOut = ({ onSuccess, onError, tryonId }) => {
         this.#timerWaitingRef = setTimeout(() => {
-            this.#handleGetTryOnResult({ shopDomain, userEmail, productName, onSuccess, onError });
+            this.#handleGetTryOnResult({ onSuccess, onError, tryonId });
             this.#disconnectSocket();
         }, 138000);
     };
-    handleTryOnWebSocket = ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }) => {
-        if ((0, utils_js_1.checkParameters)(shopDomain, tryonId, productName, userEmail) === false) {
+    handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
+        if ((0, utils_js_1.checkParameters)(tryonId) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
-            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-        }
+        // if (!isValidEmail(userEmail.trim())) {
+        //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        // }
         this.#disconnectSocket();
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
         this.#tryOnSocketRef = new WebSocket(url);
         if (this.#tryOnSocketRef) {
             this.#tryOnSocketRef.onopen = async () => {
                 onOpen?.();
-                this.#handleTimeOut({ onSuccess, onError, shopDomain, userEmail, productName });
+                this.#handleTimeOut({ onSuccess, onError, tryonId });
             };
             this.#tryOnSocketRef.onmessage = (event) => {
                 let data;
@@ -157,8 +157,8 @@ class TryOn {
             console.log("no connection made for websocket");
         }
     };
-    handleTryOnSubmit({ userEmail, customerStoreUrl, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if ((0, utils_js_1.checkParameters)(customerStoreUrl, userEmail, products, selectedUserImages) === false) {
+    handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
+        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, products, selectedUserImages) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         if (!selectedUserImages.length) {
@@ -170,7 +170,7 @@ class TryOn {
         const payload = {
             products,
             userEmail,
-            customerStoreUrl,
+            customerStoreUrl: shopDomain,
             selectedUserImages,
             ...(requestSource !== undefined && requestSource !== null && { requestSource }),
             ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),
@@ -182,9 +182,9 @@ class TryOn {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
-    #handleGetTryOnResult = async ({ onSuccess, onError, shopDomain, userEmail, productName }) => {
+    #handleGetTryOnResult = async ({ onSuccess, onError, tryonId }) => {
         try {
-            const data = await this.getTryOnResult({ shopDomain, userEmail, productName });
+            const data = await this.getTryOnResult({ tryonId });
             onSuccess?.(data.data);
         }
         catch (error) {
@@ -196,20 +196,20 @@ class TryOn {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
-    getTryOnResult = ({ userEmail, shopDomain, productName }) => {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, productName) === false) {
+    getTryOnResult = ({ tryonId }) => {
+        if ((0, utils_js_1.checkParameters)(tryonId) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
-            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-        }
-        const payload = {
-            productName,
-            userEmail,
-            customerStoreUrl: shopDomain,
-        };
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}`;
-        return axios_1.default.post(url, payload, {
+        // if (!isValidEmail(userEmail.trim())) {
+        //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+        // }
+        // const payload = {
+        //   products,
+        //   userEmail,
+        //   customerStoreUrl: shopDomain,
+        // };
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
+        return axios_1.default.post(url, null, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     };

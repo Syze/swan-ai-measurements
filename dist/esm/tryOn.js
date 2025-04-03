@@ -36,26 +36,26 @@ class TryOn {
                 clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
             }
         });
-        _TryOn_handleTimeOut.set(this, ({ onSuccess, onError, shopDomain, userEmail, productName }) => {
+        _TryOn_handleTimeOut.set(this, ({ onSuccess, onError, tryonId }) => {
             __classPrivateFieldSet(this, _TryOn_timerWaitingRef, setTimeout(() => {
-                __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { shopDomain, userEmail, productName, onSuccess, onError });
+                __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { onSuccess, onError, tryonId });
                 __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
             }, 138000), "f");
         });
-        this.handleTryOnWebSocket = ({ userEmail, shopDomain, tryonId, productName, onError, onSuccess, onClose, onOpen }) => {
-            if (checkParameters(shopDomain, tryonId, productName, userEmail) === false) {
+        this.handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
+            if (checkParameters(tryonId) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            if (!isValidEmail(userEmail.trim())) {
-                throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-            }
+            // if (!isValidEmail(userEmail.trim())) {
+            //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+            // }
             __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
             const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
             __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocket(url), "f");
             if (__classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f")) {
                 __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onopen = () => __awaiter(this, void 0, void 0, function* () {
                     onOpen === null || onOpen === void 0 ? void 0 : onOpen();
-                    __classPrivateFieldGet(this, _TryOn_handleTimeOut, "f").call(this, { onSuccess, onError, shopDomain, userEmail, productName });
+                    __classPrivateFieldGet(this, _TryOn_handleTimeOut, "f").call(this, { onSuccess, onError, tryonId });
                 });
                 __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onmessage = (event) => {
                     let data;
@@ -90,29 +90,29 @@ class TryOn {
                 console.log("no connection made for websocket");
             }
         };
-        _TryOn_handleGetTryOnResult.set(this, (_a) => __awaiter(this, [_a], void 0, function* ({ onSuccess, onError, shopDomain, userEmail, productName }) {
+        _TryOn_handleGetTryOnResult.set(this, (_a) => __awaiter(this, [_a], void 0, function* ({ onSuccess, onError, tryonId }) {
             try {
-                const data = yield this.getTryOnResult({ shopDomain, userEmail, productName });
+                const data = yield this.getTryOnResult({ tryonId });
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data.data);
             }
             catch (error) {
                 onError === null || onError === void 0 ? void 0 : onError(error);
             }
         }));
-        this.getTryOnResult = ({ userEmail, shopDomain, productName }) => {
-            if (checkParameters(shopDomain, userEmail, productName) === false) {
+        this.getTryOnResult = ({ tryonId }) => {
+            if (checkParameters(tryonId) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            if (!isValidEmail(userEmail.trim())) {
-                throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-            }
-            const payload = {
-                productName,
-                userEmail,
-                customerStoreUrl: shopDomain,
-            };
-            const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}`;
-            return axios.post(url, payload, {
+            // if (!isValidEmail(userEmail.trim())) {
+            //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+            // }
+            // const payload = {
+            //   products,
+            //   userEmail,
+            //   customerStoreUrl: shopDomain,
+            // };
+            const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
+            return axios.post(url, null, {
                 headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
             });
         };
@@ -182,8 +182,8 @@ class TryOn {
             data: payload,
         });
     }
-    handleTryOnSubmit({ userEmail, customerStoreUrl, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if (checkParameters(customerStoreUrl, userEmail, products, selectedUserImages) === false) {
+    handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
+        if (checkParameters(shopDomain, userEmail, products, selectedUserImages) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
         if (!selectedUserImages.length) {
@@ -193,9 +193,7 @@ class TryOn {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = Object.assign(Object.assign(Object.assign(Object.assign({ products,
-            userEmail,
-            customerStoreUrl,
-            selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
+            userEmail, customerStoreUrl: shopDomain, selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
         return axios.post(url, payload, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
