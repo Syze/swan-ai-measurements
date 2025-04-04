@@ -24,7 +24,7 @@ interface HandleTryOnWebSocketParams {
 interface Products {
     productUrl: string;
     productHandle: string;
-    openTryonId: string;
+    openTryonId?: string;
     selectedProductImageUrl: string;
 }
 interface HandleForLatestImageParams {
