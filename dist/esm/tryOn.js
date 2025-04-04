@@ -40,15 +40,12 @@ class TryOn {
             __classPrivateFieldSet(this, _TryOn_timerWaitingRef, setTimeout(() => {
                 __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { onSuccess, onError, tryonId });
                 __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-            }, 138000), "f");
+            }, 150000), "f");
         });
         this.handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
             if (checkParameters(tryonId) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            // if (!isValidEmail(userEmail.trim())) {
-            //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-            // }
             __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
             const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
             __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocket(url), "f");

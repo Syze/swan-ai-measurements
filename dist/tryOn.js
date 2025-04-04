@@ -107,15 +107,12 @@ class TryOn {
         this.#timerWaitingRef = setTimeout(() => {
             this.#handleGetTryOnResult({ onSuccess, onError, tryonId });
             this.#disconnectSocket();
-        }, 138000);
+        }, 150000);
     };
     handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
         if ((0, utils_js_1.checkParameters)(tryonId) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        // if (!isValidEmail(userEmail.trim())) {
-        //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-        // }
         this.#disconnectSocket();
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
         this.#tryOnSocketRef = new WebSocket(url);

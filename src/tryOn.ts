@@ -18,11 +18,7 @@ interface DeleteImageParams {
 }
 interface EligibiltyImageParams {storeUrl:string,productHandle:string,imageURL:string,productDescription:string}
 interface HandleTryOnWebSocketParams {
-  tryonId:string
-  // userEmail: string;
-  // shopDomain: string;
-  // tryonId: string;
-  // products: Products[];
+  tryonId:string;
   onError?: (error: any) => void;
   onSuccess?: (data: any) => void;
   onClose?: () => void;
@@ -51,15 +47,9 @@ interface HandleTimeOutParams {
   onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
   tryonId:string
-  // shopDomain: string;
-  // userEmail: string;
-  // products: Products[];
 }
 
 interface GetTryOnResultParams {
-  // shopDomain: string;
-  // userEmail: string;
-  // products: Products[];
   tryonId :string
 }
 
@@ -173,16 +163,13 @@ class TryOn {
     this.#timerWaitingRef = setTimeout(() => {
       this.#handleGetTryOnResult({  onSuccess, onError,tryonId });
       this.#disconnectSocket();
-    }, 138000);
+    }, 150000);
   };
 
   handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams): void => {
     if (checkParameters(tryonId) === false) {
       throw new Error(REQUIRED_MESSAGE);
     }
-    // if (!isValidEmail(userEmail.trim())) {
-    //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-    // }
     this.#disconnectSocket();
     const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
     this.#tryOnSocketRef = new WebSocket(url);
