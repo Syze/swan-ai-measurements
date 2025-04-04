@@ -33,7 +33,7 @@ interface Products
     productUrl:string,
     productHandle: string,
     openTryonId?: string,
-    selectedProductImageUrl:string
+    selectedProductImageUrl?:string
   }
 
 interface HandleForLatestImageParams {
