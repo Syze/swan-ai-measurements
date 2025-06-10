@@ -158,9 +158,9 @@ class TryOn {
         if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, products, selectedUserImages) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        if (!selectedUserImages.length) {
-            throw new Error("No user images found!");
-        }
+        //     if (!selectedUserImages.length) {
+        // 	throw new Error("No user images found!");
+        // }
         if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
             throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
@@ -168,7 +168,7 @@ class TryOn {
             products,
             userEmail,
             customerStoreUrl: shopDomain,
-            selectedUserImages,
+            ...(selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages }),
             ...(requestSource !== undefined && requestSource !== null && { requestSource }),
             ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),
             ...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),

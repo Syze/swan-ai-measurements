@@ -31,7 +31,7 @@ interface HandleForLatestImageParams {
     shopDomain: string;
     userEmail: string;
     products: Products[];
-    selectedUserImages: string[];
+    selectedUserImages?: string[];
     requestSource?: string;
     callbackUrl?: string;
     openTryonId?: string;

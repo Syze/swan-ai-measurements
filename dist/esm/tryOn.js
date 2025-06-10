@@ -183,14 +183,14 @@ class TryOn {
         if (checkParameters(shopDomain, userEmail, products, selectedUserImages) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        if (!selectedUserImages.length) {
-            throw new Error("No user images found!");
-        }
+        //     if (!selectedUserImages.length) {
+        // 	throw new Error("No user images found!");
+        // }
         if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
-        const payload = Object.assign(Object.assign(Object.assign(Object.assign({ products,
-            userEmail, customerStoreUrl: shopDomain, selectedUserImages }, (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
+        const payload = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ products,
+            userEmail, customerStoreUrl: shopDomain }, (selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages })), (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
         return axios.post(url, payload, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
