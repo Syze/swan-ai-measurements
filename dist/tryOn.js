@@ -155,7 +155,7 @@ class TryOn {
         }
     };
     handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, products, selectedUserImages) === false) {
+        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, products) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         //     if (!selectedUserImages.length) {

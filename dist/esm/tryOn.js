@@ -180,7 +180,7 @@ class TryOn {
         });
     }
     handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if (checkParameters(shopDomain, userEmail, products, selectedUserImages) === false) {
+        if (checkParameters(shopDomain, userEmail, products) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
         //     if (!selectedUserImages.length) {

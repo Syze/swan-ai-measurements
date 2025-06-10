@@ -221,7 +221,7 @@ class TryOn {
     openTryonId,
     selectedProductImageUrl
 	}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-		if (checkParameters(shopDomain, userEmail, products,selectedUserImages) === false) {
+		if (checkParameters(shopDomain, userEmail, products) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
     //     if (!selectedUserImages.length) {
