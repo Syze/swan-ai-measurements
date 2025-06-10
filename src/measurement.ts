@@ -2,9 +2,6 @@ import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
 
-
-
-
 interface MeasurementRecommendation {
   shopDomain: string;
   scanId: string;
@@ -154,7 +151,7 @@ class Measurement {
         } else {
           onError?.(data);
         }
-        if (this.#timerWaitingRef) {
+        if (this.#timerWaitingRef && data?.code === 200 && data?.scanStatus === "success" && data?.resultType === "final" ) {
           clearTimeout(this.#timerWaitingRef);
         }
       };
