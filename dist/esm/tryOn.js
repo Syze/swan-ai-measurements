@@ -100,14 +100,6 @@ class TryOn {
             if (checkParameters(tryonId) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            // if (!isValidEmail(userEmail.trim())) {
-            //   throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-            // }
-            // const payload = {
-            //   products,
-            //   userEmail,
-            //   customerStoreUrl: shopDomain,
-            // };
             const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
             return axios.post(url, null, {
                 headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
@@ -183,9 +175,6 @@ class TryOn {
         if (checkParameters(shopDomain, userEmail, products) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        //     if (!selectedUserImages.length) {
-        // 	throw new Error("No user images found!");
-        // }
         if (!isValidEmail(userEmail.trim())) {
             throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }

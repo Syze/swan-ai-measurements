@@ -1,14 +1,4 @@
-interface ObjMetaData {
-    gender: string;
-    scan_id?: string;
-    email: string;
-    focal_length: string;
-    height: string;
-    customer_store_url: string;
-    clothes_fit: string;
-    scan_type?: string;
-    callback_url: string;
-}
+import { BodyScanObjMetaData, FaceScanObjMetaData } from "./constants.js";
 interface SetDeviceInfo {
     detection?: string;
     model?: string;
@@ -20,23 +10,39 @@ interface SetDeviceInfo {
     }[];
     scanId: string;
 }
-interface UploadOptions {
+interface BodyScanUploadOptions {
     file: File;
-    arrayMetaData: Partial<ObjMetaData>[];
+    arrayMetaData: Partial<BodyScanObjMetaData>[];
     scanId: string;
     email: string;
     callBack?: (a: {
         eventName: string;
         message: string;
-        scanId: string;
+        scanId?: string;
         email?: string;
+        objectKey?: string;
+    }) => void;
+}
+interface FaceScanUploadOptions {
+    file: File;
+    arrayMetaData: Partial<FaceScanObjMetaData>[];
+    objectKey: string;
+    email: string;
+    contentType: string;
+    callBack?: (a: {
+        eventName: string;
+        message: string;
+        objectKey?: string;
+        email?: string;
+        scanId?: string;
     }) => void;
 }
 export default class FileUpload {
     #private;
     constructor(accessKey: string, stagingUrl?: boolean);
-    uploadFileFrontend({ file, arrayMetaData, scanId, email, callBack }: UploadOptions): Promise<unknown>;
-    uploadFile({ file, arrayMetaData, scanId, email }: UploadOptions): Promise<unknown>;
+    uploadFileFrontend({ file, arrayMetaData, scanId, email, callBack }: BodyScanUploadOptions): Promise<unknown>;
+    faceScanFileUploader({ file, arrayMetaData, objectKey, email, callBack }: FaceScanUploadOptions): Promise<unknown>;
+    uploadFile({ file, arrayMetaData, scanId, email }: BodyScanUploadOptions): Promise<unknown>;
     setDeviceInfo(data: SetDeviceInfo): Promise<import("axios").AxiosResponse<any, any>>;
 }
 export {};

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isValidEmail = exports.getUrl = exports.getFileChunks = exports.addScanType = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
+exports.isValidEmail = exports.getUrl = exports.getFileChunks = exports.addScanType = exports.checkValues = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 async function fetchData(options) {
@@ -39,17 +39,8 @@ function checkParameters(...args) {
 }
 exports.checkParameters = checkParameters;
 function checkMetaDataValue(arr) {
-    for (const key of constants_js_1.requiredMetaData) {
-        let hasRequiredKey = false;
-        for (const obj of arr) {
-            if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "" && typeof obj[key] !== "number") {
-                hasRequiredKey = true;
-                break;
-            }
-        }
-        if (!hasRequiredKey) {
-            return false;
-        }
+    if (!(0, exports.checkValues)(arr, constants_js_1.requiredMetaData)) {
+        return false;
     }
     let correctFormat = false;
     for (const obj of arr) {
@@ -63,6 +54,26 @@ function checkMetaDataValue(arr) {
     return true;
 }
 exports.checkMetaDataValue = checkMetaDataValue;
+const checkValues = (arr, requiredMetaData) => {
+    for (const key of requiredMetaData) {
+        let hasRequiredKey = false;
+        for (const obj of arr) {
+            if (Object.prototype.hasOwnProperty.call(obj, key) &&
+                obj[key] !== undefined &&
+                obj[key] !== null &&
+                obj[key] !== "" &&
+                typeof obj[key] !== "number") {
+                hasRequiredKey = true;
+                break;
+            }
+        }
+        if (!hasRequiredKey) {
+            return false;
+        }
+    }
+    return true;
+};
+exports.checkValues = checkValues;
 const addScanType = (arr, scan_id, email) => {
     const scanType = arr.find((el) => el.scan_type);
     if (!scanType) {

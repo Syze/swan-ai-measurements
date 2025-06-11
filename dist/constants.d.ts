@@ -12,7 +12,7 @@ export declare const APP_POSE_DETECTION_WEBSOCKET_URL = "APP_POSE_DETECTION_WEBS
 export declare const API_ENDPOINTS: {
     [key: string]: string;
 };
-export interface ObjMetaData {
+export interface BodyScanObjMetaData {
     gender: string;
     scan_id?: string;
     email: string;
@@ -23,10 +23,21 @@ export interface ObjMetaData {
     scan_type?: string;
     callback_url: string;
 }
-type RequiredMetaDataKeys = keyof ObjMetaData;
+export interface FaceScanObjMetaData {
+    gender: string;
+    face_scan_id: string;
+    email?: string;
+    focal_length: string;
+    height: string;
+    customer_store_url: string;
+    scan_type: string;
+    callback_url: string;
+}
+export type RequiredMetaDataKeys = "gender" | "focal_length" | "height" | "customer_store_url" | "callback_url" | "clothes_fit";
+export type RequiredFaceScanMetaDataKeys = "gender" | "focal_length" | "customer_store_url" | "scan_type" | "callback_url" | "face_scan_id";
 export declare const requiredMetaData: RequiredMetaDataKeys[];
+export declare const requiredFaceScanMetaData: RequiredFaceScanMetaDataKeys[];
 export declare const REQUIRED_MESSAGE: string;
 export declare const REQUIRED_MESSAGE_FOR_META_DATA: string;
 export declare const REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";
 export declare const CHUNK_SIZE: number;
-export {};

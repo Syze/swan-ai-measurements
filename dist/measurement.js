@@ -105,9 +105,12 @@ class Measurement {
                     onSuccess?.(data);
                 }
                 else {
+                    if (this.#timerWaitingRef) {
+                        clearTimeout(this.#timerWaitingRef);
+                    }
                     onError?.(data);
                 }
-                if (this.#timerWaitingRef) {
+                if (this.#timerWaitingRef && data?.code === 200 && data?.scanStatus === "success" && data?.resultType === "final") {
                     clearTimeout(this.#timerWaitingRef);
                 }
             };

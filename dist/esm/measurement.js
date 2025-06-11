@@ -68,9 +68,12 @@ class Measurement {
                     onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
                 }
                 else {
+                    if (__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f")) {
+                        clearTimeout(__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f"));
+                    }
                     onError === null || onError === void 0 ? void 0 : onError(data);
                 }
-                if (__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f")) {
+                if (__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f") && (data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success" && (data === null || data === void 0 ? void 0 : data.resultType) === "final") {
                     clearTimeout(__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f"));
                 }
             };

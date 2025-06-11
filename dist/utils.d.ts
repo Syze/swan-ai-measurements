@@ -1,4 +1,4 @@
-import { ObjMetaData } from "./constants.js";
+import { BodyScanObjMetaData } from "./constants.js";
 export interface FetchDataOptions {
     path: string;
     body?: any;
@@ -11,8 +11,9 @@ export interface FetchDataOptions {
 }
 export declare function fetchData(options: FetchDataOptions): Promise<any>;
 export declare function checkParameters(...args: any[]): boolean;
-export declare function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean;
-export declare const addScanType: (arr: Partial<ObjMetaData>[], scan_id: string, email: string) => Partial<ObjMetaData>[];
+export declare function checkMetaDataValue(arr: Partial<BodyScanObjMetaData>[]): boolean;
+export declare const checkValues: (arr: any[], requiredMetaData: any) => boolean;
+export declare const addScanType: (arr: Partial<BodyScanObjMetaData>[], scan_id: string, email: string) => Partial<BodyScanObjMetaData>[];
 export declare function getFileChunks(file: File, chunkSize?: number): Blob[];
 export declare const getUrl: ({ urlName, stagingUrl }: {
     urlName: string;

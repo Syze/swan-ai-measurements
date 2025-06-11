@@ -42,17 +42,8 @@ export function checkParameters(...args) {
     return true;
 }
 export function checkMetaDataValue(arr) {
-    for (const key of requiredMetaData) {
-        let hasRequiredKey = false;
-        for (const obj of arr) {
-            if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "" && typeof obj[key] !== "number") {
-                hasRequiredKey = true;
-                break;
-            }
-        }
-        if (!hasRequiredKey) {
-            return false;
-        }
+    if (!checkValues(arr, requiredMetaData)) {
+        return false;
     }
     let correctFormat = false;
     for (const obj of arr) {
@@ -65,6 +56,25 @@ export function checkMetaDataValue(arr) {
     }
     return true;
 }
+export const checkValues = (arr, requiredMetaData) => {
+    for (const key of requiredMetaData) {
+        let hasRequiredKey = false;
+        for (const obj of arr) {
+            if (Object.prototype.hasOwnProperty.call(obj, key) &&
+                obj[key] !== undefined &&
+                obj[key] !== null &&
+                obj[key] !== "" &&
+                typeof obj[key] !== "number") {
+                hasRequiredKey = true;
+                break;
+            }
+        }
+        if (!hasRequiredKey) {
+            return false;
+        }
+    }
+    return true;
+};
 export const addScanType = (arr, scan_id, email) => {
     const scanType = arr.find((el) => el.scan_type);
     if (!scanType) {

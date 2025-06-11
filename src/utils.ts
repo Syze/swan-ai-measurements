@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { APP_AUTH_BASE_URL, ObjMetaData, PROD_URL, STAGING_URL, requiredMetaData } from "./constants.js";
+import { APP_AUTH_BASE_URL, BodyScanObjMetaData, FaceScanObjMetaData, PROD_URL, RequiredFaceScanMetaDataKeys, RequiredMetaDataKeys, STAGING_URL, requiredMetaData } from "./constants.js";
 
 export interface FetchDataOptions {
   path: string;
@@ -53,18 +53,9 @@ export function checkParameters(...args: any[]): boolean {
   return true;
 }
 
-export function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean {
-  for (const key of requiredMetaData) {
-    let hasRequiredKey = false;
-    for (const obj of arr) {
-      if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "" && typeof obj[key] !== "number") {
-        hasRequiredKey = true;
-        break;
-      }
-    }
-    if (!hasRequiredKey) {
-      return false;
-    }
+export function checkMetaDataValue(arr: Partial<BodyScanObjMetaData>[]): boolean {
+  if (!checkValues(arr, requiredMetaData)) {
+    return false;
   }
   let correctFormat = false;
   for (const obj of arr) {
@@ -78,7 +69,29 @@ export function checkMetaDataValue(arr: Partial<ObjMetaData>[]): boolean {
   return true;
 }
 
-export const addScanType = (arr: Partial<ObjMetaData>[], scan_id: string, email: string): Partial<ObjMetaData>[] => {
+export const checkValues=(arr:any[],requiredMetaData:any)=>{
+  for (const key of requiredMetaData) {
+    let hasRequiredKey = false;
+    for (const obj of arr) {
+      if (
+        Object.prototype.hasOwnProperty.call(obj, key) &&
+        (obj as Record<string, unknown>)[key] !== undefined &&
+        (obj as Record<string, unknown>)[key] !== null &&
+        (obj as Record<string, unknown>)[key] !== "" &&
+        typeof (obj as Record<string, unknown>)[key] !== "number"
+      ) {
+        hasRequiredKey = true;
+        break;
+      }
+    }
+    if (!hasRequiredKey) {
+      return false;
+    }
+  }
+  return true
+}
+
+export const addScanType = (arr: Partial<BodyScanObjMetaData>[], scan_id: string, email: string): Partial<BodyScanObjMetaData>[] => {
   const scanType = arr.find((el) => el.scan_type);
   if (!scanType) {
     arr.push({ scan_type: "clothing_scan" });

@@ -29,14 +29,15 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-var _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl;
+var _FileUpload_instances, _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_stagingUrl, _FileUpload_uppyFileUploader;
 import axios from "axios";
-import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, CHUNK_SIZE } from "./constants.js";
-import { addScanType, checkMetaDataValue, checkParameters, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
+import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, CHUNK_SIZE, requiredFaceScanMetaData } from "./constants.js";
+import { addScanType, checkMetaDataValue, checkParameters, checkValues, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
 import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 class FileUpload {
     constructor(accessKey, stagingUrl = false) {
+        _FileUpload_instances.add(this);
         _FileUpload_uppyIns.set(this, void 0);
         _FileUpload_accessKey.set(this, void 0);
         _FileUpload_stagingUrl.set(this, void 0);
@@ -55,82 +56,175 @@ class FileUpload {
                 throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
             }
             arrayMetaData = addScanType(arrayMetaData, scanId, email);
-            return new Promise((resolve, reject) => {
-                if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
-                    __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
-                }
-                __classPrivateFieldSet(this, _FileUpload_uppyIns, new Uppy({ autoProceed: true }), "f");
-                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart, {
-                    limit: 10,
-                    retryDelays: [0, 1000, 3000, 5000],
-                    companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f") }),
-                    getChunkSize: () => CHUNK_SIZE,
-                    createMultipartUpload: (file) => {
-                        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks`, scanId, email });
-                        const objectKey = `${scanId}.${file.extension}`;
-                        return fetchData({
-                            path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-                            apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-                            stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
-                            body: {
-                                objectKey,
-                                contentType: file.type,
-                                objectMetadata: arrayMetaData,
-                            },
-                        });
-                    },
-                    completeMultipartUpload: (file, { uploadId, key, parts }) => {
-                        callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded`, scanId, email });
-                        return fetchData({
-                            path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-                            apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-                            stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
-                            body: {
-                                uploadId,
-                                objectKey: key,
-                                parts,
-                                originalFileName: file.name,
-                            },
-                        }).then((response) => {
-                            callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully`, scanId, email });
-                            return response;
-                        });
-                    },
-                    signPart: (file, partData) => fetchData({
-                        path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-                        stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
-                        apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
-                        body: {
-                            objectKey: partData.key,
-                            uploadId: partData.uploadId,
-                            partNumber: partData.partNumber,
-                        },
-                    }),
-                });
-                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").addFile({
-                    source: "manual",
-                    name: file.name,
-                    type: file.type,
-                    data: file,
-                });
-                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("upload-error", (file, error, response) => {
-                    if (error.isNetworkError) {
-                        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").retryUpload(file.id);
-                    }
-                    else {
-                        reject(error);
-                    }
-                });
-                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("upload-success", () => {
-                    resolve({ message: "file uploaded successfully" });
-                });
-                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("complete", (result) => {
-                    if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
-                        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
-                    }
-                });
-            });
+            return __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_uppyFileUploader).call(this, { callBack, arrayMetaData, scanId, email, file });
+            // return new Promise((resolve, reject) => {
+            // 	if (this.#uppyIns) {
+            // 		this.#uppyIns.close();
+            // 	}
+            // 	this.#uppyIns = new Uppy({ autoProceed: true });
+            // 	this.#uppyIns.use(AwsS3Multipart, {
+            // 		limit: 10,
+            // 		retryDelays: [0, 1000, 3000, 5000],
+            // 		companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
+            // 		getChunkSize: () => CHUNK_SIZE,
+            // 		createMultipartUpload: (file: any) => {
+            // 			const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+            // 			callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`,scanId,email})
+            // 			const objectKey = `${scanId}.${file.extension}`;
+            // 			return fetchData({
+            // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+            // 				apiKey: this.#accessKey,
+            // 				stagingUrl: this.#stagingUrl,
+            // 				body: {
+            // 					objectKey,
+            // 					contentType: file.type,
+            // 					objectMetadata: arrayMetaData,
+            // 				},
+            // 			});
+            // 		},
+            // 		completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) => {
+            // 		   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`,scanId,email})	
+            // 			return fetchData({
+            // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+            // 				apiKey: this.#accessKey,
+            // 				stagingUrl: this.#stagingUrl,
+            // 				body: {
+            // 					uploadId,
+            // 					objectKey: key,
+            // 					parts,
+            // 					originalFileName: file.name,
+            // 				},
+            // 			}).then((response) => {
+            // 				callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`,scanId,email})
+            // 				return response;  
+            // 			});
+            // 		},
+            // 		signPart: (file: any, partData: any) =>
+            // 			fetchData({
+            // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+            // 				stagingUrl: this.#stagingUrl,
+            // 				apiKey: this.#accessKey,
+            // 				body: {
+            // 					objectKey: partData.key,
+            // 					uploadId: partData.uploadId,
+            // 					partNumber: partData.partNumber,
+            // 				},
+            // 			}),
+            // 	});
+            // 	this.#uppyIns.addFile({
+            // 		source: "manual",
+            // 		name: file.name,
+            // 		type: file.type,
+            // 		data: file,
+            // 	});
+            // 	this.#uppyIns.on("upload-error", (file: any, error: any, response: any) => {
+            // 		if (error.isNetworkError) {
+            // 			this.#uppyIns.retryUpload(file.id);
+            // 		  }else{
+            // 			  reject(error);
+            // 		  }
+            // 	});
+            // 	this.#uppyIns.on("upload-success", () => {
+            // 		resolve({ message: "file uploaded successfully" });
+            // 	});
+            // 	this.#uppyIns.on("complete", (result: any) => {
+            // 		if (this.#uppyIns) {
+            // 			this.#uppyIns.close();
+            // 		}
+            // 	});
+            // });
+        });
+    }
+    faceScanFileUploader(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, objectKey, email, callBack }) {
+            if (!checkParameters(file, arrayMetaData, objectKey, email)) {
+                throw new Error(REQUIRED_MESSAGE);
+            }
+            if (!isValidEmail(email.trim())) {
+                throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
+            }
+            if (!checkValues(arrayMetaData, requiredFaceScanMetaData)) {
+                throw new Error(REQUIRED_MESSAGE_FOR_META_DATA);
+            }
+            // arrayMetaData = addScanType(arrayMetaData, objectKey, email);
+            arrayMetaData.push({ email });
+            return __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_uppyFileUploader).call(this, { callBack, arrayMetaData, objectKey, email, file });
+            // return new Promise((resolve, reject) => {
+            // 	if (this.#uppyIns) {
+            // 		this.#uppyIns.close();
+            // 	}
+            // 	this.#uppyIns = new Uppy({ autoProceed: true });
+            // 	this.#uppyIns.use(AwsS3Multipart, {
+            // 		limit: 10,
+            // 		retryDelays: [0, 1000, 3000, 5000],
+            // 		companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
+            // 		getChunkSize: () => CHUNK_SIZE,
+            // 		createMultipartUpload: (file: any) => {
+            // 			const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+            // 			callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`,scanId,email})
+            // 			const objectKey = `${scanId}.${file.extension}`;
+            // 			return fetchData({
+            // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+            // 				apiKey: this.#accessKey,
+            // 				stagingUrl: this.#stagingUrl,
+            // 				body: {
+            // 					objectKey,
+            // 					contentType: file.type,
+            // 					objectMetadata: arrayMetaData,
+            // 				},
+            // 			});
+            // 		},
+            // 		completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) => {
+            // 		   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`,scanId,email})	
+            // 			return fetchData({
+            // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+            // 				apiKey: this.#accessKey,
+            // 				stagingUrl: this.#stagingUrl,
+            // 				body: {
+            // 					uploadId,
+            // 					objectKey: key,
+            // 					parts,
+            // 					originalFileName: file.name,
+            // 				},
+            // 			}).then((response) => {
+            // 				callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`,scanId,email})
+            // 				return response;  
+            // 			});
+            // 		},
+            // 		signPart: (file: any, partData: any) =>
+            // 			fetchData({
+            // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+            // 				stagingUrl: this.#stagingUrl,
+            // 				apiKey: this.#accessKey,
+            // 				body: {
+            // 					objectKey: partData.key,
+            // 					uploadId: partData.uploadId,
+            // 					partNumber: partData.partNumber,
+            // 				},
+            // 			}),
+            // 	});
+            // 	this.#uppyIns.addFile({
+            // 		source: "manual",
+            // 		name: file.name,
+            // 		type: file.type,
+            // 		data: file,
+            // 	});
+            // 	this.#uppyIns.on("upload-error", (file: any, error: any, response: any) => {
+            // 		if (error.isNetworkError) {
+            // 			this.#uppyIns.retryUpload(file.id);
+            // 		  }else{
+            // 			  reject(error);
+            // 		  }
+            // 	});
+            // 	this.#uppyIns.on("upload-success", () => {
+            // 		resolve({ message: "file uploaded successfully" });
+            // 	});
+            // 	this.#uppyIns.on("complete", (result: any) => {
+            // 		if (this.#uppyIns) {
+            // 			this.#uppyIns.close();
+            // 		}
+            // 	});
+            // });
         });
     }
     uploadFile(_a) {
@@ -208,5 +302,82 @@ class FileUpload {
         });
     }
 }
-_FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_stagingUrl = new WeakMap();
+_FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_stagingUrl = new WeakMap(), _FileUpload_instances = new WeakSet(), _FileUpload_uppyFileUploader = function _FileUpload_uppyFileUploader({ callBack, arrayMetaData, scanId, email, file, objectKey }) {
+    return new Promise((resolve, reject) => {
+        if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
+            __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
+        }
+        __classPrivateFieldSet(this, _FileUpload_uppyIns, new Uppy({ autoProceed: true }), "f");
+        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").use(AwsS3Multipart, {
+            limit: 10,
+            retryDelays: [0, 1000, 3000, 5000],
+            companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f") }),
+            getChunkSize: () => CHUNK_SIZE,
+            createMultipartUpload: (file) => {
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_start", message: `File ${file.name} will be divided into ${totalChunks} chunks`, scanId, email, objectKey });
+                const ObjectKey = `${scanId || objectKey}.${file.extension}`;
+                return fetchData({
+                    path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
+                    apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                    stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
+                    body: {
+                        objectKey: ObjectKey,
+                        contentType: file.type,
+                        objectMetadata: arrayMetaData,
+                    },
+                });
+            },
+            completeMultipartUpload: (file, { uploadId, key, parts }) => {
+                callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_start", message: `${parts.length} chunks of file, uploaded`, scanId, email, objectKey });
+                return fetchData({
+                    path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
+                    apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                    stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
+                    body: {
+                        uploadId,
+                        objectKey: key,
+                        parts,
+                        originalFileName: file.name,
+                    },
+                }).then((response) => {
+                    callBack === null || callBack === void 0 ? void 0 : callBack({ eventName: "uploading_complete_end", message: `Multipart upload completed successfully`, scanId, email, objectKey });
+                    return response;
+                });
+            },
+            signPart: (file, partData) => fetchData({
+                path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
+                stagingUrl: __classPrivateFieldGet(this, _FileUpload_stagingUrl, "f"),
+                apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                body: {
+                    objectKey: partData.key,
+                    uploadId: partData.uploadId,
+                    partNumber: partData.partNumber,
+                },
+            }),
+        });
+        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").addFile({
+            source: "manual",
+            name: file.name,
+            type: file.type,
+            data: file,
+        });
+        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("upload-error", (file, error, response) => {
+            if (error.isNetworkError) {
+                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").retryUpload(file.id);
+            }
+            else {
+                reject(error);
+            }
+        });
+        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("upload-success", () => {
+            resolve({ message: "file uploaded successfully" });
+        });
+        __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").on("complete", (result) => {
+            if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
+                __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
+            }
+        });
+    });
+};
 export default FileUpload;
