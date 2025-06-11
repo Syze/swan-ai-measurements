@@ -64,7 +64,6 @@ export interface FaceScanObjMetaData {
 	face_scan_id: string;
 	email?: string;
 	focal_length: string;
-	height: string;
 	customer_store_url: string;
 	scan_type: string;
   callback_url:string
