@@ -10,6 +10,7 @@ interface MeasurementSocketOptions {
     onSuccess?: (data: any) => void;
     onClose?: () => void;
     onOpen?: () => void;
+    isFallback?: boolean;
 }
 declare class Measurement {
     #private;

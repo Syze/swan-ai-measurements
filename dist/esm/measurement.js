@@ -50,7 +50,7 @@ class Measurement {
         return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") } });
     }
     handleMeasurementSocket(options) {
-        const { scanId, onError, onSuccess, onClose, onOpen } = options;
+        const { scanId, onError, onSuccess, onClose, onOpen, isFallback = true } = options;
         if (!checkParameters(scanId)) {
             throw new Error(REQUIRED_MESSAGE);
         }
@@ -60,7 +60,9 @@ class Measurement {
             __classPrivateFieldSet(this, _Measurement_measurementSocketRef, new WebSocket(url), "f");
             __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onopen = () => {
                 onOpen === null || onOpen === void 0 ? void 0 : onOpen();
-                __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleTimeOut).call(this, { scanId, onSuccess, onError });
+                if (isFallback) {
+                    __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleTimeOut).call(this, { scanId, onSuccess, onError });
+                }
             };
             __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onmessage = (event) => {
                 const data = JSON.parse(event.data);

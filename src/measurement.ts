@@ -13,6 +13,7 @@ interface MeasurementSocketOptions {
   onSuccess?: (data: any) => void;
   onClose?: () => void;
   onOpen?: () => void;
+  isFallback?:boolean
 }
 
 interface GetMeasurementsCheckOptions {
@@ -129,7 +130,7 @@ class Measurement {
   }
 
   handleMeasurementSocket(options: MeasurementSocketOptions): void {
-    const { scanId, onError, onSuccess, onClose, onOpen } = options;
+    const { scanId, onError, onSuccess, onClose, onOpen,isFallback=true } = options;
 
     if (!checkParameters(scanId)) {
       throw new Error(REQUIRED_MESSAGE);
@@ -141,7 +142,9 @@ class Measurement {
       this.#measurementSocketRef = new WebSocket(url);
       this.#measurementSocketRef.onopen = () => {
         onOpen?.();
-        this.#handleTimeOut({ scanId, onSuccess, onError });
+        if (isFallback) {
+          this.#handleTimeOut({ scanId, onSuccess, onError });
+        }
       };
 
       this.#measurementSocketRef.onmessage = (event: MessageEvent) => {

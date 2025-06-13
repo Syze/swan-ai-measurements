@@ -87,7 +87,7 @@ class Measurement {
         }, 2 * 60000);
     }
     handleMeasurementSocket(options) {
-        const { scanId, onError, onSuccess, onClose, onOpen } = options;
+        const { scanId, onError, onSuccess, onClose, onOpen, isFallback = true } = options;
         if (!(0, utils_js_1.checkParameters)(scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
@@ -97,7 +97,9 @@ class Measurement {
             this.#measurementSocketRef = new WebSocket(url);
             this.#measurementSocketRef.onopen = () => {
                 onOpen?.();
-                this.#handleTimeOut({ scanId, onSuccess, onError });
+                if (isFallback) {
+                    this.#handleTimeOut({ scanId, onSuccess, onError });
+                }
             };
             this.#measurementSocketRef.onmessage = (event) => {
                 const data = JSON.parse(event.data);
