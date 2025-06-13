@@ -24,6 +24,7 @@ interface HandleSocket extends Callbacks {
 	scanId?: string;
 	faceScanId?: string;
 	paramsKey?: string;
+	delay:number
 }
 interface GetMeasurementsCheckOptions {
 	scanId: string;
@@ -140,7 +141,7 @@ class Measurement {
 		if (!checkParameters(scanId)) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		this.#handleSocket({ onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true });
+		this.#handleSocket({ onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true,delay:5000 });
 	}
 	handlFaceScaneSocket(options: FaceScanSocketOptions): void {
 		const { faceScanId, onError, onSuccess, onClose, onOpen } = options;
@@ -148,9 +149,9 @@ class Measurement {
 		if (!checkParameters(faceScanId)) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false });
+		this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false,delay:0 });
 	}
-	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId }: HandleSocket) {
+	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId,delay }: HandleSocket) {
 		setTimeout(() => {
 			this.#disconnectSocket();
 			const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
@@ -184,7 +185,7 @@ class Measurement {
 			this.#measurementSocketRef.onerror = (event: Event) => {
 				// onError?.(event);
 			};
-		}, 5000);
+		}, delay);
 	}
 }
 

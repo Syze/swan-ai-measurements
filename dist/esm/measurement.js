@@ -56,14 +56,14 @@ class Measurement {
         if (!checkParameters(scanId)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true });
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true, delay: 5000 });
     }
     handlFaceScaneSocket(options) {
         const { faceScanId, onError, onSuccess, onClose, onOpen } = options;
         if (!checkParameters(faceScanId)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false });
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 0 });
     }
 }
 _Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef = new WeakMap(), _Measurement_timerWaitingRef = new WeakMap(), _Measurement_count = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options) {
@@ -121,7 +121,7 @@ _Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef 
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError });
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this);
     }, 2 * 60000), "f");
-}, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId }) {
+}, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }) {
     setTimeout(() => {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this);
         const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
@@ -153,6 +153,6 @@ _Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef 
         __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onerror = (event) => {
             // onError?.(event);
         };
-    }, 5000);
+    }, delay);
 };
 export default Measurement;

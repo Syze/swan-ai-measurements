@@ -93,16 +93,16 @@ class Measurement {
         if (!(0, utils_js_1.checkParameters)(scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        this.#handleSocket({ onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true });
+        this.#handleSocket({ onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true, delay: 5000 });
     }
     handlFaceScaneSocket(options) {
         const { faceScanId, onError, onSuccess, onClose, onOpen } = options;
         if (!(0, utils_js_1.checkParameters)(faceScanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false });
+        this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 0 });
     }
-    #handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId }) {
+    #handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }) {
         setTimeout(() => {
             this.#disconnectSocket();
             const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
@@ -134,7 +134,7 @@ class Measurement {
             this.#measurementSocketRef.onerror = (event) => {
                 // onError?.(event);
             };
-        }, 5000);
+        }, delay);
     }
 }
 exports.default = Measurement;
