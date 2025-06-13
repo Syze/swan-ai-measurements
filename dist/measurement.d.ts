@@ -4,13 +4,17 @@ interface MeasurementRecommendation {
     scanId: string;
     productName: string;
 }
-interface MeasurementSocketOptions {
-    scanId: string;
+interface Callbacks {
     onError?: (error: any) => void;
     onSuccess?: (data: any) => void;
     onClose?: () => void;
     onOpen?: () => void;
-    isFallback?: boolean;
+}
+interface MeasurementSocketOptions extends Callbacks {
+    scanId: string;
+}
+interface FaceScanSocketOptions extends Callbacks {
+    faceScanId: string;
 }
 declare class Measurement {
     #private;
@@ -18,5 +22,6 @@ declare class Measurement {
     getMeasurementResult(scanId: string): Promise<AxiosResponse<any>>;
     getMeasurementRecommendation({ scanId, shopDomain, productName }: MeasurementRecommendation): Promise<AxiosResponse<any>>;
     handleMeasurementSocket(options: MeasurementSocketOptions): void;
+    handlFaceScaneSocket(options: FaceScanSocketOptions): void;
 }
 export default Measurement;

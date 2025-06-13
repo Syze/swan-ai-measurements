@@ -30,7 +30,9 @@ class Measurement {
         if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, { headers: { "X-Api-Key": this.#accessKey } });
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
+            headers: { "X-Api-Key": this.#accessKey },
+        });
     }
     async #getMeasurementsCheck(options) {
         const { scanId, onSuccess, onError } = options;
@@ -87,17 +89,27 @@ class Measurement {
         }, 2 * 60000);
     }
     handleMeasurementSocket(options) {
-        const { scanId, onError, onSuccess, onClose, onOpen, isFallback = true } = options;
+        const { scanId, onError, onSuccess, onClose, onOpen } = options;
         if (!(0, utils_js_1.checkParameters)(scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
+        this.#handleSocket({ onOpen, scanId, onSuccess, onError, onClose, paramsKey: "scanId", isFallback: true });
+    }
+    handlFaceScaneSocket(options) {
+        const { faceScanId, onError, onSuccess, onClose, onOpen } = options;
+        if (!(0, utils_js_1.checkParameters)(faceScanId)) {
+            throw new Error(constants_js_1.REQUIRED_MESSAGE);
+        }
+        this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false });
+    }
+    #handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId }) {
         setTimeout(() => {
             this.#disconnectSocket();
-            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.SCANNING}?scanId=${scanId}`;
+            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
             this.#measurementSocketRef = new WebSocket(url);
             this.#measurementSocketRef.onopen = () => {
                 onOpen?.();
-                if (isFallback) {
+                if (isFallback && scanId) {
                     this.#handleTimeOut({ scanId, onSuccess, onError });
                 }
             };
