@@ -149,7 +149,7 @@ class Measurement {
 		if (!checkParameters(faceScanId)) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false,delay:0 });
+		this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false,delay:1000 });
 	}
 	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId,delay }: HandleSocket) {
 		setTimeout(() => {

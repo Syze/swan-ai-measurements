@@ -63,7 +63,7 @@ class Measurement {
         if (!checkParameters(faceScanId)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 0 });
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 1000 });
     }
 }
 _Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef = new WeakMap(), _Measurement_timerWaitingRef = new WeakMap(), _Measurement_count = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options) {
