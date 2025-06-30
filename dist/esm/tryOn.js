@@ -171,18 +171,18 @@ class TryOn {
             data: payload,
         });
     }
-    handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if (checkParameters(shopDomain, userEmail, products) === false) {
+    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token }) {
+        if (checkParameters(shopDomain, products, token) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        if (!isValidEmail(userEmail.trim())) {
-            throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-        }
-        const payload = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ products,
-            userEmail, customerStoreUrl: shopDomain }, (selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages })), (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
+        const payload = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ products, customerStoreUrl: shopDomain }, (selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages })), (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}`;
+        const headers = { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
         return axios.post(url, payload, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+            headers,
         });
     }
     getShareLink(tryonId) {

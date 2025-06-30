@@ -154,16 +154,12 @@ class TryOn {
             console.log("no connection made for websocket");
         }
     };
-    handleTryOnSubmit({ userEmail, shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl }) {
-        if ((0, utils_js_1.checkParameters)(shopDomain, userEmail, products) === false) {
+    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token }) {
+        if ((0, utils_js_1.checkParameters)(shopDomain, products, token) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
-        }
-        if (!(0, utils_js_1.isValidEmail)(userEmail.trim())) {
-            throw new Error(constants_js_1.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
         }
         const payload = {
             products,
-            userEmail,
             customerStoreUrl: shopDomain,
             ...(selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages }),
             ...(requestSource !== undefined && requestSource !== null && { requestSource }),
@@ -172,8 +168,12 @@ class TryOn {
             ...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl })
         };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
+        const headers = { "X-Api-Key": this.#accessKey };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
         return axios_1.default.post(url, payload, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers,
         });
     }
     #handleGetTryOnResult = async ({ onSuccess, onError, tryonId }) => {

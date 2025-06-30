@@ -34,13 +34,13 @@ interface Products
 
 interface HandleForLatestImageParams {
 	shopDomain: string;
-	userEmail: string;
 	products:Products[];
 	selectedUserImages?:string[];
 	requestSource?: string;
 	callbackUrl?: string;
   openTryonId?:string;
-  selectedProductImageUrl?:string
+  selectedProductImageUrl?:string;
+  token: string;
 }
 
 interface HandleTimeOutParams {
@@ -212,24 +212,21 @@ class TryOn {
   };
 
   handleTryOnSubmit({
-		userEmail,
 		shopDomain,
 		products,
 		selectedUserImages,
 		requestSource,
 		callbackUrl,
     openTryonId,
-    selectedProductImageUrl
+    selectedProductImageUrl,
+    token
 	}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-		if (checkParameters(shopDomain, userEmail, products) === false) {
+		if (checkParameters(shopDomain, products,token) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		if (!isValidEmail(userEmail.trim())) {
-			throw new Error(REQUIRED_ERROR_MESSAGE_INVALID_EMAIL);
-		}
+	
 		const payload = {
 			products,
-			userEmail,
 			customerStoreUrl:shopDomain,
       ...(selectedUserImages!==undefined && selectedUserImages!==null &&{selectedUserImages}),
       ...(requestSource!==undefined && requestSource!==null &&{requestSource}),
@@ -238,8 +235,12 @@ class TryOn {
       ...(selectedProductImageUrl!==undefined && selectedProductImageUrl!==null &&{selectedProductImageUrl})
 		};
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}`;
+    const headers: Record<string, string> = { "X-Api-Key": this.#accessKey };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 		return axios.post(url, payload, {
-      headers: { "X-Api-Key": this.#accessKey },
+      headers,
 		});
 	}
 
