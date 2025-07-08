@@ -163,7 +163,7 @@ class TryOn {
     this.#timerWaitingRef = setTimeout(() => {
       this.#handleGetTryOnResult({  onSuccess, onError,tryonId });
       this.#disconnectSocket();
-    }, 150000);
+    }, 300000);
   };
 
   handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }: HandleTryOnWebSocketParams): void => {

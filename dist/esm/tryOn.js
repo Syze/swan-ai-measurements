@@ -40,7 +40,7 @@ class TryOn {
             __classPrivateFieldSet(this, _TryOn_timerWaitingRef, setTimeout(() => {
                 __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { onSuccess, onError, tryonId });
                 __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-            }, 150000), "f");
+            }, 300000), "f");
         });
         this.handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
             if (checkParameters(tryonId) === false) {
