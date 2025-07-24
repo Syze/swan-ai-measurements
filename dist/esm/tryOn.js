@@ -18,74 +18,84 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _TryOn_instances, _TryOn_tryOnSocketRef, _TryOn_timerWaitingRef, _TryOn_accessKey, _TryOn_stagingUrl, _TryOn_getSignedUrl, _TryOn_s3Upload, _TryOn_disconnectSocket, _TryOn_handleTimeOut, _TryOn_handleGetTryOnResult;
+var _TryOn_instances, _TryOn_socketMap, _TryOn_timerMap, _TryOn_accessKey, _TryOn_stagingUrl, _TryOn_getSignedUrl, _TryOn_s3Upload, _TryOn_disconnectSocket, _TryOn_handleTimeOut, _TryOn_handleGetTryOnResult;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
 class TryOn {
     constructor(accessKey, stagingUrl = false) {
         _TryOn_instances.add(this);
-        _TryOn_tryOnSocketRef.set(this, null);
-        _TryOn_timerWaitingRef.set(this, null);
+        _TryOn_socketMap.set(this, new Map());
+        _TryOn_timerMap.set(this, new Map());
         _TryOn_accessKey.set(this, void 0);
         _TryOn_stagingUrl.set(this, void 0);
-        _TryOn_disconnectSocket.set(this, () => {
-            var _a;
-            (_a = __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f")) === null || _a === void 0 ? void 0 : _a.close();
-            if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
-                clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
+        _TryOn_disconnectSocket.set(this, (tryonId) => {
+            if (tryonId) {
+                const socket = __classPrivateFieldGet(this, _TryOn_socketMap, "f").get(tryonId);
+                const timer = __classPrivateFieldGet(this, _TryOn_timerMap, "f").get(tryonId);
+                socket === null || socket === void 0 ? void 0 : socket.close();
+                if (timer)
+                    clearTimeout(timer);
+                __classPrivateFieldGet(this, _TryOn_socketMap, "f").delete(tryonId);
+                __classPrivateFieldGet(this, _TryOn_timerMap, "f").delete(tryonId);
+            }
+            else {
+                // Disconnect all
+                __classPrivateFieldGet(this, _TryOn_socketMap, "f").forEach((socket) => socket.close());
+                __classPrivateFieldGet(this, _TryOn_timerMap, "f").forEach((timer) => clearTimeout(timer));
+                __classPrivateFieldGet(this, _TryOn_socketMap, "f").clear();
+                __classPrivateFieldGet(this, _TryOn_timerMap, "f").clear();
             }
         });
         _TryOn_handleTimeOut.set(this, ({ onSuccess, onError, tryonId }) => {
-            __classPrivateFieldSet(this, _TryOn_timerWaitingRef, setTimeout(() => {
+            const timer = setTimeout(() => {
                 __classPrivateFieldGet(this, _TryOn_handleGetTryOnResult, "f").call(this, { onSuccess, onError, tryonId });
-                __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
-            }, 300000), "f");
+                __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this, tryonId);
+            }, 300000);
+            __classPrivateFieldGet(this, _TryOn_timerMap, "f").set(tryonId, timer);
         });
         this.handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
             if (checkParameters(tryonId) === false) {
                 throw new Error(REQUIRED_MESSAGE);
             }
-            __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this);
+            __classPrivateFieldGet(this, _TryOn_disconnectSocket, "f").call(this, tryonId);
             const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _TryOn_stagingUrl, "f") })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-            __classPrivateFieldSet(this, _TryOn_tryOnSocketRef, new WebSocket(url), "f");
-            if (__classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f")) {
-                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onopen = () => __awaiter(this, void 0, void 0, function* () {
-                    onOpen === null || onOpen === void 0 ? void 0 : onOpen();
-                    __classPrivateFieldGet(this, _TryOn_handleTimeOut, "f").call(this, { onSuccess, onError, tryonId });
-                });
-                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onmessage = (event) => {
-                    let data;
-                    try {
-                        data = JSON.parse(event.data);
-                    }
-                    catch (error) {
-                        console.log(data, error, "not correct format for data");
-                        return;
-                    }
-                    if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
-                        onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
-                    }
-                    else {
-                        onError === null || onError === void 0 ? void 0 : onError(data);
-                    }
-                    if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
-                        clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
-                    }
-                };
-                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onclose = () => {
-                    onClose === null || onClose === void 0 ? void 0 : onClose();
-                };
-                __classPrivateFieldGet(this, _TryOn_tryOnSocketRef, "f").onerror = (event) => {
-                    onError === null || onError === void 0 ? void 0 : onError(event);
-                    if (__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f")) {
-                        clearTimeout(__classPrivateFieldGet(this, _TryOn_timerWaitingRef, "f"));
-                    }
-                };
-            }
-            else {
-                console.log("no connection made for websocket");
-            }
+            const socket = new WebSocket(url);
+            __classPrivateFieldGet(this, _TryOn_socketMap, "f").set(tryonId, socket);
+            socket.onopen = () => {
+                onOpen === null || onOpen === void 0 ? void 0 : onOpen();
+                __classPrivateFieldGet(this, _TryOn_handleTimeOut, "f").call(this, { onSuccess, onError, tryonId });
+            };
+            socket.onmessage = (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                }
+                catch (error) {
+                    console.log("Invalid JSON:", event.data);
+                    return;
+                }
+                if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
+                    onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
+                }
+                else {
+                    onError === null || onError === void 0 ? void 0 : onError(data);
+                }
+                const timer = __classPrivateFieldGet(this, _TryOn_timerMap, "f").get(tryonId);
+                if (timer)
+                    clearTimeout(timer);
+                __classPrivateFieldGet(this, _TryOn_timerMap, "f").delete(tryonId);
+            };
+            socket.onclose = () => {
+                onClose === null || onClose === void 0 ? void 0 : onClose();
+                // this.#disconnectSocket(tryonId);
+            };
+            socket.onerror = (event) => {
+                onError === null || onError === void 0 ? void 0 : onError(event);
+                // const timer = this.#timerMap.get(tryonId);
+                // if (timer) clearTimeout(timer);
+                // this.#timerMap.delete(tryonId);
+            };
         };
         _TryOn_handleGetTryOnResult.set(this, (_a) => __awaiter(this, [_a], void 0, function* ({ onSuccess, onError, tryonId }) {
             try {
@@ -201,7 +211,7 @@ class TryOn {
         });
     }
 }
-_TryOn_tryOnSocketRef = new WeakMap(), _TryOn_timerWaitingRef = new WeakMap(), _TryOn_accessKey = new WeakMap(), _TryOn_stagingUrl = new WeakMap(), _TryOn_disconnectSocket = new WeakMap(), _TryOn_handleTimeOut = new WeakMap(), _TryOn_handleGetTryOnResult = new WeakMap(), _TryOn_instances = new WeakSet(), _TryOn_getSignedUrl = function _TryOn_getSignedUrl(payload) {
+_TryOn_socketMap = new WeakMap(), _TryOn_timerMap = new WeakMap(), _TryOn_accessKey = new WeakMap(), _TryOn_stagingUrl = new WeakMap(), _TryOn_disconnectSocket = new WeakMap(), _TryOn_handleTimeOut = new WeakMap(), _TryOn_handleGetTryOnResult = new WeakMap(), _TryOn_instances = new WeakSet(), _TryOn_getSignedUrl = function _TryOn_getSignedUrl(payload) {
     if (checkParameters(payload) === false) {
         throw new Error(REQUIRED_MESSAGE);
     }

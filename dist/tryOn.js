@@ -7,8 +7,8 @@ const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
 class TryOn {
-    #tryOnSocketRef = null;
-    #timerWaitingRef = null;
+    #socketMap = new Map();
+    #timerMap = new Map();
     #accessKey;
     #stagingUrl;
     constructor(accessKey, stagingUrl = false) {
@@ -97,62 +97,73 @@ class TryOn {
             data: payload,
         });
     }
-    #disconnectSocket = () => {
-        this.#tryOnSocketRef?.close();
-        if (this.#timerWaitingRef) {
-            clearTimeout(this.#timerWaitingRef);
+    #disconnectSocket = (tryonId) => {
+        if (tryonId) {
+            const socket = this.#socketMap.get(tryonId);
+            const timer = this.#timerMap.get(tryonId);
+            socket?.close();
+            if (timer)
+                clearTimeout(timer);
+            this.#socketMap.delete(tryonId);
+            this.#timerMap.delete(tryonId);
+        }
+        else {
+            // Disconnect all
+            this.#socketMap.forEach((socket) => socket.close());
+            this.#timerMap.forEach((timer) => clearTimeout(timer));
+            this.#socketMap.clear();
+            this.#timerMap.clear();
         }
     };
     #handleTimeOut = ({ onSuccess, onError, tryonId }) => {
-        this.#timerWaitingRef = setTimeout(() => {
+        const timer = setTimeout(() => {
             this.#handleGetTryOnResult({ onSuccess, onError, tryonId });
-            this.#disconnectSocket();
+            this.#disconnectSocket(tryonId);
         }, 300000);
+        this.#timerMap.set(tryonId, timer);
     };
     handleTryOnWebSocket = ({ tryonId, onError, onSuccess, onClose, onOpen }) => {
         if ((0, utils_js_1.checkParameters)(tryonId) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        this.#disconnectSocket();
+        this.#disconnectSocket(tryonId);
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
-        this.#tryOnSocketRef = new WebSocket(url);
-        if (this.#tryOnSocketRef) {
-            this.#tryOnSocketRef.onopen = async () => {
-                onOpen?.();
-                this.#handleTimeOut({ onSuccess, onError, tryonId });
-            };
-            this.#tryOnSocketRef.onmessage = (event) => {
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                }
-                catch (error) {
-                    console.log(data, error, "not correct format for data");
-                    return;
-                }
-                if (data?.status === "success") {
-                    onSuccess?.(data);
-                }
-                else {
-                    onError?.(data);
-                }
-                if (this.#timerWaitingRef) {
-                    clearTimeout(this.#timerWaitingRef);
-                }
-            };
-            this.#tryOnSocketRef.onclose = () => {
-                onClose?.();
-            };
-            this.#tryOnSocketRef.onerror = (event) => {
-                onError?.(event);
-                if (this.#timerWaitingRef) {
-                    clearTimeout(this.#timerWaitingRef);
-                }
-            };
-        }
-        else {
-            console.log("no connection made for websocket");
-        }
+        const socket = new WebSocket(url);
+        this.#socketMap.set(tryonId, socket);
+        socket.onopen = () => {
+            onOpen?.();
+            this.#handleTimeOut({ onSuccess, onError, tryonId });
+        };
+        socket.onmessage = (event) => {
+            let data;
+            try {
+                data = JSON.parse(event.data);
+            }
+            catch (error) {
+                console.log("Invalid JSON:", event.data);
+                return;
+            }
+            if (data?.status === "success") {
+                onSuccess?.(data);
+            }
+            else {
+                onError?.(data);
+            }
+            const timer = this.#timerMap.get(tryonId);
+            if (timer)
+                clearTimeout(timer);
+            this.#timerMap.delete(tryonId);
+        };
+        socket.onclose = () => {
+            onClose?.();
+            // this.#disconnectSocket(tryonId);
+        };
+        socket.onerror = (event) => {
+            onError?.(event);
+            // const timer = this.#timerMap.get(tryonId);
+            // if (timer) clearTimeout(timer);
+            // this.#timerMap.delete(tryonId);
+        };
     };
     handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token }) {
         if ((0, utils_js_1.checkParameters)(shopDomain, products, token) === false) {
@@ -165,7 +176,7 @@ class TryOn {
             ...(requestSource !== undefined && requestSource !== null && { requestSource }),
             ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),
             ...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),
-            ...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl })
+            ...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }),
         };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
         const headers = { "X-Api-Key": this.#accessKey };
