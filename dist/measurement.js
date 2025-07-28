@@ -7,10 +7,10 @@ const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
 class Measurement {
-    #measurementSocketRef = null;
-    #timerPollingRef = null;
-    #timerWaitingRef = null;
-    #count = 1;
+    #socketRefs = {};
+    #waitingTimers = {};
+    #pollingTimers = {};
+    #pollingCounts = {};
     #accessKey;
     #stagingUrl;
     constructor(accessKey, stagingUrl = false) {
@@ -34,59 +34,55 @@ class Measurement {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
-    async #getMeasurementsCheck(options) {
+    #disconnectSocket(key) {
+        this.#socketRefs[key]?.close();
+        this.#socketRefs[key] = null;
+        if (this.#waitingTimers[key]) {
+            clearTimeout(this.#waitingTimers[key]);
+            this.#waitingTimers[key] = null;
+        }
+    }
+    #handleTimeOut(options, key) {
+        const { scanId, onSuccess, onError } = options;
+        this.#pollingCounts[key] = 1;
+        this.#waitingTimers[key] = setTimeout(() => {
+            this.#handlePolling({ scanId, onSuccess, onError }, key);
+            this.#disconnectSocket(key);
+        }, 2 * 60000);
+    }
+    #handlePolling(options, key) {
+        const { scanId, onSuccess, onError } = options;
+        if (this.#pollingTimers[key]) {
+            clearTimeout(this.#pollingTimers[key]);
+        }
+        this.#pollingTimers[key] = setTimeout(() => {
+            this.#getMeasurementsCheck({ scanId, onSuccess, onError }, key);
+        }, (this.#pollingCounts[key] || 1) * 5000);
+    }
+    async #getMeasurementsCheck(options, key) {
         const { scanId, onSuccess, onError } = options;
         try {
             const res = await this.getMeasurementResult(scanId);
             if (res?.data && res?.data?.isMeasured === true) {
                 onSuccess?.(res.data);
-                if (this.#timerPollingRef) {
-                    clearInterval(this.#timerPollingRef);
-                }
+                clearInterval(this.#pollingTimers[key]);
             }
             else {
-                if (this.#count < 8) {
-                    this.#count++;
-                    this.#handlePolling({ scanId, onSuccess, onError });
+                if ((this.#pollingCounts[key] || 1) < 8) {
+                    this.#pollingCounts[key] = (this.#pollingCounts[key] || 1) + 1;
+                    this.#handlePolling({ scanId, onSuccess, onError }, key);
                 }
                 else {
-                    this.#count = 1;
-                    if (this.#timerPollingRef) {
-                        clearInterval(this.#timerPollingRef);
-                    }
+                    this.#pollingCounts[key] = 1;
+                    clearInterval(this.#pollingTimers[key]);
                     onError?.({ scanStatus: "failed", message: "Scan not found", isMeasured: false });
                 }
             }
         }
         catch (e) {
-            if (this.#timerPollingRef) {
-                clearInterval(this.#timerPollingRef);
-            }
+            clearInterval(this.#pollingTimers[key]);
             onError?.(e);
         }
-    }
-    #handlePolling(options) {
-        const { scanId, onSuccess, onError } = options;
-        if (this.#timerPollingRef) {
-            clearInterval(this.#timerPollingRef);
-        }
-        this.#timerPollingRef = setTimeout(() => {
-            this.#getMeasurementsCheck({ scanId, onSuccess, onError });
-        }, this.#count * 5000);
-    }
-    #disconnectSocket() {
-        this.#measurementSocketRef?.close();
-        if (this.#timerWaitingRef) {
-            clearTimeout(this.#timerWaitingRef);
-        }
-    }
-    #handleTimeOut(options) {
-        const { scanId, onSuccess, onError } = options;
-        this.#count = 1;
-        this.#timerWaitingRef = setTimeout(() => {
-            this.#handlePolling({ scanId, onSuccess, onError });
-            this.#disconnectSocket();
-        }, 2 * 60000);
     }
     handleMeasurementSocket(options) {
         const { scanId, onError, onSuccess, onClose, onOpen } = options;
@@ -103,37 +99,33 @@ class Measurement {
         this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 1000 });
     }
     #handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }) {
+        const key = isFallback ? "measurement" : "faceScan";
         setTimeout(() => {
-            this.#disconnectSocket();
+            this.#disconnectSocket(key);
             const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
-            this.#measurementSocketRef = new WebSocket(url);
-            this.#measurementSocketRef.onopen = () => {
+            const socket = new WebSocket(url);
+            this.#socketRefs[key] = socket;
+            socket.onopen = () => {
                 onOpen?.();
                 if (isFallback && scanId) {
-                    this.#handleTimeOut({ scanId, onSuccess, onError });
+                    this.#handleTimeOut({ scanId, onSuccess, onError }, key);
                 }
             };
-            this.#measurementSocketRef.onmessage = (event) => {
+            socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data?.code === 200 && data?.scanStatus === "success") {
                     onSuccess?.(data);
                 }
                 else {
-                    if (this.#timerWaitingRef) {
-                        clearTimeout(this.#timerWaitingRef);
-                    }
+                    clearTimeout(this.#waitingTimers[key]);
                     onError?.(data);
                 }
-                if (this.#timerWaitingRef && data?.code === 200 && data?.scanStatus === "success" && data?.resultType === "final") {
-                    clearTimeout(this.#timerWaitingRef);
+                if (data?.code === 200 && data?.scanStatus === "success" && data?.resultType === "final") {
+                    clearTimeout(this.#waitingTimers[key]);
                 }
             };
-            this.#measurementSocketRef.onclose = () => {
-                onClose?.();
-            };
-            this.#measurementSocketRef.onerror = (event) => {
-                // onError?.(event);
-            };
+            socket.onclose = () => onClose?.();
+            socket.onerror = () => { };
         }, delay);
     }
 }

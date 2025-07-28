@@ -18,17 +18,17 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Measurement_instances, _Measurement_measurementSocketRef, _Measurement_timerPollingRef, _Measurement_timerWaitingRef, _Measurement_count, _Measurement_accessKey, _Measurement_stagingUrl, _Measurement_getMeasurementsCheck, _Measurement_handlePolling, _Measurement_disconnectSocket, _Measurement_handleTimeOut, _Measurement_handleSocket;
+var _Measurement_instances, _Measurement_socketRefs, _Measurement_waitingTimers, _Measurement_pollingTimers, _Measurement_pollingCounts, _Measurement_accessKey, _Measurement_stagingUrl, _Measurement_disconnectSocket, _Measurement_handleTimeOut, _Measurement_handlePolling, _Measurement_getMeasurementsCheck, _Measurement_handleSocket;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
 class Measurement {
     constructor(accessKey, stagingUrl = false) {
         _Measurement_instances.add(this);
-        _Measurement_measurementSocketRef.set(this, null);
-        _Measurement_timerPollingRef.set(this, null);
-        _Measurement_timerWaitingRef.set(this, null);
-        _Measurement_count.set(this, 1);
+        _Measurement_socketRefs.set(this, {});
+        _Measurement_waitingTimers.set(this, {});
+        _Measurement_pollingTimers.set(this, {});
+        _Measurement_pollingCounts.set(this, {});
         _Measurement_accessKey.set(this, void 0);
         _Measurement_stagingUrl.set(this, void 0);
         __classPrivateFieldSet(this, _Measurement_accessKey, accessKey, "f");
@@ -66,93 +66,84 @@ class Measurement {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 1000 });
     }
 }
-_Measurement_measurementSocketRef = new WeakMap(), _Measurement_timerPollingRef = new WeakMap(), _Measurement_timerWaitingRef = new WeakMap(), _Measurement_count = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options) {
+_Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMap(), _Measurement_pollingTimers = new WeakMap(), _Measurement_pollingCounts = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_disconnectSocket = function _Measurement_disconnectSocket(key) {
+    var _a;
+    (_a = __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key]) === null || _a === void 0 ? void 0 : _a.close();
+    __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key] = null;
+    if (__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]) {
+        clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
+        __classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key] = null;
+    }
+}, _Measurement_handleTimeOut = function _Measurement_handleTimeOut(options, key) {
+    const { scanId, onSuccess, onError } = options;
+    __classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] = 1;
+    __classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key] = setTimeout(() => {
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError }, key);
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
+    }, 2 * 60000);
+}, _Measurement_handlePolling = function _Measurement_handlePolling(options, key) {
+    const { scanId, onSuccess, onError } = options;
+    if (__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]) {
+        clearTimeout(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
+    }
+    __classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key] = setTimeout(() => {
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_getMeasurementsCheck).call(this, { scanId, onSuccess, onError }, key);
+    }, (__classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] || 1) * 5000);
+}, _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options, key) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        var _b;
         const { scanId, onSuccess, onError } = options;
         try {
             const res = yield this.getMeasurementResult(scanId);
             if ((res === null || res === void 0 ? void 0 : res.data) && ((_a = res === null || res === void 0 ? void 0 : res.data) === null || _a === void 0 ? void 0 : _a.isMeasured) === true) {
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(res.data);
-                if (__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f")) {
-                    clearInterval(__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f"));
-                }
+                clearInterval(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
             }
             else {
-                if (__classPrivateFieldGet(this, _Measurement_count, "f") < 8) {
-                    __classPrivateFieldSet(this, _Measurement_count, (_b = __classPrivateFieldGet(this, _Measurement_count, "f"), _b++, _b), "f");
-                    __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError });
+                if ((__classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] || 1) < 8) {
+                    __classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] = (__classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] || 1) + 1;
+                    __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError }, key);
                 }
                 else {
-                    __classPrivateFieldSet(this, _Measurement_count, 1, "f");
-                    if (__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f")) {
-                        clearInterval(__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f"));
-                    }
+                    __classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] = 1;
+                    clearInterval(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
                     onError === null || onError === void 0 ? void 0 : onError({ scanStatus: "failed", message: "Scan not found", isMeasured: false });
                 }
             }
         }
         catch (e) {
-            if (__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f")) {
-                clearInterval(__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f"));
-            }
+            clearInterval(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
             onError === null || onError === void 0 ? void 0 : onError(e);
         }
     });
-}, _Measurement_handlePolling = function _Measurement_handlePolling(options) {
-    const { scanId, onSuccess, onError } = options;
-    if (__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f")) {
-        clearInterval(__classPrivateFieldGet(this, _Measurement_timerPollingRef, "f"));
-    }
-    __classPrivateFieldSet(this, _Measurement_timerPollingRef, setTimeout(() => {
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_getMeasurementsCheck).call(this, { scanId, onSuccess, onError });
-    }, __classPrivateFieldGet(this, _Measurement_count, "f") * 5000), "f");
-}, _Measurement_disconnectSocket = function _Measurement_disconnectSocket() {
-    var _a;
-    (_a = __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f")) === null || _a === void 0 ? void 0 : _a.close();
-    if (__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f")) {
-        clearTimeout(__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f"));
-    }
-}, _Measurement_handleTimeOut = function _Measurement_handleTimeOut(options) {
-    const { scanId, onSuccess, onError } = options;
-    __classPrivateFieldSet(this, _Measurement_count, 1, "f");
-    __classPrivateFieldSet(this, _Measurement_timerWaitingRef, setTimeout(() => {
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError });
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this);
-    }, 2 * 60000), "f");
 }, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }) {
+    const key = isFallback ? "measurement" : "faceScan";
     setTimeout(() => {
-        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this);
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
         const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
-        __classPrivateFieldSet(this, _Measurement_measurementSocketRef, new WebSocket(url), "f");
-        __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onopen = () => {
+        const socket = new WebSocket(url);
+        __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key] = socket;
+        socket.onopen = () => {
             onOpen === null || onOpen === void 0 ? void 0 : onOpen();
             if (isFallback && scanId) {
-                __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleTimeOut).call(this, { scanId, onSuccess, onError });
+                __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleTimeOut).call(this, { scanId, onSuccess, onError }, key);
             }
         };
-        __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onmessage = (event) => {
+        socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success") {
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
             }
             else {
-                if (__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f")) {
-                    clearTimeout(__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f"));
-                }
+                clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
                 onError === null || onError === void 0 ? void 0 : onError(data);
             }
-            if (__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f") && (data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success" && (data === null || data === void 0 ? void 0 : data.resultType) === "final") {
-                clearTimeout(__classPrivateFieldGet(this, _Measurement_timerWaitingRef, "f"));
+            if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success" && (data === null || data === void 0 ? void 0 : data.resultType) === "final") {
+                clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
             }
         };
-        __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onclose = () => {
-            onClose === null || onClose === void 0 ? void 0 : onClose();
-        };
-        __classPrivateFieldGet(this, _Measurement_measurementSocketRef, "f").onerror = (event) => {
-            // onError?.(event);
-        };
+        socket.onclose = () => onClose === null || onClose === void 0 ? void 0 : onClose();
+        socket.onerror = () => { };
     }, delay);
 };
 export default Measurement;
