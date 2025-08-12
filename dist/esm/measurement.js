@@ -80,7 +80,7 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
     __classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key] = setTimeout(() => {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError }, key);
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
-    }, 2 * 60000);
+    }, 10000);
 }, _Measurement_handlePolling = function _Measurement_handlePolling(options, key) {
     const { scanId, onSuccess, onError } = options;
     if (__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]) {
@@ -117,7 +117,7 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
         }
     });
 }, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }) {
-    const key = isFallback ? "measurement" : "faceScan";
+    const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
     setTimeout(() => {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
         const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;

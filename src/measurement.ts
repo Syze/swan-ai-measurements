@@ -91,7 +91,7 @@ class Measurement {
 		this.#waitingTimers[key] = setTimeout(() => {
 			this.#handlePolling({ scanId, onSuccess, onError }, key);
 			this.#disconnectSocket(key);
-		}, 2 * 60000);
+		}, 10000);
 	}
 
 	#handlePolling(options: HandlePollingOptions, key: string): void {
@@ -144,7 +144,7 @@ class Measurement {
 	}
 
 	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }: HandleSocket) {
-		const key = isFallback ? "measurement" : "faceScan";
+		const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
 		setTimeout(() => {
 			this.#disconnectSocket(key);
 			const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
