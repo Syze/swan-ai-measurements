@@ -80,7 +80,7 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
     __classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key] = setTimeout(() => {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handlePolling).call(this, { scanId, onSuccess, onError }, key);
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
-    }, 10000);
+    }, 1.5 * 60000);
 }, _Measurement_handlePolling = function _Measurement_handlePolling(options, key) {
     const { scanId, onSuccess, onError } = options;
     if (__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]) {

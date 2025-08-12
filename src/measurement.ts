@@ -91,7 +91,7 @@ class Measurement {
 		this.#waitingTimers[key] = setTimeout(() => {
 			this.#handlePolling({ scanId, onSuccess, onError }, key);
 			this.#disconnectSocket(key);
-		}, 10000);
+		}, 1.5 * 60000);
 	}
 
 	#handlePolling(options: HandlePollingOptions, key: string): void {
