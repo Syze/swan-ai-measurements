@@ -125,7 +125,11 @@ class Measurement {
                 }
             };
             socket.onclose = () => onClose?.();
-            socket.onerror = () => { };
+            socket.onerror = () => {
+                if (!isFallback) {
+                    onError?.(new Error("An error occurred in the WebSocket connection."));
+                }
+            };
         }, delay);
     }
 }

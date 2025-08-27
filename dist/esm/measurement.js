@@ -143,7 +143,11 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
             }
         };
         socket.onclose = () => onClose === null || onClose === void 0 ? void 0 : onClose();
-        socket.onerror = () => { };
+        socket.onerror = () => {
+            if (!isFallback) {
+                onError === null || onError === void 0 ? void 0 : onError(new Error("An error occurred in the WebSocket connection."));
+            }
+        };
     }, delay);
 };
 export default Measurement;
