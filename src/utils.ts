@@ -113,7 +113,7 @@ export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024): Blob[] {
   return chunks;
 }
 
-export const getUrl = ({ urlName, urlType = URLType.STAGING }: { urlName: string; urlType: URLType }) => {
+export const getUrl = ({ urlName, urlType = URLType.PROD }: { urlName: string; urlType: URLType }) => {
   return URLS[urlType][urlName]
 
 };

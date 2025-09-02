@@ -96,7 +96,7 @@ function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {
     return chunks;
 }
 exports.getFileChunks = getFileChunks;
-const getUrl = ({ urlName, urlType = enum_js_1.URLType.STAGING }) => {
+const getUrl = ({ urlName, urlType = enum_js_1.URLType.PROD }) => {
     return constants_js_1.URLS[urlType][urlName];
 };
 exports.getUrl = getUrl;

@@ -95,7 +95,7 @@ export function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {
     }
     return chunks;
 }
-export const getUrl = ({ urlName, urlType = URLType.STAGING }) => {
+export const getUrl = ({ urlName, urlType = URLType.PROD }) => {
     return URLS[urlType][urlName];
 };
 export const isValidEmail = (email) => {
