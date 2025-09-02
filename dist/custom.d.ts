@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { URLType } from "./enum.js";
 interface CreateCustomer {
     name: string;
     storeUrl: string;
@@ -9,7 +10,7 @@ interface CreateCustomer {
 }
 declare class Custom {
     #private;
-    constructor(accessKey: string, stagingUrl?: boolean);
+    constructor(accessKey: string, urlType?: URLType);
     createCustomer(payload: CreateCustomer): Promise<AxiosResponse<any>>;
     getCustomCustomerConfig: (store_url: string) => Promise<AxiosResponse<any>>;
     getModelUrl: (id: string) => Promise<AxiosResponse<any>>;

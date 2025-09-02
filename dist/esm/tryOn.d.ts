@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { URLType } from "./enum.js";
 interface UploadFileParams {
     files: File[];
     userEmail: string;
@@ -42,7 +43,7 @@ interface GetTryOnResultParams {
 }
 declare class TryOn {
     #private;
-    constructor(accessKey: string, stagingUrl?: boolean);
+    constructor(accessKey: string, urlType?: URLType);
     uploadFile({ files, userEmail, fileNoLimit }: UploadFileParams): Promise<string>;
     getUploadedFiles(userEmail: string): Promise<AxiosResponse<any>>;
     deleteImage({ userEmail, fileName }: DeleteImageParams): Promise<AxiosResponse<any>>;

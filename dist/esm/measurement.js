@@ -18,27 +18,28 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Measurement_instances, _Measurement_socketRefs, _Measurement_waitingTimers, _Measurement_pollingTimers, _Measurement_pollingCounts, _Measurement_accessKey, _Measurement_stagingUrl, _Measurement_disconnectSocket, _Measurement_handleTimeOut, _Measurement_handlePolling, _Measurement_getMeasurementsCheck, _Measurement_handleSocket;
+var _Measurement_instances, _Measurement_socketRefs, _Measurement_waitingTimers, _Measurement_pollingTimers, _Measurement_pollingCounts, _Measurement_accessKey, _Measurement_urlType, _Measurement_disconnectSocket, _Measurement_handleTimeOut, _Measurement_handlePolling, _Measurement_getMeasurementsCheck, _Measurement_handleSocket;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
+import { URLType } from "./enum.js";
 class Measurement {
-    constructor(accessKey, stagingUrl = false) {
+    constructor(accessKey, urlType = URLType.PROD) {
         _Measurement_instances.add(this);
         _Measurement_socketRefs.set(this, {});
         _Measurement_waitingTimers.set(this, {});
         _Measurement_pollingTimers.set(this, {});
         _Measurement_pollingCounts.set(this, {});
         _Measurement_accessKey.set(this, void 0);
-        _Measurement_stagingUrl.set(this, void 0);
+        _Measurement_urlType.set(this, void 0);
         __classPrivateFieldSet(this, _Measurement_accessKey, accessKey, "f");
-        __classPrivateFieldSet(this, _Measurement_stagingUrl, stagingUrl, "f");
+        __classPrivateFieldSet(this, _Measurement_urlType, urlType, "f");
     }
     getMeasurementResult(scanId) {
         if (!checkParameters(scanId)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}/measurements?scanId=${scanId}`;
+        const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Measurement_urlType, "f") })}/measurements?scanId=${scanId}`;
         return axios.get(url, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") },
         });
@@ -47,7 +48,7 @@ class Measurement {
         if (!checkParameters(scanId, shopDomain, productName)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
+        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Measurement_urlType, "f") })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") },
         });
     }
@@ -66,7 +67,7 @@ class Measurement {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 1000 });
     }
 }
-_Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMap(), _Measurement_pollingTimers = new WeakMap(), _Measurement_pollingCounts = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_stagingUrl = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_disconnectSocket = function _Measurement_disconnectSocket(key) {
+_Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMap(), _Measurement_pollingTimers = new WeakMap(), _Measurement_pollingCounts = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_urlType = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_disconnectSocket = function _Measurement_disconnectSocket(key) {
     var _a;
     (_a = __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key]) === null || _a === void 0 ? void 0 : _a.close();
     __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key] = null;
@@ -120,7 +121,7 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
     const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
     setTimeout(() => {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
-        const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Measurement_stagingUrl, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
+        const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: __classPrivateFieldGet(this, _Measurement_urlType, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
         const socket = new WebSocket(url);
         __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key] = socket;
         socket.onopen = () => {

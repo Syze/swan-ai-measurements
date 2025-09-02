@@ -6,13 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+const enum_js_1 = require("./enum.js");
 class Auth {
     #socketRef;
     #accessKey;
-    #stagingUrl;
-    constructor(accessKey, stagingUrl = false) {
+    #urlType;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
         this.#accessKey = accessKey;
-        this.#stagingUrl = stagingUrl;
+        this.#urlType = urlType;
     }
     registerUser({ email, appVerifyUrl, gender, height, username }) {
         if (!(0, utils_js_1.checkParameters)(email, appVerifyUrl)) {
@@ -22,7 +23,7 @@ class Auth {
         if (gender && height) {
             body = { ...body, attributes: { gender, height } };
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.REGISTER_USER}`, body, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.REGISTER_USER}`, body, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -30,7 +31,7 @@ class Auth {
         if (!(0, utils_js_1.checkParameters)(token)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.VERIFY_USER}`, null, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.VERIFY_USER}`, null, {
             params: { token },
             headers: { "X-Api-Key": this.#accessKey },
         });
@@ -39,13 +40,13 @@ class Auth {
         if (!(0, utils_js_1.checkParameters)(scanId, email, height, gender)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": this.#accessKey } });
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": this.#accessKey } });
     }
     getUserDetail(email) {
         if (!(0, utils_js_1.checkParameters)(email)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -55,7 +56,7 @@ class Auth {
         }
         if (this.#socketRef)
             this.#socketRef.close();
-        this.#socketRef = new WebSocket(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.AUTH}`);
+        this.#socketRef = new WebSocket(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.AUTH}`);
         const detailObj = { email, scanId };
         if (this.#socketRef) {
             this.#socketRef.onopen = () => {

@@ -6,9 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidEmail = exports.getUrl = exports.getFileChunks = exports.addScanType = exports.checkValues = exports.checkMetaDataValue = exports.checkParameters = exports.fetchData = void 0;
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
+const enum_js_1 = require("./enum.js");
 async function fetchData(options) {
-    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, stagingUrl = false, } = options;
-    const apiUrl = `${(0, exports.getUrl)({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
+    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, urlType = enum_js_1.URLType.STAGING, } = options;
+    const apiUrl = `${(0, exports.getUrl)({ urlName: baseUrl, urlType })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
     try {
         const res = await axios_1.default.post(apiUrl, body, { headers });
         if (res.status >= 200 && res.status < 300) {
@@ -95,11 +96,8 @@ function getFileChunks(file, chunkSize = 5 * 1024 * 1024) {
     return chunks;
 }
 exports.getFileChunks = getFileChunks;
-const getUrl = ({ urlName, stagingUrl = false }) => {
-    if (stagingUrl) {
-        return constants_js_1.STAGING_URL[urlName];
-    }
-    return constants_js_1.PROD_URL[urlName];
+const getUrl = ({ urlName, urlType = enum_js_1.URLType.STAGING }) => {
+    return constants_js_1.URLS[urlType][urlName];
 };
 exports.getUrl = getUrl;
 const isValidEmail = (email) => {

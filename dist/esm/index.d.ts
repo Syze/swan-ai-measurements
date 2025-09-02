@@ -1,5 +1,6 @@
 import Auth from "./auth.js";
 import Custom from "./custom.js";
+import { URLType } from "./enum.js";
 import FileUpload from "./fileUpload.js";
 import Measurement from "./measurement.js";
 import PoseDetection from "./poseDetection.js";
@@ -12,6 +13,6 @@ declare class Swan {
     measurement: Measurement;
     poseDetection: PoseDetection;
     tryOn: TryOn;
-    constructor(accessKey: string, stagingUrl?: boolean);
+    constructor(accessKey: string, urlType?: URLType);
 }
 export default Swan;

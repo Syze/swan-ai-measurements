@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { URLType } from "./enum.js";
 interface RegisterUserParams {
     email: string;
     appVerifyUrl: string;
@@ -24,7 +25,7 @@ interface AuthSocketParams {
 }
 export default class Auth {
     #private;
-    constructor(accessKey: string, stagingUrl?: boolean);
+    constructor(accessKey: string, urlType?: URLType);
     registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse>;
     verifyToken(token: string): Promise<AxiosResponse>;
     addUser({ scanId, email, name, height, gender, offsetMarketingConsent }: AddUserParams): Promise<AxiosResponse>;

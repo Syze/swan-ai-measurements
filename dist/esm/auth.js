@@ -9,17 +9,18 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Auth_socketRef, _Auth_accessKey, _Auth_stagingUrl;
+var _Auth_socketRef, _Auth_accessKey, _Auth_urlType;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
+import { URLType } from "./enum.js";
 class Auth {
-    constructor(accessKey, stagingUrl = false) {
+    constructor(accessKey, urlType = URLType.PROD) {
         _Auth_socketRef.set(this, void 0);
         _Auth_accessKey.set(this, void 0);
-        _Auth_stagingUrl.set(this, void 0);
+        _Auth_urlType.set(this, void 0);
         __classPrivateFieldSet(this, _Auth_accessKey, accessKey, "f");
-        __classPrivateFieldSet(this, _Auth_stagingUrl, stagingUrl, "f");
+        __classPrivateFieldSet(this, _Auth_urlType, urlType, "f");
     }
     registerUser({ email, appVerifyUrl, gender, height, username }) {
         if (!checkParameters(email, appVerifyUrl)) {
@@ -29,7 +30,7 @@ class Auth {
         if (gender && height) {
             body = Object.assign(Object.assign({}, body), { attributes: { gender, height } });
         }
-        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.REGISTER_USER}`, body, {
+        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.REGISTER_USER}`, body, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") },
         });
     }
@@ -37,7 +38,7 @@ class Auth {
         if (!checkParameters(token)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.VERIFY_USER}`, null, {
+        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.VERIFY_USER}`, null, {
             params: { token },
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") },
         });
@@ -46,13 +47,13 @@ class Auth {
         if (!checkParameters(scanId, email, height, gender)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") } });
+        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") } });
     }
     getUserDetail(email) {
         if (!checkParameters(email)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
+        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
             headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") },
         });
     }
@@ -62,7 +63,7 @@ class Auth {
         }
         if (__classPrivateFieldGet(this, _Auth_socketRef, "f"))
             __classPrivateFieldGet(this, _Auth_socketRef, "f").close();
-        __classPrivateFieldSet(this, _Auth_socketRef, new WebSocket(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: __classPrivateFieldGet(this, _Auth_stagingUrl, "f") })}${API_ENDPOINTS.AUTH}`), "f");
+        __classPrivateFieldSet(this, _Auth_socketRef, new WebSocket(`${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.AUTH}`), "f");
         const detailObj = { email, scanId };
         if (__classPrivateFieldGet(this, _Auth_socketRef, "f")) {
             __classPrivateFieldGet(this, _Auth_socketRef, "f").onopen = () => {
@@ -91,5 +92,5 @@ class Auth {
         }
     }
 }
-_Auth_socketRef = new WeakMap(), _Auth_accessKey = new WeakMap(), _Auth_stagingUrl = new WeakMap();
+_Auth_socketRef = new WeakMap(), _Auth_accessKey = new WeakMap(), _Auth_urlType = new WeakMap();
 export default Auth;

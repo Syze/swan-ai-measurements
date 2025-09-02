@@ -8,13 +8,14 @@ const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
 const core_1 = __importDefault(require("@uppy/core"));
 const aws_s3_multipart_1 = __importDefault(require("@uppy/aws-s3-multipart"));
+const enum_js_1 = require("./enum.js");
 class FileUpload {
     #uppyIns;
     #accessKey;
-    #stagingUrl;
-    constructor(accessKey, stagingUrl = false) {
+    #urlType;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
         this.#accessKey = accessKey;
-        this.#stagingUrl = stagingUrl;
+        this.#urlType = urlType;
     }
     #uppyFileUploader({ callBack, arrayMetaData, scanId, email, file, objectKey }) {
         return new Promise((resolve, reject) => {
@@ -25,7 +26,7 @@ class FileUpload {
             this.#uppyIns.use(aws_s3_multipart_1.default, {
                 limit: 10,
                 retryDelays: [0, 1000, 3000, 5000],
-                companionUrl: (0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
+                companionUrl: (0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType }),
                 getChunkSize: () => constants_js_1.CHUNK_SIZE,
                 createMultipartUpload: (file) => {
                     const totalChunks = Math.ceil(file.size / constants_js_1.CHUNK_SIZE);
@@ -34,7 +35,7 @@ class FileUpload {
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                         apiKey: this.#accessKey,
-                        stagingUrl: this.#stagingUrl,
+                        urlType: this.#urlType,
                         body: {
                             objectKey: ObjectKey,
                             contentType: file.type,
@@ -47,7 +48,7 @@ class FileUpload {
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                         apiKey: this.#accessKey,
-                        stagingUrl: this.#stagingUrl,
+                        urlType: this.#urlType,
                         body: {
                             uploadId,
                             objectKey: key,
@@ -61,7 +62,7 @@ class FileUpload {
                 },
                 signPart: (file, partData) => (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-                    stagingUrl: this.#stagingUrl,
+                    urlType: this.#urlType,
                     apiKey: this.#accessKey,
                     body: {
                         objectKey: partData.key,
@@ -106,82 +107,6 @@ class FileUpload {
         }
         arrayMetaData = (0, utils_js_1.addScanType)(arrayMetaData, scanId, email);
         return this.#uppyFileUploader({ callBack, arrayMetaData, scanId, email, file });
-        // return new Promise((resolve, reject) => {
-        // 	if (this.#uppyIns) {
-        // 		this.#uppyIns.close();
-        // 	}
-        // 	this.#uppyIns = new Uppy({ autoProceed: true });
-        // 	this.#uppyIns.use(AwsS3Multipart, {
-        // 		limit: 10,
-        // 		retryDelays: [0, 1000, 3000, 5000],
-        // 		companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
-        // 		getChunkSize: () => CHUNK_SIZE,
-        // 		createMultipartUpload: (file: any) => {
-        // 			const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-        // 			callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`,scanId,email})
-        // 			const objectKey = `${scanId}.${file.extension}`;
-        // 			return fetchData({
-        // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-        // 				apiKey: this.#accessKey,
-        // 				stagingUrl: this.#stagingUrl,
-        // 				body: {
-        // 					objectKey,
-        // 					contentType: file.type,
-        // 					objectMetadata: arrayMetaData,
-        // 				},
-        // 			});
-        // 		},
-        // 		completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) => {
-        // 		   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`,scanId,email})	
-        // 			return fetchData({
-        // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-        // 				apiKey: this.#accessKey,
-        // 				stagingUrl: this.#stagingUrl,
-        // 				body: {
-        // 					uploadId,
-        // 					objectKey: key,
-        // 					parts,
-        // 					originalFileName: file.name,
-        // 				},
-        // 			}).then((response) => {
-        // 				callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`,scanId,email})
-        // 				return response;  
-        // 			});
-        // 		},
-        // 		signPart: (file: any, partData: any) =>
-        // 			fetchData({
-        // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-        // 				stagingUrl: this.#stagingUrl,
-        // 				apiKey: this.#accessKey,
-        // 				body: {
-        // 					objectKey: partData.key,
-        // 					uploadId: partData.uploadId,
-        // 					partNumber: partData.partNumber,
-        // 				},
-        // 			}),
-        // 	});
-        // 	this.#uppyIns.addFile({
-        // 		source: "manual",
-        // 		name: file.name,
-        // 		type: file.type,
-        // 		data: file,
-        // 	});
-        // 	this.#uppyIns.on("upload-error", (file: any, error: any, response: any) => {
-        // 		if (error.isNetworkError) {
-        // 			this.#uppyIns.retryUpload(file.id);
-        // 		  }else{
-        // 			  reject(error);
-        // 		  }
-        // 	});
-        // 	this.#uppyIns.on("upload-success", () => {
-        // 		resolve({ message: "file uploaded successfully" });
-        // 	});
-        // 	this.#uppyIns.on("complete", (result: any) => {
-        // 		if (this.#uppyIns) {
-        // 			this.#uppyIns.close();
-        // 		}
-        // 	});
-        // });
     }
     async faceScanFileUploader({ file, arrayMetaData, objectKey, email, callBack }) {
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, objectKey, email)) {
@@ -193,85 +118,8 @@ class FileUpload {
         if (!(0, utils_js_1.checkValues)(arrayMetaData, constants_js_1.requiredFaceScanMetaData)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE_FOR_META_DATA);
         }
-        // arrayMetaData = addScanType(arrayMetaData, objectKey, email);
         arrayMetaData.push({ email });
         return this.#uppyFileUploader({ callBack, arrayMetaData, objectKey, email, file });
-        // return new Promise((resolve, reject) => {
-        // 	if (this.#uppyIns) {
-        // 		this.#uppyIns.close();
-        // 	}
-        // 	this.#uppyIns = new Uppy({ autoProceed: true });
-        // 	this.#uppyIns.use(AwsS3Multipart, {
-        // 		limit: 10,
-        // 		retryDelays: [0, 1000, 3000, 5000],
-        // 		companionUrl: getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl }),
-        // 		getChunkSize: () => CHUNK_SIZE,
-        // 		createMultipartUpload: (file: any) => {
-        // 			const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-        // 			callBack?.({eventName:"uploading_start",message:`File ${file.name} will be divided into ${totalChunks} chunks`,scanId,email})
-        // 			const objectKey = `${scanId}.${file.extension}`;
-        // 			return fetchData({
-        // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
-        // 				apiKey: this.#accessKey,
-        // 				stagingUrl: this.#stagingUrl,
-        // 				body: {
-        // 					objectKey,
-        // 					contentType: file.type,
-        // 					objectMetadata: arrayMetaData,
-        // 				},
-        // 			});
-        // 		},
-        // 		completeMultipartUpload: (file: any, { uploadId, key, parts }: { uploadId: string | number; key: string | number; parts: any }) => {
-        // 		   callBack?.({eventName:"uploading_complete_start",message:`${parts.length} chunks of file, uploaded`,scanId,email})	
-        // 			return fetchData({
-        // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
-        // 				apiKey: this.#accessKey,
-        // 				stagingUrl: this.#stagingUrl,
-        // 				body: {
-        // 					uploadId,
-        // 					objectKey: key,
-        // 					parts,
-        // 					originalFileName: file.name,
-        // 				},
-        // 			}).then((response) => {
-        // 				callBack?.({eventName:"uploading_complete_end",message:`Multipart upload completed successfully`,scanId,email})
-        // 				return response;  
-        // 			});
-        // 		},
-        // 		signPart: (file: any, partData: any) =>
-        // 			fetchData({
-        // 				path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
-        // 				stagingUrl: this.#stagingUrl,
-        // 				apiKey: this.#accessKey,
-        // 				body: {
-        // 					objectKey: partData.key,
-        // 					uploadId: partData.uploadId,
-        // 					partNumber: partData.partNumber,
-        // 				},
-        // 			}),
-        // 	});
-        // 	this.#uppyIns.addFile({
-        // 		source: "manual",
-        // 		name: file.name,
-        // 		type: file.type,
-        // 		data: file,
-        // 	});
-        // 	this.#uppyIns.on("upload-error", (file: any, error: any, response: any) => {
-        // 		if (error.isNetworkError) {
-        // 			this.#uppyIns.retryUpload(file.id);
-        // 		  }else{
-        // 			  reject(error);
-        // 		  }
-        // 	});
-        // 	this.#uppyIns.on("upload-success", () => {
-        // 		resolve({ message: "file uploaded successfully" });
-        // 	});
-        // 	this.#uppyIns.on("complete", (result: any) => {
-        // 		if (this.#uppyIns) {
-        // 			this.#uppyIns.close();
-        // 		}
-        // 	});
-        // });
     }
     async uploadFile({ file, arrayMetaData, scanId, email }) {
         if (!(0, utils_js_1.checkParameters)(file, arrayMetaData, scanId, email)) {
@@ -289,7 +137,7 @@ class FileUpload {
                 const res = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                     apiKey: this.#accessKey,
-                    stagingUrl: this.#stagingUrl,
+                    urlType: this.#urlType,
                     body: {
                         objectKey: file.name,
                         contentType: file.type,
@@ -303,7 +151,7 @@ class FileUpload {
                     const data = await (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                         apiKey: this.#accessKey,
-                        stagingUrl: this.#stagingUrl,
+                        urlType: this.#urlType,
                         body: {
                             objectKey: res?.key,
                             uploadId: res?.uploadId,
@@ -317,7 +165,7 @@ class FileUpload {
                 const completeValue = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                     apiKey: this.#accessKey,
-                    stagingUrl: this.#stagingUrl,
+                    urlType: this.#urlType,
                     body: {
                         uploadId: res?.uploadId,
                         objectKey: res?.key,
@@ -338,7 +186,7 @@ class FileUpload {
         if ((0, utils_js_1.checkParameters)(scanId) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.DEVICE_INFO}/${scanId}`, { device_info: { ...rest } }, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.DEVICE_INFO}/${scanId}`, { device_info: { ...rest } }, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }

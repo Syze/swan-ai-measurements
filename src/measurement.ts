@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
+import { URLType } from "./enum.js";
 
 interface MeasurementRecommendation {
 	shopDomain: string;
@@ -50,18 +51,18 @@ class Measurement {
 	#pollingTimers: Record<string, NodeJS.Timeout | null> = {};
 	#pollingCounts: Record<string, number> = {};
 	#accessKey: string;
-	#stagingUrl: boolean;
+	#urlType: URLType;
 
-	constructor(accessKey: string, stagingUrl = false) {
+	constructor(accessKey: string, urlType = URLType.PROD) {
 		this.#accessKey = accessKey;
-		this.#stagingUrl = stagingUrl;
+		this.#urlType = urlType;
 	}
 
 	getMeasurementResult(scanId: string): Promise<AxiosResponse<any>> {
 		if (!checkParameters(scanId)) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}/measurements?scanId=${scanId}`;
+		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}/measurements?scanId=${scanId}`;
 		return axios.get(url, {
 			headers: { "X-Api-Key": this.#accessKey },
 		});
@@ -71,7 +72,7 @@ class Measurement {
 		if (!checkParameters(scanId, shopDomain, productName)) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
+		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
 			headers: { "X-Api-Key": this.#accessKey },
 		});
 	}
@@ -147,7 +148,7 @@ class Measurement {
 		const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
 		setTimeout(() => {
 			this.#disconnectSocket(key);
-			const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
+			const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
 			const socket = new WebSocket(url);
 			this.#socketRefs[key] = socket;
 

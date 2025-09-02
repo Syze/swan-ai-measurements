@@ -1,3 +1,4 @@
+import { URLType } from "./enum.js";
 interface VideoEmitOptions {
     image: string;
     scanId: string;
@@ -5,7 +6,7 @@ interface VideoEmitOptions {
 type PoseStatusCallback = (data: any) => void;
 declare class PoseDetection {
     #private;
-    constructor(accessKey: string, stagingUrl?: boolean);
+    constructor(accessKey: string, urlType?: URLType);
     connect(): Promise<string>;
     videoEmit({ image, scanId }: VideoEmitOptions): void;
     disconnect(): void;

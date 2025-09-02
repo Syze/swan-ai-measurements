@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { APP_AUTH_BASE_URL, BodyScanObjMetaData, FaceScanObjMetaData, PROD_URL, RequiredFaceScanMetaDataKeys, RequiredMetaDataKeys, STAGING_URL, requiredMetaData } from "./constants.js";
+import { APP_AUTH_BASE_URL, BodyScanObjMetaData,URLS, requiredMetaData } from "./constants.js";
+import { URLType } from "./enum.js";
 
 export interface FetchDataOptions {
   path: string;
@@ -9,7 +10,7 @@ export interface FetchDataOptions {
   apiKey?: string;
   headers?: Record<string, string>;
   throwError?: boolean;
-  stagingUrl: boolean;
+  urlType: URLType;
 }
 
 export async function fetchData(options: FetchDataOptions): Promise<any> {
@@ -21,10 +22,10 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     apiKey = "",
     throwError = false,
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
-    stagingUrl = false,
+    urlType = URLType.STAGING,
   } = options;
 
-  const apiUrl = `${getUrl({ urlName: baseUrl, stagingUrl: stagingUrl })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
+  const apiUrl = `${getUrl({ urlName: baseUrl, urlType })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
   try {
     const res: AxiosResponse<any> = await axios.post(apiUrl, body, { headers });
     if (res.status >= 200 && res.status < 300) {
@@ -112,11 +113,9 @@ export function getFileChunks(file: File, chunkSize = 5 * 1024 * 1024): Blob[] {
   return chunks;
 }
 
-export const getUrl = ({ urlName, stagingUrl = false }: { urlName: string; stagingUrl: boolean }) => {
-  if (stagingUrl) {
-    return STAGING_URL[urlName];
-  }
-  return PROD_URL[urlName];
+export const getUrl = ({ urlName, urlType = URLType.STAGING }: { urlName: string; urlType: URLType }) => {
+  return URLS[urlType][urlName]
+
 };
 
 export const isValidEmail = (email: string) => {

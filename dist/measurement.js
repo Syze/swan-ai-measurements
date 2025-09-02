@@ -6,22 +6,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+const enum_js_1 = require("./enum.js");
 class Measurement {
     #socketRefs = {};
     #waitingTimers = {};
     #pollingTimers = {};
     #pollingCounts = {};
     #accessKey;
-    #stagingUrl;
-    constructor(accessKey, stagingUrl = false) {
+    #urlType;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
         this.#accessKey = accessKey;
-        this.#stagingUrl = stagingUrl;
+        this.#urlType = urlType;
     }
     getMeasurementResult(scanId) {
         if (!(0, utils_js_1.checkParameters)(scanId)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}/measurements?scanId=${scanId}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}/measurements?scanId=${scanId}`;
         return axios_1.default.get(url, {
             headers: { "X-Api-Key": this.#accessKey },
         });
@@ -30,7 +31,7 @@ class Measurement {
         if (!(0, utils_js_1.checkParameters)(scanId, shopDomain, productName)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -102,7 +103,7 @@ class Measurement {
         const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
         setTimeout(() => {
             this.#disconnectSocket(key);
-            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
+            const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
             const socket = new WebSocket(url);
             this.#socketRefs[key] = socket;
             socket.onopen = () => {

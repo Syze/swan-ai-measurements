@@ -1,5 +1,7 @@
 export declare const STAGING_URL: Record<string, string>;
 export declare const PROD_URL: Record<string, string>;
+export declare const DEV_URL: Record<string, string>;
+export declare const URLS: Record<string, Record<string, string>>;
 export declare const FILE_UPLOAD_ENDPOINT: {
     UPLOAD_START: string;
     UPLOAD_COMPLETE: string;

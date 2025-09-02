@@ -6,14 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+const enum_js_1 = require("./enum.js");
 class TryOn {
     #socketMap = new Map();
     #timerMap = new Map();
     #accessKey;
-    #stagingUrl;
-    constructor(accessKey, stagingUrl = false) {
+    #urlType;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
         this.#accessKey = accessKey;
-        this.#stagingUrl = stagingUrl;
+        this.#urlType = urlType;
     }
     async uploadFile({ files, userEmail, fileNoLimit = 2 }) {
         if ((0, utils_js_1.checkParameters)(files, userEmail) === false) {
@@ -50,7 +51,7 @@ class TryOn {
         if ((0, utils_js_1.checkParameters)(payload) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
             headers: {
                 "Content-Type": "application/json",
                 "X-Api-Key": this.#accessKey,
@@ -77,7 +78,7 @@ class TryOn {
         const payload = {
             userEmail,
         };
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -92,7 +93,7 @@ class TryOn {
             userEmail,
             file: fileName,
         };
-        return axios_1.default.delete(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
+        return axios_1.default.delete(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
             headers: { "X-Api-Key": this.#accessKey },
             data: payload,
         });
@@ -127,7 +128,7 @@ class TryOn {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         this.#disconnectSocket(tryonId);
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
         const socket = new WebSocket(url);
         this.#socketMap.set(tryonId, socket);
         socket.onopen = () => {
@@ -178,7 +179,7 @@ class TryOn {
             ...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),
             ...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }),
         };
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
         const headers = { "X-Api-Key": this.#accessKey };
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
@@ -197,7 +198,7 @@ class TryOn {
         }
     };
     getShareLink(tryonId) {
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     }
@@ -205,7 +206,7 @@ class TryOn {
         if ((0, utils_js_1.checkParameters)(tryonId) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
         return axios_1.default.post(url, null, {
             headers: { "X-Api-Key": this.#accessKey },
         });
@@ -215,7 +216,7 @@ class TryOn {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         const payload = { storeUrl, productHandle, imageURL, productDescription: productDescription ?? null };
-        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
+        const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
         return axios_1.default.post(url, payload, {
             headers: { "X-Api-Key": this.#accessKey },
         });

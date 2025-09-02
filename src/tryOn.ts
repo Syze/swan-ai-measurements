@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
+import { URLType } from "./enum.js";
 
 interface UploadFileParams {
 	files: File[];
@@ -59,10 +60,10 @@ class TryOn {
   
 
 	#accessKey: string;
-	#stagingUrl: boolean;
-	constructor(accessKey: string, stagingUrl = false) {
+	#urlType: URLType;
+	constructor(accessKey: string, urlType = URLType.PROD) {
 		this.#accessKey = accessKey;
-		this.#stagingUrl = stagingUrl;
+		this.#urlType = urlType;
 	}
 
 	async uploadFile({ files, userEmail, fileNoLimit = 2 }: UploadFileParams): Promise<string> {
@@ -101,7 +102,7 @@ class TryOn {
 		if (checkParameters(payload) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
+		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
 			headers: {
 				"Content-Type": "application/json",
 				"X-Api-Key": this.#accessKey,
@@ -132,7 +133,7 @@ class TryOn {
 			userEmail,
 		};
 
-		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
+		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
 			headers: { "X-Api-Key": this.#accessKey },
 		});
 	}
@@ -148,7 +149,7 @@ class TryOn {
 			userEmail,
 			file: fileName,
 		};
-		return axios.delete(`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
+		return axios.delete(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
 			headers: { "X-Api-Key": this.#accessKey },
 			data: payload,
 		});
@@ -188,7 +189,7 @@ class TryOn {
   
     this.#disconnectSocket(tryonId);
   
-    const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
+    const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON}?tryonId=${tryonId}`;
     const socket = new WebSocket(url);
   
     this.#socketMap.set(tryonId, socket);
@@ -246,7 +247,7 @@ class TryOn {
 			...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),
 			...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }),
 		};
-		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON}`;
+		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON}`;
 		const headers: Record<string, string> = { "X-Api-Key": this.#accessKey };
 		if (token) {
 			headers["Authorization"] = `Bearer ${token}`;
@@ -267,7 +268,7 @@ class TryOn {
 
 	getShareLink(tryonId: string) {
 		return axios.post(
-			`${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_SHARE}`,
+			`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_SHARE}`,
 			{ tryonId },
 			{
 				headers: { "X-Api-Key": this.#accessKey },
@@ -279,7 +280,7 @@ class TryOn {
 		if (checkParameters(tryonId) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
+		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
 		return axios.post(url, null, {
 			headers: { "X-Api-Key": this.#accessKey },
 		});
@@ -290,7 +291,7 @@ class TryOn {
 			throw new Error(REQUIRED_MESSAGE);
 		}
 		const payload = { storeUrl, productHandle, imageURL, productDescription: productDescription ?? null };
-		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
+		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
 		return axios.post(url, payload, {
 			headers: { "X-Api-Key": this.#accessKey },
 		});

@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { URLType } from "./enum.js";
 interface MeasurementRecommendation {
     shopDomain: string;
     scanId: string;
@@ -18,7 +19,7 @@ interface FaceScanSocketOptions extends Callbacks {
 }
 declare class Measurement {
     #private;
-    constructor(accessKey: string, stagingUrl?: boolean);
+    constructor(accessKey: string, urlType?: URLType);
     getMeasurementResult(scanId: string): Promise<AxiosResponse<any>>;
     getMeasurementRecommendation({ scanId, shopDomain, productName }: MeasurementRecommendation): Promise<AxiosResponse<any>>;
     handleMeasurementSocket(options: MeasurementSocketOptions): void;

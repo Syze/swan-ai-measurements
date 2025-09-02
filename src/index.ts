@@ -1,5 +1,6 @@
 import Auth from "./auth.js";
 import Custom from "./custom.js";
+import { URLType } from "./enum.js";
 import FileUpload from "./fileUpload.js";
 import Measurement from "./measurement.js";
 import PoseDetection from "./poseDetection.js";
@@ -7,7 +8,7 @@ import TryOn from "./tryOn.js";
 
 class Swan {
   #accessKey: string;
-  #stagingUrl: boolean;
+  #urlType: URLType;
   auth: Auth;
   custom: Custom;
   fileUpload: FileUpload;
@@ -15,15 +16,15 @@ class Swan {
   poseDetection: PoseDetection;
   tryOn: TryOn;
 
-  constructor(accessKey: string, stagingUrl = false) {
+  constructor(accessKey: string, urlType = URLType.PROD) {
     this.#accessKey = accessKey;
-    this.#stagingUrl = stagingUrl;
-    this.auth = new Auth(this.#accessKey, this.#stagingUrl);
-    this.custom = new Custom(this.#accessKey, this.#stagingUrl);
-    this.fileUpload = new FileUpload(this.#accessKey, this.#stagingUrl);
-    this.measurement = new Measurement(this.#accessKey, this.#stagingUrl);
-    this.poseDetection = new PoseDetection(this.#accessKey, this.#stagingUrl);
-    this.tryOn = new TryOn(this.#accessKey, this.#stagingUrl);
+    this.#urlType = urlType;
+    this.auth = new Auth(this.#accessKey, this.#urlType);
+    this.custom = new Custom(this.#accessKey, this.#urlType);
+    this.fileUpload = new FileUpload(this.#accessKey, this.#urlType);
+    this.measurement = new Measurement(this.#accessKey, this.#urlType);
+    this.poseDetection = new PoseDetection(this.#accessKey, this.#urlType);
+    this.tryOn = new TryOn(this.#accessKey, this.#urlType);
   }
 }
 

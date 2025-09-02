@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CHUNK_SIZE = exports.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = exports.REQUIRED_MESSAGE_FOR_META_DATA = exports.REQUIRED_MESSAGE = exports.requiredFaceScanMetaData = exports.requiredMetaData = exports.API_ENDPOINTS = exports.APP_POSE_DETECTION_WEBSOCKET_URL = exports.APP_BASE_WEBSOCKET_URL = exports.APP_AUTH_BASE_URL = exports.FILE_UPLOAD_ENDPOINT = exports.PROD_URL = exports.STAGING_URL = void 0;
+exports.CHUNK_SIZE = exports.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = exports.REQUIRED_MESSAGE_FOR_META_DATA = exports.REQUIRED_MESSAGE = exports.requiredFaceScanMetaData = exports.requiredMetaData = exports.API_ENDPOINTS = exports.APP_POSE_DETECTION_WEBSOCKET_URL = exports.APP_BASE_WEBSOCKET_URL = exports.APP_AUTH_BASE_URL = exports.FILE_UPLOAD_ENDPOINT = exports.URLS = exports.DEV_URL = exports.PROD_URL = exports.STAGING_URL = void 0;
 exports.STAGING_URL = {
     APP_AUTH_BASE_URL: "https://staging.api.swanvision.ai",
     APP_BASE_WEBSOCKET_URL: "wss://staging.wsnotify.api.swanvision.ai",
@@ -10,6 +10,16 @@ exports.PROD_URL = {
     APP_AUTH_BASE_URL: "https://api.swanvision.ai",
     APP_BASE_WEBSOCKET_URL: "wss://wsnotify.api.swanvision.ai",
     APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service.uvcn97hn133d6.eu-west-1.cs.amazonlightsail.com",
+};
+exports.DEV_URL = {
+    APP_AUTH_BASE_URL: "https://develop.api.swanvision.ai",
+    APP_BASE_WEBSOCKET_URL: "wss://develop.wsnotify.api.swanvision.ai",
+    APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com",
+};
+exports.URLS = {
+    dev: exports.DEV_URL,
+    staging: exports.STAGING_URL,
+    prod: exports.PROD_URL
 };
 exports.FILE_UPLOAD_ENDPOINT = {
     UPLOAD_START: "/upload/start",

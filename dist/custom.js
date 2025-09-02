@@ -6,18 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const utils_js_1 = require("./utils.js");
+const enum_js_1 = require("./enum.js");
 class Custom {
     #accessKey;
-    #stagingUrl;
-    constructor(accessKey, stagingUrl = false) {
+    #urlType;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
         this.#accessKey = accessKey;
-        this.#stagingUrl = stagingUrl;
+        this.#urlType = urlType;
     }
     createCustomer(payload) {
         if ((0, utils_js_1.checkParameters)(payload.name, payload.storeUrl, payload.email, payload.location) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.CREATE_CUSTOMER}`, {
+        return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.CREATE_CUSTOMER}`, {
             ...payload,
             headers: { "X-Api-Key": this.#accessKey },
         });
@@ -28,7 +29,7 @@ class Custom {
         }
         return axios_1.default.get(`${(0, utils_js_1.getUrl)({
             urlName: constants_js_1.APP_AUTH_BASE_URL,
-            stagingUrl: this.#stagingUrl,
+            urlType: this.#urlType,
         })}${constants_js_1.API_ENDPOINTS.CUSTOM_CUSTOMER}`, {
             params: { store_url },
             headers: { "X-Api-Key": this.#accessKey },
@@ -38,7 +39,7 @@ class Custom {
         if ((0, utils_js_1.checkParameters)(id) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
-        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, stagingUrl: this.#stagingUrl })}${constants_js_1.API_ENDPOINTS.MODEL}/${id}`, {
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.MODEL}/${id}`, {
             headers: { "X-Api-Key": this.#accessKey },
         });
     };

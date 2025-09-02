@@ -8,6 +8,16 @@ export const PROD_URL = {
     APP_BASE_WEBSOCKET_URL: "wss://wsnotify.api.swanvision.ai",
     APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service.uvcn97hn133d6.eu-west-1.cs.amazonlightsail.com",
 };
+export const DEV_URL = {
+    APP_AUTH_BASE_URL: "https://develop.api.swanvision.ai",
+    APP_BASE_WEBSOCKET_URL: "wss://develop.wsnotify.api.swanvision.ai",
+    APP_POSE_DETECTION_WEBSOCKET_URL: "https://posedetect-service-staging.ft2a64raup4pg.us-east-1.cs.amazonlightsail.com",
+};
+export const URLS = {
+    dev: DEV_URL,
+    staging: STAGING_URL,
+    prod: PROD_URL
+};
 export const FILE_UPLOAD_ENDPOINT = {
     UPLOAD_START: "/upload/start",
     UPLOAD_COMPLETE: "/upload/complete",
