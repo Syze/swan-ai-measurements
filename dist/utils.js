@@ -8,7 +8,7 @@ const axios_1 = __importDefault(require("axios"));
 const constants_js_1 = require("./constants.js");
 const enum_js_1 = require("./enum.js");
 async function fetchData(options) {
-    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, urlType = enum_js_1.URLType.STAGING, } = options;
+    const { path, body, queryParams, baseUrl = constants_js_1.APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, urlType = enum_js_1.URLType.PROD, } = options;
     const apiUrl = `${(0, exports.getUrl)({ urlName: baseUrl, urlType })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
     try {
         const res = await axios_1.default.post(apiUrl, body, { headers });

@@ -22,7 +22,7 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     apiKey = "",
     throwError = false,
     headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
-    urlType = URLType.STAGING,
+    urlType = URLType.PROD,
   } = options;
 
   const apiUrl = `${getUrl({ urlName: baseUrl, urlType })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
