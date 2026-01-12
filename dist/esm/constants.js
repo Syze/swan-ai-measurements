@@ -48,8 +48,8 @@ export const API_ENDPOINTS = {
     DEVICE_INFO: "/deviceinfo",
     TRY_ON_PRODUCT_IMAGE_ELIGIBILTY: "/tryon/product-image-eligibility"
 };
-export const requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
-export const requiredFaceScanMetaData = ["gender", "focal_length", "customer_store_url", "scan_type", "callback_url", "face_scan_id"];
+export const requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "clothes_fit"];
+export const requiredFaceScanMetaData = ["gender", "focal_length", "customer_store_url", "scan_type", "face_scan_id"];
 export const REQUIRED_MESSAGE = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
 export const REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";

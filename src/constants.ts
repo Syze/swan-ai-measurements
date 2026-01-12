@@ -83,8 +83,8 @@ export interface FaceScanObjMetaData {
 export type RequiredMetaDataKeys = "gender" | "focal_length" | "height" | "customer_store_url" | "callback_url" | "clothes_fit";
 export type RequiredFaceScanMetaDataKeys = "gender" | "focal_length" | "customer_store_url" | "scan_type" | "callback_url" | "face_scan_id";
 
-export const requiredMetaData: RequiredMetaDataKeys[] = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
-export const requiredFaceScanMetaData: RequiredFaceScanMetaDataKeys[] = ["gender", "focal_length", "customer_store_url","scan_type","callback_url","face_scan_id"];
+export const requiredMetaData: RequiredMetaDataKeys[] = ["gender", "focal_length", "height", "customer_store_url", "clothes_fit"];
+export const requiredFaceScanMetaData: RequiredFaceScanMetaDataKeys[] = ["gender", "focal_length", "customer_store_url","scan_type","face_scan_id"];
 
 export const REQUIRED_MESSAGE: string = "Please verify required parameters";
 export const REQUIRED_MESSAGE_FOR_META_DATA: string = "Please verify required parameters in meta data";

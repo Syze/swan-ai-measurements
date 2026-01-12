@@ -51,8 +51,8 @@ exports.API_ENDPOINTS = {
     DEVICE_INFO: "/deviceinfo",
     TRY_ON_PRODUCT_IMAGE_ELIGIBILTY: "/tryon/product-image-eligibility"
 };
-exports.requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "callback_url", "clothes_fit"];
-exports.requiredFaceScanMetaData = ["gender", "focal_length", "customer_store_url", "scan_type", "callback_url", "face_scan_id"];
+exports.requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "clothes_fit"];
+exports.requiredFaceScanMetaData = ["gender", "focal_length", "customer_store_url", "scan_type", "face_scan_id"];
 exports.REQUIRED_MESSAGE = "Please verify required parameters";
 exports.REQUIRED_MESSAGE_FOR_META_DATA = "Please verify required parameters in meta data";
 exports.REQUIRED_ERROR_MESSAGE_INVALID_EMAIL = "Invalid Email";
