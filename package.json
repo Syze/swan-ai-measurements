@@ -21,7 +21,8 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "whoami": "^0.0.3"
   },
   "scripts": {
     "start": "nodemon dist/index.js",
