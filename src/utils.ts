@@ -58,15 +58,15 @@ export function checkMetaDataValue(arr: Partial<BodyScanObjMetaData>[]): boolean
   if (!checkValues(arr, requiredMetaData)) {
     return false;
   }
-  let correctFormat = false;
-  for (const obj of arr) {
-    if (obj.callback_url && obj.callback_url.startsWith("https")) {
-      correctFormat = true;
-    }
-  }
-  if (!correctFormat) {
-    return false;
-  }
+  // let correctFormat = false;
+  // for (const obj of arr) {
+  //   if (obj.callback_url && obj.callback_url.startsWith("https")) {
+  //     correctFormat = true;
+  //   }
+  // }
+  // if (!correctFormat) {
+  //   return false;
+  // }
   return true;
 }
 

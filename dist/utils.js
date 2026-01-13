@@ -43,15 +43,15 @@ function checkMetaDataValue(arr) {
     if (!(0, exports.checkValues)(arr, constants_js_1.requiredMetaData)) {
         return false;
     }
-    let correctFormat = false;
-    for (const obj of arr) {
-        if (obj.callback_url && obj.callback_url.startsWith("https")) {
-            correctFormat = true;
-        }
-    }
-    if (!correctFormat) {
-        return false;
-    }
+    // let correctFormat = false;
+    // for (const obj of arr) {
+    //   if (obj.callback_url && obj.callback_url.startsWith("https")) {
+    //     correctFormat = true;
+    //   }
+    // }
+    // if (!correctFormat) {
+    //   return false;
+    // }
     return true;
 }
 exports.checkMetaDataValue = checkMetaDataValue;
