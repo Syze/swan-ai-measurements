@@ -209,11 +209,11 @@ class TryOn {
         return;
       }
   
-      if (data?.status === "success") {
+      if (data?.eventType === "tryon.completed") {
         onSuccess?.(data);
-      } else {
-        onError?.(data);
-      }
+      } else if (data?.eventType=="tryon.failed") {
+		onError?.(data);
+	  }
   
       const timer = this.#timerMap.get(tryonId);
       if (timer) clearTimeout(timer);

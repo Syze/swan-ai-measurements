@@ -144,10 +144,10 @@ class TryOn {
                 console.log("Invalid JSON:", event.data);
                 return;
             }
-            if (data?.status === "success") {
+            if (data?.eventType === "tryon.completed") {
                 onSuccess?.(data);
             }
-            else {
+            else if (data?.eventType == "tryon.failed") {
                 onError?.(data);
             }
             const timer = this.#timerMap.get(tryonId);

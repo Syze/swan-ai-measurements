@@ -76,10 +76,10 @@ class TryOn {
                     console.log("Invalid JSON:", event.data);
                     return;
                 }
-                if ((data === null || data === void 0 ? void 0 : data.status) === "success") {
+                if ((data === null || data === void 0 ? void 0 : data.eventType) === "tryon.completed") {
                     onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
                 }
-                else {
+                else if ((data === null || data === void 0 ? void 0 : data.eventType) == "tryon.failed") {
                     onError === null || onError === void 0 ? void 0 : onError(data);
                 }
                 const timer = __classPrivateFieldGet(this, _TryOn_timerMap, "f").get(tryonId);
