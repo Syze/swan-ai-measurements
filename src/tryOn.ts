@@ -42,6 +42,7 @@ interface HandleForLatestImageParams {
 	openTryonId?: string;
 	selectedProductImageUrl?: string;
 	token: string;
+	requestedTryonViews?: string[];
 }
 
 interface HandleTimeOutParams {
@@ -233,7 +234,7 @@ class TryOn {
   };
   
 
-	handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token }: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
+	handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token ,requestedTryonViews}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
 		if (checkParameters(shopDomain, products, token) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
@@ -246,6 +247,7 @@ class TryOn {
 			...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),
 			...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),
 			...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }),
+			...(requestedTryonViews && requestedTryonViews?.length > 0 && { requestedTryonViews }),
 		};
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON}`;
 		const headers: Record<string, string> = { "X-Api-Key": this.#accessKey };

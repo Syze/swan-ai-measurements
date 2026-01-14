@@ -182,11 +182,11 @@ class TryOn {
             data: payload,
         });
     }
-    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token }) {
+    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token, requestedTryonViews }) {
         if (checkParameters(shopDomain, products, token) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        const payload = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ products, customerStoreUrl: shopDomain }, (selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages })), (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }));
+        const payload = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ products, customerStoreUrl: shopDomain }, (selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages })), (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl })), (requestedTryonViews && (requestedTryonViews === null || requestedTryonViews === void 0 ? void 0 : requestedTryonViews.length) > 0 && { requestedTryonViews }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON}`;
         const headers = { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") };
         if (token) {

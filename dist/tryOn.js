@@ -166,7 +166,7 @@ class TryOn {
             // this.#timerMap.delete(tryonId);
         };
     };
-    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token }) {
+    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token, requestedTryonViews }) {
         if ((0, utils_js_1.checkParameters)(shopDomain, products, token) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
@@ -178,6 +178,7 @@ class TryOn {
             ...(callbackUrl !== undefined && callbackUrl !== null && { callbackUrl }),
             ...(openTryonId !== undefined && openTryonId !== null && { openTryonId }),
             ...(selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl }),
+            ...(requestedTryonViews && requestedTryonViews?.length > 0 && { requestedTryonViews }),
         };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
         const headers = { "X-Api-Key": this.#accessKey };
