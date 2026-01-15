@@ -117,10 +117,11 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
             onError === null || onError === void 0 ? void 0 : onError(e);
         }
     });
-}, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }) {
+}, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay, onPreopen }) {
     const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
     setTimeout(() => {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
+        onPreopen === null || onPreopen === void 0 ? void 0 : onPreopen();
         const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: __classPrivateFieldGet(this, _Measurement_urlType, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
         const socket = new WebSocket(url);
         __classPrivateFieldGet(this, _Measurement_socketRefs, "f")[key] = socket;

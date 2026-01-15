@@ -10,6 +10,7 @@ interface Callbacks {
     onSuccess?: (data: any) => void;
     onClose?: () => void;
     onOpen?: () => void;
+    onPreopen?: () => void;
 }
 interface MeasurementSocketOptions extends Callbacks {
     scanId: string;

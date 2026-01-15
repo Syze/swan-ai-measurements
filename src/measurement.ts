@@ -13,6 +13,7 @@ interface Callbacks {
 	onSuccess?: (data: any) => void;
 	onClose?: () => void;
 	onOpen?: () => void;
+	onPreopen?: () => void;
 }
 interface MeasurementSocketOptions extends Callbacks {
 	scanId: string;
@@ -144,10 +145,11 @@ class Measurement {
 		this.#handleSocket({ onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 1000 });
 	}
 
-	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay }: HandleSocket) {
+	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay, onPreopen }: HandleSocket) {
 		const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
 		setTimeout(() => {
 			this.#disconnectSocket(key);
+			onPreopen?.()
 			const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
 			const socket = new WebSocket(url);
 			this.#socketRefs[key] = socket;
