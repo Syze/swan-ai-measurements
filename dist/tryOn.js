@@ -157,13 +157,9 @@ class TryOn {
         };
         socket.onclose = () => {
             onClose?.();
-            // this.#disconnectSocket(tryonId);
         };
         socket.onerror = (event) => {
             onError?.(event);
-            // const timer = this.#timerMap.get(tryonId);
-            // if (timer) clearTimeout(timer);
-            // this.#timerMap.delete(tryonId);
         };
     };
     handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token, requestedTryonViews }) {
@@ -198,9 +194,9 @@ class TryOn {
             onError?.(error);
         }
     };
-    getShareLink(tryonId) {
+    getShareLink(tryonId, token) {
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers: { "X-Api-Key": this.#accessKey, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
     }
     getTryOnResult = ({ tryonId }) => {

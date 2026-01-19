@@ -222,14 +222,10 @@ class TryOn {
   
     socket.onclose = () => {
       onClose?.();
-      // this.#disconnectSocket(tryonId);
     };
   
     socket.onerror = (event) => {
       onError?.(event);
-      // const timer = this.#timerMap.get(tryonId);
-      // if (timer) clearTimeout(timer);
-      // this.#timerMap.delete(tryonId);
     };
   };
   
@@ -268,12 +264,12 @@ class TryOn {
 		}
 	};
 
-	getShareLink(tryonId: string) {
+	getShareLink(tryonId: string,token:string): Promise<AxiosResponse<any>> {
 		return axios.post(
 			`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_SHARE}`,
 			{ tryonId },
 			{
-				headers: { "X-Api-Key": this.#accessKey },
+				headers: { "X-Api-Key": this.#accessKey, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
 			},
 		);
 	}

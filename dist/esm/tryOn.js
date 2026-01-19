@@ -89,13 +89,9 @@ class TryOn {
             };
             socket.onclose = () => {
                 onClose === null || onClose === void 0 ? void 0 : onClose();
-                // this.#disconnectSocket(tryonId);
             };
             socket.onerror = (event) => {
                 onError === null || onError === void 0 ? void 0 : onError(event);
-                // const timer = this.#timerMap.get(tryonId);
-                // if (timer) clearTimeout(timer);
-                // this.#timerMap.delete(tryonId);
             };
         };
         _TryOn_handleGetTryOnResult.set(this, (_a) => __awaiter(this, [_a], void 0, function* ({ onSuccess, onError, tryonId }) {
@@ -196,9 +192,9 @@ class TryOn {
             headers,
         });
     }
-    getShareLink(tryonId) {
+    getShareLink(tryonId, token) {
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+            headers: Object.assign({ "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") }, (token ? { Authorization: `Bearer ${token}` } : {})),
         });
     }
     getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }) {
