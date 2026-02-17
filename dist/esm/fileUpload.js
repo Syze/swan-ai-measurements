@@ -29,7 +29,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-var _FileUpload_instances, _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_urlType, _FileUpload_uppyFileUploader;
+var _FileUpload_instances, _FileUpload_uppyIns, _FileUpload_accessKey, _FileUpload_urlType, _FileUpload_token, _FileUpload_getHeaders, _FileUpload_uppyFileUploader;
 import axios from "axios";
 import { REQUIRED_MESSAGE, REQUIRED_MESSAGE_FOR_META_DATA, FILE_UPLOAD_ENDPOINT, APP_AUTH_BASE_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, API_ENDPOINTS, CHUNK_SIZE, requiredFaceScanMetaData } from "./constants.js";
 import { addScanType, checkMetaDataValue, checkParameters, checkValues, fetchData, getFileChunks, getUrl, isValidEmail } from "./utils.js";
@@ -37,13 +37,15 @@ import Uppy from "@uppy/core";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import { URLType } from "./enum.js";
 class FileUpload {
-    constructor(accessKey, urlType = URLType.PROD) {
+    constructor(accessKey, urlType = URLType.PROD, token) {
         _FileUpload_instances.add(this);
         _FileUpload_uppyIns.set(this, void 0);
         _FileUpload_accessKey.set(this, void 0);
         _FileUpload_urlType.set(this, void 0);
+        _FileUpload_token.set(this, void 0);
         __classPrivateFieldSet(this, _FileUpload_accessKey, accessKey, "f");
         __classPrivateFieldSet(this, _FileUpload_urlType, urlType, "f");
+        __classPrivateFieldSet(this, _FileUpload_token, token, "f");
     }
     uploadFileFrontend(_a) {
         return __awaiter(this, arguments, void 0, function* ({ file, arrayMetaData, scanId, email, callBack }) {
@@ -93,6 +95,7 @@ class FileUpload {
                     const res = yield fetchData({
                         path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                         apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                        token: __classPrivateFieldGet(this, _FileUpload_token, "f"),
                         urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f"),
                         body: {
                             objectKey: file.name,
@@ -107,6 +110,7 @@ class FileUpload {
                         const data = yield fetchData({
                             path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                             apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                            token: __classPrivateFieldGet(this, _FileUpload_token, "f"),
                             urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f"),
                             body: {
                                 objectKey: res === null || res === void 0 ? void 0 : res.key,
@@ -115,12 +119,13 @@ class FileUpload {
                             },
                             throwError: true,
                         });
-                        const val = yield axios.put(data === null || data === void 0 ? void 0 : data.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") } });
+                        const val = yield axios.put(data === null || data === void 0 ? void 0 : data.url, totalChunks[i], { headers: __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_getHeaders).call(this, { "Content-Type": file.type }) });
                         parts.push({ PartNumber: i + 1, ETag: (_b = val === null || val === void 0 ? void 0 : val.headers) === null || _b === void 0 ? void 0 : _b.etag });
                     }
                     const completeValue = yield fetchData({
                         path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                         apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                        token: __classPrivateFieldGet(this, _FileUpload_token, "f"),
                         urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f"),
                         body: {
                             uploadId: res === null || res === void 0 ? void 0 : res.uploadId,
@@ -145,12 +150,14 @@ class FileUpload {
                 throw new Error(REQUIRED_MESSAGE);
             }
             return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f") })}${API_ENDPOINTS.DEVICE_INFO}/${scanId}`, { device_info: Object.assign({}, rest) }, {
-                headers: { "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") },
+                headers: __classPrivateFieldGet(this, _FileUpload_instances, "m", _FileUpload_getHeaders).call(this),
             });
         });
     }
 }
-_FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_urlType = new WeakMap(), _FileUpload_instances = new WeakSet(), _FileUpload_uppyFileUploader = function _FileUpload_uppyFileUploader({ callBack, arrayMetaData, scanId, email, file, objectKey }) {
+_FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _FileUpload_urlType = new WeakMap(), _FileUpload_token = new WeakMap(), _FileUpload_instances = new WeakSet(), _FileUpload_getHeaders = function _FileUpload_getHeaders(extraHeaders = {}) {
+    return Object.assign(Object.assign(Object.assign({}, extraHeaders), (__classPrivateFieldGet(this, _FileUpload_accessKey, "f") ? { "X-Api-Key": __classPrivateFieldGet(this, _FileUpload_accessKey, "f") } : {})), (__classPrivateFieldGet(this, _FileUpload_token, "f") ? { Authorization: `Bearer ${__classPrivateFieldGet(this, _FileUpload_token, "f")}` } : {}));
+}, _FileUpload_uppyFileUploader = function _FileUpload_uppyFileUploader({ callBack, arrayMetaData, scanId, email, file, objectKey }) {
     return new Promise((resolve, reject) => {
         if (__classPrivateFieldGet(this, _FileUpload_uppyIns, "f")) {
             __classPrivateFieldGet(this, _FileUpload_uppyIns, "f").close();
@@ -168,6 +175,7 @@ _FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _Fil
                 return fetchData({
                     path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                     apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                    token: __classPrivateFieldGet(this, _FileUpload_token, "f"),
                     urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f"),
                     body: {
                         objectKey: ObjectKey,
@@ -181,6 +189,7 @@ _FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _Fil
                 return fetchData({
                     path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                     apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                    token: __classPrivateFieldGet(this, _FileUpload_token, "f"),
                     urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f"),
                     body: {
                         uploadId,
@@ -197,6 +206,7 @@ _FileUpload_uppyIns = new WeakMap(), _FileUpload_accessKey = new WeakMap(), _Fil
                 path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                 urlType: __classPrivateFieldGet(this, _FileUpload_urlType, "f"),
                 apiKey: __classPrivateFieldGet(this, _FileUpload_accessKey, "f"),
+                token: __classPrivateFieldGet(this, _FileUpload_token, "f"),
                 body: {
                     objectKey: partData.key,
                     uploadId: partData.uploadId,

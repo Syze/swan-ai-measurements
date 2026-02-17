@@ -11,12 +11,22 @@ import { BodyScanUploadOptions, FaceScanUploadOptions, SetDeviceInfo, UploadOpti
 
 export default class FileUpload {
 	#uppyIns: any;
-	#accessKey: string;
+	#accessKey?: string;
 	#urlType: URLType;
+	#token?: string;
 
-	constructor(accessKey: string, urlType = URLType.PROD) {
+	constructor(accessKey?: string, urlType = URLType.PROD, token?: string) {
 		this.#accessKey = accessKey;
 		this.#urlType = urlType;
+		this.#token = token;
+	}
+
+	#getHeaders(extraHeaders: Record<string, string> = {}): Record<string, string> {
+		return {
+			...extraHeaders,
+			...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+			...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+		};
 	}
 	#uppyFileUploader({callBack,arrayMetaData,scanId,email,file,objectKey}:UploadOptions){
 		return new Promise((resolve, reject) => {
@@ -36,6 +46,7 @@ export default class FileUpload {
 					return fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
 						apiKey: this.#accessKey,
+						token: this.#token,
 						urlType: this.#urlType,
 						body: {
 							objectKey:ObjectKey,
@@ -49,6 +60,7 @@ export default class FileUpload {
 					return fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
 						apiKey: this.#accessKey,
+						token: this.#token,
 						urlType: this.#urlType,
 						body: {
 							uploadId,
@@ -67,6 +79,7 @@ export default class FileUpload {
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
 						urlType: this.#urlType,
 						apiKey: this.#accessKey,
+						token: this.#token,
 						body: {
 							objectKey: partData.key,
 							uploadId: partData.uploadId,
@@ -142,6 +155,7 @@ export default class FileUpload {
 				const res: { key: string; uploadId: string } = await fetchData({
 					path: FILE_UPLOAD_ENDPOINT.UPLOAD_START,
 					apiKey: this.#accessKey,
+					token: this.#token,
 					urlType: this.#urlType,
 					body: {
 						objectKey: file.name,
@@ -156,6 +170,7 @@ export default class FileUpload {
 					const data: { url: string } = await fetchData({
 						path: FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
 						apiKey: this.#accessKey,
+						token: this.#token,
 						urlType: this.#urlType,
 						body: {
 							objectKey: res?.key,
@@ -164,12 +179,13 @@ export default class FileUpload {
 						},
 						throwError: true,
 					});
-					const val = await axios.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
+					const val = await axios.put(data?.url, totalChunks[i], { headers: this.#getHeaders({ "Content-Type": file.type }) });
 					parts.push({ PartNumber: i + 1, ETag: val?.headers?.etag });
 				}
 				const completeValue = await fetchData({
 					path: FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
 					apiKey: this.#accessKey,
+					token: this.#token,
 					urlType: this.#urlType,
 					body: {
 						uploadId: res?.uploadId,
@@ -194,7 +210,7 @@ export default class FileUpload {
 			`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.DEVICE_INFO}/${scanId}`,
 			{ device_info: { ...rest } },
 			{
-				headers: { "X-Api-Key": this.#accessKey },
+				headers: this.#getHeaders(),
 			},
 		);
 	}

@@ -13,21 +13,23 @@ const tryOn_js_1 = __importDefault(require("./tryOn.js"));
 class Swan {
     #accessKey;
     #urlType;
+    #token;
     auth;
     custom;
     fileUpload;
     measurement;
     poseDetection;
     tryOn;
-    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD, token) {
         this.#accessKey = accessKey;
         this.#urlType = urlType;
-        this.auth = new auth_js_1.default(this.#accessKey, this.#urlType);
-        this.custom = new custom_js_1.default(this.#accessKey, this.#urlType);
-        this.fileUpload = new fileUpload_js_1.default(this.#accessKey, this.#urlType);
-        this.measurement = new measurement_js_1.default(this.#accessKey, this.#urlType);
-        this.poseDetection = new poseDetection_js_1.default(this.#accessKey, this.#urlType);
-        this.tryOn = new tryOn_js_1.default(this.#accessKey, this.#urlType);
+        this.#token = token;
+        this.auth = new auth_js_1.default(this.#accessKey, this.#urlType, this.#token);
+        this.custom = new custom_js_1.default(this.#accessKey, this.#urlType, this.#token);
+        this.fileUpload = new fileUpload_js_1.default(this.#accessKey, this.#urlType, this.#token);
+        this.measurement = new measurement_js_1.default(this.#accessKey, this.#urlType, this.#token);
+        this.poseDetection = new poseDetection_js_1.default(this.#accessKey, this.#urlType, this.#token);
+        this.tryOn = new tryOn_js_1.default(this.#accessKey, this.#urlType, this.#token);
     }
 }
 exports.default = Swan;

@@ -37,12 +37,21 @@ interface AuthSocketDetail {
 
 export default class Auth {
 	#socketRef?: WebSocket;
-	#accessKey: string;
+	#accessKey?: string;
 	#urlType: URLType;
+	#token?: string;
 
-	constructor(accessKey: string, urlType = URLType.PROD) {
+	constructor(accessKey?: string, urlType = URLType.PROD, token?: string) {
 		this.#accessKey = accessKey;
 		this.#urlType = urlType;
+		this.#token = token;
+	}
+
+	#getHeaders(): Record<string, string> {
+		return {
+			...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+			...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+		};
 	}
 
 	registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse> {
@@ -54,7 +63,7 @@ export default class Auth {
 			body = { ...body, attributes: { gender, height } };
 		}
 		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.REGISTER_USER}`, body, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 
@@ -64,7 +73,7 @@ export default class Auth {
 		}
 		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.VERIFY_USER}`, null, {
 			params: { token },
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 
@@ -75,7 +84,7 @@ export default class Auth {
 		return axios.post(
 			`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.ADD_USER}`,
 			{ scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) },
-			{ headers: { "X-Api-Key": this.#accessKey } },
+			{ headers: this.#getHeaders() },
 		);
 	}
 
@@ -84,7 +93,7 @@ export default class Auth {
 			throw new Error(REQUIRED_MESSAGE);
 		}
 		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 

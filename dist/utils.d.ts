@@ -6,6 +6,7 @@ export interface FetchDataOptions {
     queryParams?: string;
     baseUrl?: string;
     apiKey?: string;
+    token?: string;
     headers?: Record<string, string>;
     throwError?: boolean;
     urlType: URLType;

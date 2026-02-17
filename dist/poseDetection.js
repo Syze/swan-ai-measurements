@@ -8,13 +8,20 @@ class PoseDetection {
     #socketRef = null;
     #accessKey;
     #urlType;
-    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
+    #token;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD, token) {
         this.#accessKey = accessKey;
         this.#urlType = urlType;
+        this.#token = token;
     }
     connect() {
         return new Promise((resolve, reject) => {
-            this.#socketRef = (0, socket_io_client_1.io)((0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_POSE_DETECTION_WEBSOCKET_URL, urlType: this.#urlType }));
+            this.#socketRef = (0, socket_io_client_1.io)((0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_POSE_DETECTION_WEBSOCKET_URL, urlType: this.#urlType }), {
+                extraHeaders: {
+                    ...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+                    ...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+                },
+            });
             this.#socketRef.on("connect", () => {
                 const socketId = this.#socketRef?.id;
                 if (socketId) {

@@ -8,6 +8,7 @@ export interface FetchDataOptions {
   queryParams?: string;
   baseUrl?: string;
   apiKey?: string;
+  token?: string;
   headers?: Record<string, string>;
   throwError?: boolean;
   urlType: URLType;
@@ -19,9 +20,14 @@ export async function fetchData(options: FetchDataOptions): Promise<any> {
     body,
     queryParams,
     baseUrl = APP_AUTH_BASE_URL,
-    apiKey = "",
+    apiKey,
+    token,
     throwError = false,
-    headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" },
+    headers = {
+      "Content-Type": "application/json",
+      ...(apiKey ? { "X-Api-Key": apiKey } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     urlType = URLType.PROD,
   } = options;
 

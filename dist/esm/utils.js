@@ -12,7 +12,7 @@ import { APP_AUTH_BASE_URL, URLS, requiredMetaData } from "./constants.js";
 import { URLType } from "./enum.js";
 export function fetchData(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey = "", throwError = false, headers = { "X-Api-Key": apiKey, "Content-Type": "application/json" }, urlType = URLType.PROD, } = options;
+        const { path, body, queryParams, baseUrl = APP_AUTH_BASE_URL, apiKey, token, throwError = false, headers = Object.assign(Object.assign({ "Content-Type": "application/json" }, (apiKey ? { "X-Api-Key": apiKey } : {})), (token ? { Authorization: `Bearer ${token}` } : {})), urlType = URLType.PROD, } = options;
         const apiUrl = `${getUrl({ urlName: baseUrl, urlType })}${path}${queryParams ? `?${new URLSearchParams(queryParams)}` : ""}`;
         try {
             const res = yield axios.post(apiUrl, body, { headers });

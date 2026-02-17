@@ -13,16 +13,23 @@ type PoseStatusCallback = (data: any) => void;
 
 class PoseDetection {
   #socketRef: Socket | null = null;
-  #accessKey: string;
+  #accessKey?: string;
   #urlType: URLType;
-  constructor(accessKey: string, urlType = URLType.PROD) {
+  #token?: string;
+  constructor(accessKey?: string, urlType = URLType.PROD, token?: string) {
     this.#accessKey = accessKey;
     this.#urlType = urlType;
+    this.#token = token;
   }
 
   connect(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.#socketRef = io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, urlType: this.#urlType }));
+      this.#socketRef = io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, urlType: this.#urlType }), {
+        extraHeaders: {
+          ...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+          ...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+        },
+      });
       this.#socketRef.on("connect", () => {
         const socketId = this.#socketRef?.id;
         if (socketId) {

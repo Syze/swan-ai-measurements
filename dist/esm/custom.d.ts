@@ -10,7 +10,7 @@ interface CreateCustomer {
 }
 declare class Custom {
     #private;
-    constructor(accessKey: string, urlType?: URLType);
+    constructor(accessKey?: string, urlType?: URLType, token?: string);
     createCustomer(payload: CreateCustomer): Promise<AxiosResponse<any>>;
     getCustomCustomerConfig: (store_url: string) => Promise<AxiosResponse<any>>;
     getModelUrl: (id: string) => Promise<AxiosResponse<any>>;

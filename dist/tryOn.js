@@ -12,9 +12,19 @@ class TryOn {
     #timerMap = new Map();
     #accessKey;
     #urlType;
-    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
+    #token;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD, token) {
         this.#accessKey = accessKey;
         this.#urlType = urlType;
+        this.#token = token;
+    }
+    #getHeaders(token, extraHeaders = {}) {
+        const requestToken = token ?? this.#token;
+        return {
+            ...extraHeaders,
+            ...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+            ...(requestToken ? { Authorization: `Bearer ${requestToken}` } : {}),
+        };
     }
     async uploadFile({ files, userEmail, fileNoLimit = 2 }) {
         if ((0, utils_js_1.checkParameters)(files, userEmail) === false) {
@@ -52,10 +62,7 @@ class TryOn {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
-            headers: {
-                "Content-Type": "application/json",
-                "X-Api-Key": this.#accessKey,
-            },
+            headers: this.#getHeaders(undefined, { "Content-Type": "application/json" }),
         });
     }
     #s3Upload(url, file) {
@@ -79,7 +86,7 @@ class TryOn {
             userEmail,
         };
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers: this.#getHeaders(),
         });
     }
     deleteImage({ userEmail, fileName }) {
@@ -94,7 +101,7 @@ class TryOn {
             file: fileName,
         };
         return axios_1.default.delete(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers: this.#getHeaders(),
             data: payload,
         });
     }
@@ -162,8 +169,8 @@ class TryOn {
             onError?.(event);
         };
     };
-    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token, requestedTryonViews }) {
-        if ((0, utils_js_1.checkParameters)(shopDomain, products, token) === false) {
+    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, requestedTryonViews }) {
+        if ((0, utils_js_1.checkParameters)(shopDomain, products) === false) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         const payload = {
@@ -177,12 +184,8 @@ class TryOn {
             ...(requestedTryonViews && requestedTryonViews?.length > 0 && { requestedTryonViews }),
         };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON}`;
-        const headers = { "X-Api-Key": this.#accessKey };
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
         return axios_1.default.post(url, payload, {
-            headers,
+            headers: this.#getHeaders(),
         });
     }
     #handleGetTryOnResult = async ({ onSuccess, onError, tryonId }) => {
@@ -194,9 +197,9 @@ class TryOn {
             onError?.(error);
         }
     };
-    getShareLink(tryonId, token) {
+    getShareLink(tryonId) {
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
-            headers: { "X-Api-Key": this.#accessKey, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+            headers: this.#getHeaders(),
         });
     }
     getTryOnResult = ({ tryonId }) => {
@@ -205,7 +208,7 @@ class TryOn {
         }
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
         return axios_1.default.post(url, null, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers: this.#getHeaders(),
         });
     };
     getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }) {
@@ -215,7 +218,7 @@ class TryOn {
         const payload = { storeUrl, productHandle, imageURL, productDescription: productDescription ?? null };
         const url = `${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
         return axios_1.default.post(url, payload, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers: this.#getHeaders(),
         });
     }
 }

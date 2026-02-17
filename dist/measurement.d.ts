@@ -20,7 +20,7 @@ interface FaceScanSocketOptions extends Callbacks {
 }
 declare class Measurement {
     #private;
-    constructor(accessKey: string, urlType?: URLType);
+    constructor(accessKey?: string, urlType?: URLType, token?: string);
     getMeasurementResult(scanId: string): Promise<AxiosResponse<any>>;
     getMeasurementRecommendation({ scanId, shopDomain, productName }: MeasurementRecommendation): Promise<AxiosResponse<any>>;
     handleMeasurementSocket(options: MeasurementSocketOptions): void;

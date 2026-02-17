@@ -13,9 +13,18 @@ class FileUpload {
     #uppyIns;
     #accessKey;
     #urlType;
-    constructor(accessKey, urlType = enum_js_1.URLType.PROD) {
+    #token;
+    constructor(accessKey, urlType = enum_js_1.URLType.PROD, token) {
         this.#accessKey = accessKey;
         this.#urlType = urlType;
+        this.#token = token;
+    }
+    #getHeaders(extraHeaders = {}) {
+        return {
+            ...extraHeaders,
+            ...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+            ...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+        };
     }
     #uppyFileUploader({ callBack, arrayMetaData, scanId, email, file, objectKey }) {
         return new Promise((resolve, reject) => {
@@ -35,6 +44,7 @@ class FileUpload {
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                         apiKey: this.#accessKey,
+                        token: this.#token,
                         urlType: this.#urlType,
                         body: {
                             objectKey: ObjectKey,
@@ -48,6 +58,7 @@ class FileUpload {
                     return (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                         apiKey: this.#accessKey,
+                        token: this.#token,
                         urlType: this.#urlType,
                         body: {
                             uploadId,
@@ -64,6 +75,7 @@ class FileUpload {
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                     urlType: this.#urlType,
                     apiKey: this.#accessKey,
+                    token: this.#token,
                     body: {
                         objectKey: partData.key,
                         uploadId: partData.uploadId,
@@ -137,6 +149,7 @@ class FileUpload {
                 const res = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_START,
                     apiKey: this.#accessKey,
+                    token: this.#token,
                     urlType: this.#urlType,
                     body: {
                         objectKey: file.name,
@@ -151,6 +164,7 @@ class FileUpload {
                     const data = await (0, utils_js_1.fetchData)({
                         path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_SIGN_PART,
                         apiKey: this.#accessKey,
+                        token: this.#token,
                         urlType: this.#urlType,
                         body: {
                             objectKey: res?.key,
@@ -159,12 +173,13 @@ class FileUpload {
                         },
                         throwError: true,
                     });
-                    const val = await axios_1.default.put(data?.url, totalChunks[i], { headers: { "Content-Type": file.type, "X-Api-Key": this.#accessKey } });
+                    const val = await axios_1.default.put(data?.url, totalChunks[i], { headers: this.#getHeaders({ "Content-Type": file.type }) });
                     parts.push({ PartNumber: i + 1, ETag: val?.headers?.etag });
                 }
                 const completeValue = await (0, utils_js_1.fetchData)({
                     path: constants_js_1.FILE_UPLOAD_ENDPOINT.UPLOAD_COMPLETE,
                     apiKey: this.#accessKey,
+                    token: this.#token,
                     urlType: this.#urlType,
                     body: {
                         uploadId: res?.uploadId,
@@ -187,7 +202,7 @@ class FileUpload {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);
         }
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.DEVICE_INFO}/${scanId}`, { device_info: { ...rest } }, {
-            headers: { "X-Api-Key": this.#accessKey },
+            headers: this.#getHeaders(),
         });
     }
 }

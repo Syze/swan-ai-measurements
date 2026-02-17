@@ -18,18 +18,19 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _TryOn_instances, _TryOn_socketMap, _TryOn_timerMap, _TryOn_accessKey, _TryOn_urlType, _TryOn_getSignedUrl, _TryOn_s3Upload, _TryOn_disconnectSocket, _TryOn_handleTimeOut, _TryOn_handleGetTryOnResult;
+var _TryOn_instances, _TryOn_socketMap, _TryOn_timerMap, _TryOn_accessKey, _TryOn_urlType, _TryOn_token, _TryOn_getHeaders, _TryOn_getSignedUrl, _TryOn_s3Upload, _TryOn_disconnectSocket, _TryOn_handleTimeOut, _TryOn_handleGetTryOnResult;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_ERROR_MESSAGE_INVALID_EMAIL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl, isValidEmail } from "./utils.js";
 import { URLType } from "./enum.js";
 class TryOn {
-    constructor(accessKey, urlType = URLType.PROD) {
+    constructor(accessKey, urlType = URLType.PROD, token) {
         _TryOn_instances.add(this);
         _TryOn_socketMap.set(this, new Map());
         _TryOn_timerMap.set(this, new Map());
         _TryOn_accessKey.set(this, void 0);
         _TryOn_urlType.set(this, void 0);
+        _TryOn_token.set(this, void 0);
         _TryOn_disconnectSocket.set(this, (tryonId) => {
             if (tryonId) {
                 const socket = __classPrivateFieldGet(this, _TryOn_socketMap, "f").get(tryonId);
@@ -109,11 +110,12 @@ class TryOn {
             }
             const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
             return axios.post(url, null, {
-                headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+                headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this),
             });
         };
         __classPrivateFieldSet(this, _TryOn_accessKey, accessKey, "f");
         __classPrivateFieldSet(this, _TryOn_urlType, urlType, "f");
+        __classPrivateFieldSet(this, _TryOn_token, token, "f");
     }
     uploadFile(_a) {
         return __awaiter(this, arguments, void 0, function* ({ files, userEmail, fileNoLimit = 2 }) {
@@ -159,7 +161,7 @@ class TryOn {
             userEmail,
         };
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+            headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this),
         });
     }
     deleteImage({ userEmail, fileName }) {
@@ -174,27 +176,23 @@ class TryOn {
             file: fileName,
         };
         return axios.delete(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+            headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this),
             data: payload,
         });
     }
-    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token, requestedTryonViews }) {
-        if (checkParameters(shopDomain, products, token) === false) {
+    handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, requestedTryonViews }) {
+        if (checkParameters(shopDomain, products) === false) {
             throw new Error(REQUIRED_MESSAGE);
         }
         const payload = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ products, customerStoreUrl: shopDomain }, (selectedUserImages !== undefined && selectedUserImages !== null && { selectedUserImages })), (requestSource !== undefined && requestSource !== null && { requestSource })), (callbackUrl !== undefined && callbackUrl !== null && { callbackUrl })), (openTryonId !== undefined && openTryonId !== null && { openTryonId })), (selectedProductImageUrl !== undefined && selectedProductImageUrl !== null && { selectedProductImageUrl })), (requestedTryonViews && (requestedTryonViews === null || requestedTryonViews === void 0 ? void 0 : requestedTryonViews.length) > 0 && { requestedTryonViews }));
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON}`;
-        const headers = { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") };
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
         return axios.post(url, payload, {
-            headers,
+            headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this),
         });
     }
-    getShareLink(tryonId, token) {
+    getShareLink(tryonId) {
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_SHARE}`, { tryonId }, {
-            headers: Object.assign({ "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") }, (token ? { Authorization: `Bearer ${token}` } : {})),
+            headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this),
         });
     }
     getProductImageEligibility({ storeUrl, productHandle, imageURL, productDescription }) {
@@ -204,19 +202,19 @@ class TryOn {
         const payload = { storeUrl, productHandle, imageURL, productDescription: productDescription !== null && productDescription !== void 0 ? productDescription : null };
         const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
         return axios.post(url, payload, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") },
+            headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this),
         });
     }
 }
-_TryOn_socketMap = new WeakMap(), _TryOn_timerMap = new WeakMap(), _TryOn_accessKey = new WeakMap(), _TryOn_urlType = new WeakMap(), _TryOn_disconnectSocket = new WeakMap(), _TryOn_handleTimeOut = new WeakMap(), _TryOn_handleGetTryOnResult = new WeakMap(), _TryOn_instances = new WeakSet(), _TryOn_getSignedUrl = function _TryOn_getSignedUrl(payload) {
+_TryOn_socketMap = new WeakMap(), _TryOn_timerMap = new WeakMap(), _TryOn_accessKey = new WeakMap(), _TryOn_urlType = new WeakMap(), _TryOn_token = new WeakMap(), _TryOn_disconnectSocket = new WeakMap(), _TryOn_handleTimeOut = new WeakMap(), _TryOn_handleGetTryOnResult = new WeakMap(), _TryOn_instances = new WeakSet(), _TryOn_getHeaders = function _TryOn_getHeaders(token, extraHeaders = {}) {
+    const requestToken = token !== null && token !== void 0 ? token : __classPrivateFieldGet(this, _TryOn_token, "f");
+    return Object.assign(Object.assign(Object.assign({}, extraHeaders), (__classPrivateFieldGet(this, _TryOn_accessKey, "f") ? { "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f") } : {})), (requestToken ? { Authorization: `Bearer ${requestToken}` } : {}));
+}, _TryOn_getSignedUrl = function _TryOn_getSignedUrl(payload) {
     if (checkParameters(payload) === false) {
         throw new Error(REQUIRED_MESSAGE);
     }
     return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _TryOn_urlType, "f") })}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
-        headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": __classPrivateFieldGet(this, _TryOn_accessKey, "f"),
-        },
+        headers: __classPrivateFieldGet(this, _TryOn_instances, "m", _TryOn_getHeaders).call(this, undefined, { "Content-Type": "application/json" }),
     });
 }, _TryOn_s3Upload = function _TryOn_s3Upload(url, file) {
     if (checkParameters(url, file) === false) {

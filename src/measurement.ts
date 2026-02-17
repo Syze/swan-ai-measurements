@@ -51,12 +51,21 @@ class Measurement {
 	#waitingTimers: Record<string, NodeJS.Timeout | null> = {};
 	#pollingTimers: Record<string, NodeJS.Timeout | null> = {};
 	#pollingCounts: Record<string, number> = {};
-	#accessKey: string;
+	#accessKey?: string;
 	#urlType: URLType;
+	#token?: string;
 
-	constructor(accessKey: string, urlType = URLType.PROD) {
+	constructor(accessKey?: string, urlType = URLType.PROD, token?: string) {
 		this.#accessKey = accessKey;
 		this.#urlType = urlType;
+		this.#token = token;
+	}
+
+	#getHeaders(): Record<string, string> {
+		return {
+			...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+			...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+		};
 	}
 
 	getMeasurementResult(scanId: string): Promise<AxiosResponse<any>> {
@@ -65,7 +74,7 @@ class Measurement {
 		}
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}/measurements?scanId=${scanId}`;
 		return axios.get(url, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 
@@ -74,7 +83,7 @@ class Measurement {
 			throw new Error(REQUIRED_MESSAGE);
 		}
 		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.RECOMMENDATION}/scan/${scanId}/shop/${shopDomain}/product/${productName}`, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 

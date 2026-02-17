@@ -9,22 +9,26 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _PoseDetection_socketRef, _PoseDetection_accessKey, _PoseDetection_urlType;
+var _PoseDetection_socketRef, _PoseDetection_accessKey, _PoseDetection_urlType, _PoseDetection_token;
 import { io } from "socket.io-client";
 import { APP_POSE_DETECTION_WEBSOCKET_URL } from "./constants.js";
 import { getUrl } from "./utils.js";
 import { URLType } from "./enum.js";
 class PoseDetection {
-    constructor(accessKey, urlType = URLType.PROD) {
+    constructor(accessKey, urlType = URLType.PROD, token) {
         _PoseDetection_socketRef.set(this, null);
         _PoseDetection_accessKey.set(this, void 0);
         _PoseDetection_urlType.set(this, void 0);
+        _PoseDetection_token.set(this, void 0);
         __classPrivateFieldSet(this, _PoseDetection_accessKey, accessKey, "f");
         __classPrivateFieldSet(this, _PoseDetection_urlType, urlType, "f");
+        __classPrivateFieldSet(this, _PoseDetection_token, token, "f");
     }
     connect() {
         return new Promise((resolve, reject) => {
-            __classPrivateFieldSet(this, _PoseDetection_socketRef, io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, urlType: __classPrivateFieldGet(this, _PoseDetection_urlType, "f") })), "f");
+            __classPrivateFieldSet(this, _PoseDetection_socketRef, io(getUrl({ urlName: APP_POSE_DETECTION_WEBSOCKET_URL, urlType: __classPrivateFieldGet(this, _PoseDetection_urlType, "f") }), {
+                extraHeaders: Object.assign(Object.assign({}, (__classPrivateFieldGet(this, _PoseDetection_accessKey, "f") ? { "X-Api-Key": __classPrivateFieldGet(this, _PoseDetection_accessKey, "f") } : {})), (__classPrivateFieldGet(this, _PoseDetection_token, "f") ? { Authorization: `Bearer ${__classPrivateFieldGet(this, _PoseDetection_token, "f")}` } : {})),
+            }), "f");
             __classPrivateFieldGet(this, _PoseDetection_socketRef, "f").on("connect", () => {
                 var _a;
                 const socketId = (_a = __classPrivateFieldGet(this, _PoseDetection_socketRef, "f")) === null || _a === void 0 ? void 0 : _a.id;
@@ -66,5 +70,5 @@ class PoseDetection {
         return !!((_a = __classPrivateFieldGet(this, _PoseDetection_socketRef, "f")) === null || _a === void 0 ? void 0 : _a.connected);
     }
 }
-_PoseDetection_socketRef = new WeakMap(), _PoseDetection_accessKey = new WeakMap(), _PoseDetection_urlType = new WeakMap();
+_PoseDetection_socketRef = new WeakMap(), _PoseDetection_accessKey = new WeakMap(), _PoseDetection_urlType = new WeakMap(), _PoseDetection_token = new WeakMap();
 export default PoseDetection;

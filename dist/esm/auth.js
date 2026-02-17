@@ -9,18 +9,21 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Auth_socketRef, _Auth_accessKey, _Auth_urlType;
+var _Auth_instances, _Auth_socketRef, _Auth_accessKey, _Auth_urlType, _Auth_token, _Auth_getHeaders;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
 import { URLType } from "./enum.js";
 class Auth {
-    constructor(accessKey, urlType = URLType.PROD) {
+    constructor(accessKey, urlType = URLType.PROD, token) {
+        _Auth_instances.add(this);
         _Auth_socketRef.set(this, void 0);
         _Auth_accessKey.set(this, void 0);
         _Auth_urlType.set(this, void 0);
+        _Auth_token.set(this, void 0);
         __classPrivateFieldSet(this, _Auth_accessKey, accessKey, "f");
         __classPrivateFieldSet(this, _Auth_urlType, urlType, "f");
+        __classPrivateFieldSet(this, _Auth_token, token, "f");
     }
     registerUser({ email, appVerifyUrl, gender, height, username }) {
         if (!checkParameters(email, appVerifyUrl)) {
@@ -31,7 +34,7 @@ class Auth {
             body = Object.assign(Object.assign({}, body), { attributes: { gender, height } });
         }
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.REGISTER_USER}`, body, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") },
+            headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this),
         });
     }
     verifyToken(token) {
@@ -40,21 +43,21 @@ class Auth {
         }
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.VERIFY_USER}`, null, {
             params: { token },
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") },
+            headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this),
         });
     }
     addUser({ scanId, email, name, height, gender, offsetMarketingConsent }) {
         if (!checkParameters(scanId, email, height, gender)) {
             throw new Error(REQUIRED_MESSAGE);
         }
-        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") } });
+        return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this) });
     }
     getUserDetail(email) {
         if (!checkParameters(email)) {
             throw new Error(REQUIRED_MESSAGE);
         }
         return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.GET_USER_DETAIL}/${email}`, {
-            headers: { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") },
+            headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this),
         });
     }
     handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }) {
@@ -92,5 +95,7 @@ class Auth {
         }
     }
 }
-_Auth_socketRef = new WeakMap(), _Auth_accessKey = new WeakMap(), _Auth_urlType = new WeakMap();
+_Auth_socketRef = new WeakMap(), _Auth_accessKey = new WeakMap(), _Auth_urlType = new WeakMap(), _Auth_token = new WeakMap(), _Auth_instances = new WeakSet(), _Auth_getHeaders = function _Auth_getHeaders() {
+    return Object.assign(Object.assign({}, (__classPrivateFieldGet(this, _Auth_accessKey, "f") ? { "X-Api-Key": __classPrivateFieldGet(this, _Auth_accessKey, "f") } : {})), (__classPrivateFieldGet(this, _Auth_token, "f") ? { Authorization: `Bearer ${__classPrivateFieldGet(this, _Auth_token, "f")}` } : {}));
+};
 export default Auth;

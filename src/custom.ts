@@ -12,20 +12,28 @@ interface CreateCustomer {
 	emailsTier_2?: string;
 }
 class Custom {
-	#accessKey: string;
+	#accessKey?: string;
 	#urlType: URLType;
-	constructor(accessKey: string, urlType = URLType.PROD) {
+	#token?: string;
+	constructor(accessKey?: string, urlType = URLType.PROD, token?: string) {
 		this.#accessKey = accessKey;
 		this.#urlType = urlType;
+		this.#token = token;
+	}
+
+	#getHeaders(): Record<string, string> {
+		return {
+			...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+			...(this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
+		};
 	}
 
 	createCustomer(payload: CreateCustomer): Promise<AxiosResponse<any>> {
 		if (checkParameters(payload.name, payload.storeUrl, payload.email, payload.location) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
-		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.CREATE_CUSTOMER}`, {
-			...payload,
-			headers: { "X-Api-Key": this.#accessKey },
+		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.CREATE_CUSTOMER}`, payload, {
+			headers: this.#getHeaders(),
 		});
 	}
 
@@ -40,7 +48,7 @@ class Custom {
 			})}${API_ENDPOINTS.CUSTOM_CUSTOMER}`,
 			{
 				params: { store_url },
-				headers: { "X-Api-Key": this.#accessKey },
+				headers: this.#getHeaders(),
 			},
 		);
 	};
@@ -50,7 +58,7 @@ class Custom {
 			throw new Error(REQUIRED_MESSAGE);
 		}
 		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.MODEL}/${id}`, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	};
 }

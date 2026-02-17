@@ -41,7 +41,6 @@ interface HandleForLatestImageParams {
 	callbackUrl?: string;
 	openTryonId?: string;
 	selectedProductImageUrl?: string;
-	token: string;
 	requestedTryonViews?: string[];
 }
 
@@ -60,11 +59,22 @@ class TryOn {
   #timerMap: Map<string, ReturnType<typeof setTimeout>> = new Map();
   
 
-	#accessKey: string;
+	#accessKey?: string;
 	#urlType: URLType;
-	constructor(accessKey: string, urlType = URLType.PROD) {
+	#token?: string;
+	constructor(accessKey?: string, urlType = URLType.PROD, token?: string) {
 		this.#accessKey = accessKey;
 		this.#urlType = urlType;
+		this.#token = token;
+	}
+
+	#getHeaders(token?: string, extraHeaders: Record<string, string> = {}): Record<string, string> {
+		const requestToken = token ?? this.#token;
+		return {
+			...extraHeaders,
+			...(this.#accessKey ? { "X-Api-Key": this.#accessKey } : {}),
+			...(requestToken ? { Authorization: `Bearer ${requestToken}` } : {}),
+		};
 	}
 
 	async uploadFile({ files, userEmail, fileNoLimit = 2 }: UploadFileParams): Promise<string> {
@@ -104,10 +114,7 @@ class TryOn {
 			throw new Error(REQUIRED_MESSAGE);
 		}
 		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_IMAGE_UPLOAD}`, payload, {
-			headers: {
-				"Content-Type": "application/json",
-				"X-Api-Key": this.#accessKey,
-			},
+			headers: this.#getHeaders(undefined, { "Content-Type": "application/json" }),
 		});
 	}
 
@@ -135,7 +142,7 @@ class TryOn {
 		};
 
 		return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_IMAGE_DOWNLOAD}`, payload, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 
@@ -151,7 +158,7 @@ class TryOn {
 			file: fileName,
 		};
 		return axios.delete(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_IMAGE_URLS}`, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 			data: payload,
 		});
 	}
@@ -230,8 +237,8 @@ class TryOn {
   };
   
 
-	handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl, token ,requestedTryonViews}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
-		if (checkParameters(shopDomain, products, token) === false) {
+	handleTryOnSubmit({ shopDomain, products, selectedUserImages, requestSource, callbackUrl, openTryonId, selectedProductImageUrl ,requestedTryonViews}: HandleForLatestImageParams): Promise<AxiosResponse<any>> {
+		if (checkParameters(shopDomain, products) === false) {
 			throw new Error(REQUIRED_MESSAGE);
 		}
 
@@ -246,12 +253,8 @@ class TryOn {
 			...(requestedTryonViews && requestedTryonViews?.length > 0 && { requestedTryonViews }),
 		};
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON}`;
-		const headers: Record<string, string> = { "X-Api-Key": this.#accessKey };
-		if (token) {
-			headers["Authorization"] = `Bearer ${token}`;
-		}
 		return axios.post(url, payload, {
-			headers,
+			headers: this.#getHeaders(),
 		});
 	}
 
@@ -264,12 +267,12 @@ class TryOn {
 		}
 	};
 
-	getShareLink(tryonId: string,token:string): Promise<AxiosResponse<any>> {
+	getShareLink(tryonId: string): Promise<AxiosResponse<any>> {
 		return axios.post(
 			`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_SHARE}`,
 			{ tryonId },
 			{
-				headers: { "X-Api-Key": this.#accessKey, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+				headers: this.#getHeaders(),
 			},
 		);
 	}
@@ -280,7 +283,7 @@ class TryOn {
 		}
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_RESULT_IMAGE_DOWNLOAD}/${tryonId}`;
 		return axios.post(url, null, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	};
 
@@ -291,7 +294,7 @@ class TryOn {
 		const payload = { storeUrl, productHandle, imageURL, productDescription: productDescription ?? null };
 		const url = `${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.TRY_ON_PRODUCT_IMAGE_ELIGIBILTY}`;
 		return axios.post(url, payload, {
-			headers: { "X-Api-Key": this.#accessKey },
+			headers: this.#getHeaders(),
 		});
 	}
 }
