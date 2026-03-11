@@ -36,7 +36,7 @@ export interface FaceScanObjMetaData {
     body_scan_id?: string;
 }
 export type RequiredMetaDataKeys = "gender" | "focal_length" | "height" | "customer_store_url" | "callback_url" | "clothes_fit";
-export type RequiredFaceScanMetaDataKeys = "gender" | "focal_length" | "customer_store_url" | "scan_type" | "callback_url" | "face_scan_id";
+export type RequiredFaceScanMetaDataKeys = "gender" | "focal_length" | "customer_store_url" | "scan_type"  | "face_scan_id";
 export declare const requiredMetaData: RequiredMetaDataKeys[];
 export declare const requiredFaceScanMetaData: RequiredFaceScanMetaDataKeys[];
 export declare const REQUIRED_MESSAGE: string;
