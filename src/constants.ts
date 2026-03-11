@@ -79,6 +79,7 @@ export interface FaceScanObjMetaData {
 	customer_store_url: string;
 	scan_type: string;
   callback_url?:string
+  body_scan_id?:string;
 }
 export type RequiredMetaDataKeys = "gender" | "focal_length" | "height" | "customer_store_url" | "callback_url" | "clothes_fit";
 export type RequiredFaceScanMetaDataKeys = "gender" | "focal_length" | "customer_store_url" | "scan_type" | "callback_url" | "face_scan_id";
