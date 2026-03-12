@@ -50,6 +50,16 @@ class Auth {
         }
         return axios_1.default.post(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: this.#getHeaders() });
     }
+    userProfile() {
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.USER_PROFILE}`, {
+            headers: this.#getHeaders(),
+        });
+    }
+    userExists() {
+        return axios_1.default.get(`${(0, utils_js_1.getUrl)({ urlName: constants_js_1.APP_AUTH_BASE_URL, urlType: this.#urlType })}${constants_js_1.API_ENDPOINTS.USER_EXISTS}`, {
+            headers: this.#getHeaders(),
+        });
+    }
     getUserDetail(email) {
         if (!(0, utils_js_1.checkParameters)(email)) {
             throw new Error(constants_js_1.REQUIRED_MESSAGE);

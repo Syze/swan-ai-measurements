@@ -88,6 +88,18 @@ export default class Auth {
 		);
 	}
 
+	userProfile(): Promise<AxiosResponse> {
+		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.USER_PROFILE}`, {
+			headers: this.#getHeaders(),
+		});
+	}
+
+	userExists(): Promise<AxiosResponse> {
+		return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: this.#urlType })}${API_ENDPOINTS.USER_EXISTS}`, {
+			headers: this.#getHeaders(),
+		});
+	}
+
 	getUserDetail(email: string): Promise<AxiosResponse> {
 		if (!checkParameters(email)) {
 			throw new Error(REQUIRED_MESSAGE);

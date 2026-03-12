@@ -49,7 +49,9 @@ exports.API_ENDPOINTS = {
     RECOMMENDATION: "/recommendation",
     TRY_ON_SHARE: "/tryon/share",
     DEVICE_INFO: "/deviceinfo",
-    TRY_ON_PRODUCT_IMAGE_ELIGIBILTY: "/tryon/product-image-eligibility"
+    TRY_ON_PRODUCT_IMAGE_ELIGIBILTY: "/tryon/product-image-eligibility",
+    USER_PROFILE: "/user/profile",
+    USER_EXISTS: "/user/exists"
 };
 exports.requiredMetaData = ["gender", "focal_length", "height", "customer_store_url", "clothes_fit"];
 exports.requiredFaceScanMetaData = ["gender", "focal_length", "customer_store_url", "scan_type", "face_scan_id"];

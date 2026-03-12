@@ -52,6 +52,16 @@ class Auth {
         }
         return axios.post(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.ADD_USER}`, { scan_id: scanId, email, name, offsetMarketingConsent, attributes: JSON.stringify({ height, gender }) }, { headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this) });
     }
+    userProfile() {
+        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.USER_PROFILE}`, {
+            headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this),
+        });
+    }
+    userExists() {
+        return axios.get(`${getUrl({ urlName: APP_AUTH_BASE_URL, urlType: __classPrivateFieldGet(this, _Auth_urlType, "f") })}${API_ENDPOINTS.USER_EXISTS}`, {
+            headers: __classPrivateFieldGet(this, _Auth_instances, "m", _Auth_getHeaders).call(this),
+        });
+    }
     getUserDetail(email) {
         if (!checkParameters(email)) {
             throw new Error(REQUIRED_MESSAGE);

@@ -29,6 +29,8 @@ export default class Auth {
     registerUser({ email, appVerifyUrl, gender, height, username }: RegisterUserParams): Promise<AxiosResponse>;
     verifyToken(token: string): Promise<AxiosResponse>;
     addUser({ scanId, email, name, height, gender, offsetMarketingConsent }: AddUserParams): Promise<AxiosResponse>;
+    userProfile(): Promise<AxiosResponse>;
+    userExists(): Promise<AxiosResponse>;
     getUserDetail(email: string): Promise<AxiosResponse>;
     handleAuthSocket({ email, scanId, onError, onSuccess, onClose, onOpen }: AuthSocketParams): void;
 }

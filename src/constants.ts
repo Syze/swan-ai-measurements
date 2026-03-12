@@ -58,7 +58,9 @@ export const API_ENDPOINTS: {
   RECOMMENDATION: "/recommendation",
   TRY_ON_SHARE: "/tryon/share",
   DEVICE_INFO:"/deviceinfo",
-  TRY_ON_PRODUCT_IMAGE_ELIGIBILTY:"/tryon/product-image-eligibility"
+  TRY_ON_PRODUCT_IMAGE_ELIGIBILTY:"/tryon/product-image-eligibility",
+  USER_PROFILE: "/user/profile",
+  USER_EXISTS: "/user/exists"
 };
 export interface BodyScanObjMetaData {
 	gender: string;
