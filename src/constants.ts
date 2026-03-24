@@ -72,6 +72,7 @@ export interface BodyScanObjMetaData {
 	clothes_fit: string;
 	scan_type?: string;
 	callback_url?: string;
+  source_tag?:string;
 }
 export interface FaceScanObjMetaData {
 	gender: string;
