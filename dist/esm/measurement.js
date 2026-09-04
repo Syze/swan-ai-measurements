@@ -142,16 +142,13 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
         };
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success" && (data === null || data === void 0 ? void 0 : data.isMeasured) === true) {
+            if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success") {
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
             }
             else {
-                clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
                 onError === null || onError === void 0 ? void 0 : onError(data);
             }
-            if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success" && (data === null || data === void 0 ? void 0 : data.resultType) === "final") {
-                clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
-            }
+            clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
         };
         socket.onclose = () => onClose === null || onClose === void 0 ? void 0 : onClose();
         socket.onerror = () => {

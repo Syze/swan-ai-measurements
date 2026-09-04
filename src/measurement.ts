@@ -176,15 +176,12 @@ class Measurement {
 
 			socket.onmessage = (event: MessageEvent) => {
 				const data = JSON.parse(event.data);
-				if (data?.code === 200 && data?.scanStatus === "success" && data?.isMeasured === true) {
+				if (data?.code === 200 && data?.scanStatus === "success") {
 					onSuccess?.(data);
 				} else {
-					clearTimeout(this.#waitingTimers[key]!);
 					onError?.(data);
 				}
-				if (data?.code === 200 && data?.scanStatus === "success" && data?.resultType === "final") {
-					clearTimeout(this.#waitingTimers[key]!);
-				}
+				clearTimeout(this.#waitingTimers[key]!);
 			};
 
 			socket.onclose = () => onClose?.();
