@@ -76,6 +76,11 @@ class Measurement {
                 onSuccess?.(res.data);
                 clearInterval(this.#pollingTimers[key]);
             }
+            else if (res?.data?.failureReason) {
+                this.#pollingCounts[key] = 1;
+                clearInterval(this.#pollingTimers[key]);
+                onError?.({ scanStatus: "failed", message: res.data.failureReason, isMeasured: false });
+            }
             else {
                 if ((this.#pollingCounts[key] || 1) < 8) {
                     this.#pollingCounts[key] = (this.#pollingCounts[key] || 1) + 1;
@@ -123,7 +128,7 @@ class Measurement {
             };
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data?.code === 200 && data?.scanStatus === "success") {
+                if (data?.code === 200 && data?.scanStatus === "success" && data?.isMeasured === true) {
                     onSuccess?.(data);
                 }
                 else {

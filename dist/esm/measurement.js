@@ -96,13 +96,18 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
     }, (__classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] || 1) * 5000);
 }, _Measurement_getMeasurementsCheck = function _Measurement_getMeasurementsCheck(options, key) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         const { scanId, onSuccess, onError } = options;
         try {
             const res = yield this.getMeasurementResult(scanId);
             if ((res === null || res === void 0 ? void 0 : res.data) && ((_a = res === null || res === void 0 ? void 0 : res.data) === null || _a === void 0 ? void 0 : _a.isMeasured) === true) {
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(res.data);
                 clearInterval(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
+            }
+            else if ((_b = res === null || res === void 0 ? void 0 : res.data) === null || _b === void 0 ? void 0 : _b.failureReason) {
+                __classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] = 1;
+                clearInterval(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
+                onError === null || onError === void 0 ? void 0 : onError({ scanStatus: "failed", message: res.data.failureReason, isMeasured: false });
             }
             else {
                 if ((__classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] || 1) < 8) {
@@ -137,7 +142,7 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
         };
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success") {
+            if ((data === null || data === void 0 ? void 0 : data.code) === 200 && (data === null || data === void 0 ? void 0 : data.scanStatus) === "success" && (data === null || data === void 0 ? void 0 : data.isMeasured) === true) {
                 onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(data);
             }
             else {
