@@ -51,6 +51,15 @@ class Measurement {
 	#waitingTimers: Record<string, NodeJS.Timeout | null> = {};
 	#pollingTimers: Record<string, NodeJS.Timeout | null> = {};
 	#pollingCounts: Record<string, number> = {};
+	/**
+	 * Handles for the deferred opens in #handleSocket.
+	 *
+	 * The socket is created after a delay (5s for measurement, 1s for face), so
+	 * between the call and that timer firing there is nothing to close. Without
+	 * this, closing in that window is a no-op and the socket opens afterwards
+	 * anyway — which is exactly what a quick retry does.
+	 */
+	#openTimers: Record<string, NodeJS.Timeout | null> = {};
 	#accessKey?: string;
 	#urlType: URLType;
 	#token?: string;
@@ -94,6 +103,48 @@ class Measurement {
 			clearTimeout(this.#waitingTimers[key]!);
 			this.#waitingTimers[key] = null;
 		}
+	}
+
+	/**
+	 * Everything holding a scan open: the pending open, the socket, the fallback
+	 * timer and the polling timer.
+	 *
+	 * Deliberately separate from #disconnectSocket rather than folded into it.
+	 * #handleTimeOut starts polling and *then* calls #disconnectSocket, so a
+	 * version of that method which also cleared #pollingTimers would cancel the
+	 * polling it had just scheduled — the fallback would silently stop working.
+	 */
+	#closeSocketAndTimers(key: string): void {
+		if (this.#openTimers[key]) {
+			clearTimeout(this.#openTimers[key]!);
+			this.#openTimers[key] = null;
+		}
+		this.#disconnectSocket(key);
+		if (this.#pollingTimers[key]) {
+			clearTimeout(this.#pollingTimers[key]!);
+			this.#pollingTimers[key] = null;
+		}
+		this.#pollingCounts[key] = 1;
+	}
+
+	/**
+	 * Releases everything held for one body scan.
+	 *
+	 * Callers own the lifetime, because only they know when a result is final.
+	 * The client cannot tell: a socket that has delivered a final frame looks the
+	 * same as one still waiting, and closing on the caller's behalf would cut off
+	 * the late result that is the only signal a scan failed after the user moved
+	 * on. Safe to call more than once, and for a scan that never opened a socket.
+	 */
+	closeMeasurementSocket(scanId: string): void {
+		if (!scanId) return;
+		this.#closeSocketAndTimers(`measurement-${scanId}`);
+	}
+
+	/** As closeMeasurementSocket, for a face scan. */
+	closeFaceScanSocket(faceScanId: string): void {
+		if (!faceScanId) return;
+		this.#closeSocketAndTimers(`faceScan-${faceScanId}`);
 	}
 
 	#handleTimeOut(options: HandleTimeOutOptions, key: string): void {
@@ -160,7 +211,8 @@ class Measurement {
 
 	#handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay, onPreopen }: HandleSocket) {
 		const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
-		setTimeout(() => {
+		this.#openTimers[key] = setTimeout(() => {
+			this.#openTimers[key] = null;
 			this.#disconnectSocket(key);
 			onPreopen?.()
 			const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: this.#urlType })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;

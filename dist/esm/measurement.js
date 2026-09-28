@@ -18,7 +18,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Measurement_instances, _Measurement_socketRefs, _Measurement_waitingTimers, _Measurement_pollingTimers, _Measurement_pollingCounts, _Measurement_accessKey, _Measurement_urlType, _Measurement_token, _Measurement_getHeaders, _Measurement_disconnectSocket, _Measurement_handleTimeOut, _Measurement_handlePolling, _Measurement_getMeasurementsCheck, _Measurement_handleSocket;
+var _Measurement_instances, _Measurement_socketRefs, _Measurement_waitingTimers, _Measurement_pollingTimers, _Measurement_pollingCounts, _Measurement_openTimers, _Measurement_accessKey, _Measurement_urlType, _Measurement_token, _Measurement_getHeaders, _Measurement_disconnectSocket, _Measurement_closeSocketAndTimers, _Measurement_handleTimeOut, _Measurement_handlePolling, _Measurement_getMeasurementsCheck, _Measurement_handleSocket;
 import axios from "axios";
 import { API_ENDPOINTS, APP_AUTH_BASE_URL, APP_BASE_WEBSOCKET_URL, REQUIRED_MESSAGE } from "./constants.js";
 import { checkParameters, getUrl } from "./utils.js";
@@ -30,6 +30,15 @@ class Measurement {
         _Measurement_waitingTimers.set(this, {});
         _Measurement_pollingTimers.set(this, {});
         _Measurement_pollingCounts.set(this, {});
+        /**
+         * Handles for the deferred opens in #handleSocket.
+         *
+         * The socket is created after a delay (5s for measurement, 1s for face), so
+         * between the call and that timer firing there is nothing to close. Without
+         * this, closing in that window is a no-op and the socket opens afterwards
+         * anyway — which is exactly what a quick retry does.
+         */
+        _Measurement_openTimers.set(this, {});
         _Measurement_accessKey.set(this, void 0);
         _Measurement_urlType.set(this, void 0);
         _Measurement_token.set(this, void 0);
@@ -54,6 +63,26 @@ class Measurement {
             headers: __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_getHeaders).call(this),
         });
     }
+    /**
+     * Releases everything held for one body scan.
+     *
+     * Callers own the lifetime, because only they know when a result is final.
+     * The client cannot tell: a socket that has delivered a final frame looks the
+     * same as one still waiting, and closing on the caller's behalf would cut off
+     * the late result that is the only signal a scan failed after the user moved
+     * on. Safe to call more than once, and for a scan that never opened a socket.
+     */
+    closeMeasurementSocket(scanId) {
+        if (!scanId)
+            return;
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_closeSocketAndTimers).call(this, `measurement-${scanId}`);
+    }
+    /** As closeMeasurementSocket, for a face scan. */
+    closeFaceScanSocket(faceScanId) {
+        if (!faceScanId)
+            return;
+        __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_closeSocketAndTimers).call(this, `faceScan-${faceScanId}`);
+    }
     handleMeasurementSocket(options) {
         const { scanId, onError, onSuccess, onClose, onOpen } = options;
         if (!checkParameters(scanId)) {
@@ -69,7 +98,7 @@ class Measurement {
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_handleSocket).call(this, { onOpen, faceScanId, onSuccess, onError, onClose, paramsKey: "faceScanId", isFallback: false, delay: 1000 });
     }
 }
-_Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMap(), _Measurement_pollingTimers = new WeakMap(), _Measurement_pollingCounts = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_urlType = new WeakMap(), _Measurement_token = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getHeaders = function _Measurement_getHeaders() {
+_Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMap(), _Measurement_pollingTimers = new WeakMap(), _Measurement_pollingCounts = new WeakMap(), _Measurement_openTimers = new WeakMap(), _Measurement_accessKey = new WeakMap(), _Measurement_urlType = new WeakMap(), _Measurement_token = new WeakMap(), _Measurement_instances = new WeakSet(), _Measurement_getHeaders = function _Measurement_getHeaders() {
     return Object.assign(Object.assign({}, (__classPrivateFieldGet(this, _Measurement_accessKey, "f") ? { "X-Api-Key": __classPrivateFieldGet(this, _Measurement_accessKey, "f") } : {})), (__classPrivateFieldGet(this, _Measurement_token, "f") ? { Authorization: `Bearer ${__classPrivateFieldGet(this, _Measurement_token, "f")}` } : {}));
 }, _Measurement_disconnectSocket = function _Measurement_disconnectSocket(key) {
     var _a;
@@ -79,6 +108,17 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
         clearTimeout(__classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key]);
         __classPrivateFieldGet(this, _Measurement_waitingTimers, "f")[key] = null;
     }
+}, _Measurement_closeSocketAndTimers = function _Measurement_closeSocketAndTimers(key) {
+    if (__classPrivateFieldGet(this, _Measurement_openTimers, "f")[key]) {
+        clearTimeout(__classPrivateFieldGet(this, _Measurement_openTimers, "f")[key]);
+        __classPrivateFieldGet(this, _Measurement_openTimers, "f")[key] = null;
+    }
+    __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
+    if (__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]) {
+        clearTimeout(__classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key]);
+        __classPrivateFieldGet(this, _Measurement_pollingTimers, "f")[key] = null;
+    }
+    __classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] = 1;
 }, _Measurement_handleTimeOut = function _Measurement_handleTimeOut(options, key) {
     const { scanId, onSuccess, onError } = options;
     __classPrivateFieldGet(this, _Measurement_pollingCounts, "f")[key] = 1;
@@ -128,7 +168,8 @@ _Measurement_socketRefs = new WeakMap(), _Measurement_waitingTimers = new WeakMa
     });
 }, _Measurement_handleSocket = function _Measurement_handleSocket({ onOpen, isFallback, scanId, onSuccess, onError, onClose, paramsKey, faceScanId, delay, onPreopen }) {
     const key = isFallback ? `measurement-${scanId}` : `faceScan-${faceScanId}`;
-    setTimeout(() => {
+    __classPrivateFieldGet(this, _Measurement_openTimers, "f")[key] = setTimeout(() => {
+        __classPrivateFieldGet(this, _Measurement_openTimers, "f")[key] = null;
         __classPrivateFieldGet(this, _Measurement_instances, "m", _Measurement_disconnectSocket).call(this, key);
         onPreopen === null || onPreopen === void 0 ? void 0 : onPreopen();
         const url = `${getUrl({ urlName: APP_BASE_WEBSOCKET_URL, urlType: __classPrivateFieldGet(this, _Measurement_urlType, "f") })}${API_ENDPOINTS.SCANNING}?${paramsKey}=${scanId || faceScanId}`;
